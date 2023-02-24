@@ -1,0 +1,93 @@
+{
+    "name": "uiconfig.js",
+    "version": "0.0.2",
+    "description": "A framework for building user interface layouts with JSON configuration.",
+    "main": "src/index.ts",
+    "module": "src/index.ts",
+    "types": "src/index.ts",
+    "source": "src/index.ts",
+    "sideEffects": false,
+    "scripts": {
+        "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
+        "new:publish": "npm run prepare && clean-package && npm publish; clean-package restore",
+        "build": "NODE_ENV=production rollup -c",
+        "dev": "rollup -c -w",
+        "docs": "npx typedoc ./src/index.ts",
+        "serve-docs": "ws -d docs -p 8080",
+        "prepare": "npm run build && npm run docs",
+        "build-examples": "NODE_ENV=production rollup --config examples/rollup.config.mjs",
+        "dev-examples": "rollup -w --config examples/rollup.config.mjs",
+        "serve": "ws",
+        "lint": "eslint src examples --fix"
+    },
+    "clean-package": {
+        "remove": [
+            "clean-package",
+            "scripts",
+            "devDependencies",
+            "optionalDependencies"
+        ],
+        "replace": {
+            "main": "dist/index.mjs",
+            "module": "dist/index.mjs",
+            "types": "dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist",
+        "src",
+        "docs",
+        "tsconfig.json"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/repalash/uiconfig.js.git"
+    },
+    "keywords": [
+        "javascript",
+        "typescript",
+        "json",
+        "ui",
+        "three.js",
+        "html",
+        "interfaces",
+        "library"
+    ],
+    "author": "repalash <palash@shaders.app>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/repalash/uiconfig.js/issues"
+    },
+    "homepage": "https://github.com/repalash/uiconfig.js#readme",
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^24.0.1",
+        "@rollup/plugin-json": "^6.0.0",
+        "@rollup/plugin-node-resolve": "^15.0.1",
+        "@rollup/plugin-terser": "^0.4.0",
+        "@rollup/plugin-typescript": "^11.0.0",
+        "@types/uuid": "^9.0.0",
+        "@typescript-eslint/eslint-plugin": "^5.53.0",
+        "eslint": "^8.34.0",
+        "eslint-plugin-deprecation": "^1.3.3",
+        "eslint-plugin-html": "^7.1.0",
+        "eslint-plugin-import": "^2.27.5",
+        "local-web-server": "^5.3.0",
+        "clean-package": "^2.2.0",
+        "rollup": "^3.17.2",
+        "rollup-plugin-delete": "^2.0.0",
+        "rollup-plugin-license": "^3.0.1",
+        "rollup-plugin-multi-input": "^1.3.3",
+        "ts-browser-helpers": "^0.2.0",
+        "tslib": "^2.5.0",
+        "typescript": "^4.9.5",
+        "uuid": "^9.0.0",
+        "typedoc": "^0.23.26"
+    },
+    "optionalDependencies": {
+        "win-node-env": "^0.6.1"
+    },
+    "browserslist": [
+        "defaults"
+    ],
+    "type": "module"
+}
