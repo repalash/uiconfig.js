@@ -1,0 +1,93 @@
+@import "~@blueprintjs/core/lib/scss/variables.scss";
+
+.folder-children {
+  gap: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  align-items: flex-start;
+
+  > div {
+    display: contents;
+  }
+}
+
+.bp4-dark .folder-card {
+  background-color: $dark-gray2 !important;
+}
+
+.folder-card {
+  user-select: none;
+  width: 100%;
+  //padding-top: $pt-grid-size !important;
+  //padding-bottom: $pt-grid-size !important;
+  padding: 0 !important;
+  //border-top: 1px solid #444 !important;
+  //border-bottom: 1px solid #444 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+
+//.folder-head-label{
+//  margin-bottom: 0;
+//  user-select: none;
+//  //line-height: $pt-input-height !important;
+//  padding: $pt-grid-size !important;
+//  width: auto;
+//  cursor: pointer;
+//}
+
+
+.folder-trigger-button {
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $dark-gray1 !important;
+
+  &:hover {
+    background-color: $dark-gray3 !important;
+  }
+
+  &:active {
+    background-color: $dark-gray5 !important;
+  }
+}
+
+//.folder-trigger-button:focus{
+//  outline: none !important;
+//}
+
+
+.folder-head-card-minimal {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  flex-direction: row;
+
+  > .folder-trigger-button {
+    margin-right: $pt-grid-size;
+  }
+}
+
+.folder-head-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  box-shadow: 0 1px $pt-divider-black;
+  z-index: 1;
+
+  > button {
+    border-radius: 0;
+  }
+
+  .bp4-dark & {
+    box-shadow: 0 1px $pt-dark-divider-white;
+    //background-color: $dark-gray1;
+  }
+}
+

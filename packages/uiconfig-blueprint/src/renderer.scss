@@ -1,0 +1,149 @@
+@import "~normalize.css";
+
+@import "~@blueprintjs/core/lib/scss/variables.scss";
+
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/select/lib/css/blueprint-select.css";
+@import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+
+@import "components/common";
+@import "bpComponents/index";
+
+//@import "~@blueprintjs/core/src/blueprint";
+//@import "~@blueprintjs/select/src/blueprint-select.scss";
+//@import "~@blueprintjs/popover2/src/blueprint-popover2.scss";
+
+.bp4-form-group.bp4-inline label.bp4-label{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: calc(min(50%, 12*$pt-font-size-small));
+  width: 50%;
+  font-size: $pt-font-size-small;
+}
+.switch{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row-reverse;
+  margin-bottom: 0;
+  height: $pt-input-height;
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: $pt-font-size-small;
+}
+
+.formGroupContent {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $pt-grid-size/2;
+  height: $pt-input-height;
+  flex-grow: 1;
+}
+
+.bp4-panel-stack-view {
+  .bp4-dark & {
+    background-color: $dark-gray2 !important;
+
+  }
+}
+
+#bpInspectorCard {
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0 0 0 0;
+}
+#blueprintUiContainer {
+  height: 100%;
+  overflow-y: scroll;
+  padding: 0 0 0 0;
+
+  position: fixed;
+  top: 0;
+  right: 10px;
+  width: var(--blueprint-ui-container-width);
+  pointer-events: auto;
+  max-height: calc(100% - 6rem);
+  border-radius: 0.5rem;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "system-ui", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.numericInput {
+  .bp4-input-group {
+    flex-shrink: 1;
+  }
+}
+
+.xPaddedContent {
+  padding-left: $pt-grid-size;
+  padding-right: $pt-grid-size;
+}
+
+.folderContent {
+  flex: 1 1 auto;
+  max-width: 100%;
+}
+//button {
+//  -webkit-tap-highlight-color: rgba(0,0,0,0);
+//}
+//input:focus {
+//  outline: 0;
+//  box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, 0.15), inset 0 1px 1px rgba(16, 22, 26, 0.2);
+//}
+.editorSplitContainer {
+  display: flex;
+  height: calc(100% - $pt-navbar-height);
+
+  .gutter {
+    background: $dark-gray1;
+    flex-shrink: 0;
+  }
+
+  .gutter:hover {
+    background: $dark-gray4;
+  }
+
+  .gutter-horizontal {
+    cursor: ew-resize;
+  }
+
+  .gutter-vertical {
+    cursor: ns-resize;
+  }
+}
+.bp4-control-group {
+  .bp4-input-group{
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+}
+
+.color-picker-popover{
+  padding: $pt-grid-size/2;
+  width: max-content;
+  background: $dark-gray1;
+}
+
+.inputGroupFile{
+  input[type='file'] {
+    width: 100%;
+    min-width: $pt-grid-size * 15;
+  }
+}
+
+.inspectorPanelStack {
+  height: 100%;
+}
+
+.bp4-slider:not(.bp4-slider-vertical) {
+  min-width: $pt-grid-size * 11;
+}
+
+.bp4-input, .bp4-file-upload-input {
+  .bp4-dark & {
+    box-shadow: inset 0 0 0 1px $dark-gray5, inset 0 -1px 1px 0 $dark-gray1;;
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "name": "uiconfig-blueprint",
+  "version": "1.0.0",
+  "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "browser": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "scripts": {
+    "build": "NODE_ENV=production rollup -c",
+    "dev": "rollup -c -w",
+    "dev-examples": "rollup -w --config examples/rollup.config.mjs",
+    "test": "node test/test.spec.js",
+    "pretest": "npm run build",
+    "serve": "ws",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/repalash/uiconfig-blueprint.git"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "json",
+    "ui",
+    "three.js",
+    "html",
+    "blueprint",
+    "library"
+  ],
+  "author": "repalash <palash@shaders.app>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/repalash/uiconfig/issues"
+  },
+  "homepage": "https://github.com/repalash/uiconfig#readme",
+  "devDependencies": {
+    "@blueprintjs/core": "^4.17.4",
+    "@blueprintjs/icons": "^4.14.3",
+    "@blueprintjs/select": "^4.9.8",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@types/uuid": "^9.0.1",
+    "autoprefixer": "^10.4.13",
+    "local-web-server": "^5.3.0",
+    "node-sass": "^8.0.0",
+    "postcss": "^8.4.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rollup": "^3.17.2",
+    "rollup-plugin-license": "^3.0.1",
+    "rollup-plugin-multi-input": "^1.3.3",
+    "rollup-plugin-postcss": "^4.0.2",
+    "ts-browser-helpers": "git://github.com/repalash/ts-browser-helpers#master",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5",
+    "uuid": "^9.0.0"
+  },
+  "dependencies": {
+    "uiconfig": "file:./../uiconfig"
+  },
+  "optionalDependencies": {
+    "win-node-env": "^0.6.1"
+  },
+  "browserslist": [
+    "defaults"
+  ]
+}
