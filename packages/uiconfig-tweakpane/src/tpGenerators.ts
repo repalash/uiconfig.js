@@ -1,22 +1,24 @@
 import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi} from 'tweakpane'
-import {BladeController, View} from '@tweakpane/core'
+import {BladeController, TextView, View} from '@tweakpane/core'
 import {tweakPaneMoveToParentIndex} from './tpUtils'
-import {UiObjectConfig} from 'uiconfig.js'
-import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
+import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
+import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
 
 export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
-    let folder = config.uiRef as FolderApi
+    let folder = config.uiRef as FolderApi | undefined
+    if (folder?.controller_.viewProps.get('disposed')) folder = undefined
     const lastExpanded = folder?.expanded
     if (!folder) {
-        folder = parent.addFolder({
+        const folder1 = parent.addFolder({
             title: '',
         })
+        folder = folder1
         folder.on('fold', _2 => {
-            let expanded = folder.expanded
+            let expanded = folder1.expanded
             safeSetProperty(config, 'expanded', expanded, true)
             expanded = getOrCall(config.expanded) ?? expanded
-            if (expanded !== folder.expanded) folder.expanded = expanded
+            if (expanded !== folder1.expanded) folder1.expanded = expanded
             config.uiRefresh?.(true, 'postFrame')
             if (expanded) {
                 config.onExpand?.(config)
@@ -33,6 +35,10 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     // const children = childObjects?.map(value => value.uiRef) as BladeApi<BladeController<View>>[]
     let i = 0
     for (const child of childObjects) { // todo check comparison with uiConfig.uuid
+        child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
+            plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
+        }
+
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
             // check if all correct or set child.uiRef to undefined.
@@ -66,7 +72,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         const rm = ch[ch.length - 1]
         folder.remove(rm) // todo; remove listeners etc
         ch = folder.children
-        // todo: do we need to do plugin.disposeUiConfig?
+        // todo: do we need to do disposeUiConfig?
     }
 
     folder.controller_.props.set('title', plugin.methods.getLabel(config))
@@ -98,7 +104,8 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
 }
 
 export const tpButtonInputGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
-    let input = config.uiRef as ButtonApi
+    let input = config.uiRef as ButtonApi | undefined
+    if (input?.controller_.viewProps.get('disposed')) input = undefined
     if (!input) {
         // Create button in parent and bind click to property
         input = parent.addButton({title: ''})
@@ -136,9 +143,11 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
     }
 
     let input = config.uiRef as InputBindingApi<any, any> | MonitorBindingApi<any> | undefined
+    if (input?.controller_.viewProps.get('disposed')) input = undefined
+
     let proxy = config.__proxy
-    if (!proxy) proxy = config.__proxy = {}
-    proxy.value = renderer.methods.getValue(config)
+    if (!proxy) proxy = config.__proxy = {} // see tpColorInputGenerator
+    if (!objectHasOwn(proxy, 'value_')) proxy.value = renderer.methods.getValue(config)
     if (!input) {
         // Create input in parent and bind to property
         try {
@@ -147,7 +156,8 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
                 input = tar ? parent.addMonitor(tar, key, inputParams) : undefined
             } else {
                 input = parent.addInput(proxy, 'value', inputParams).on('change', ev => {
-                    renderer.methods.setValue(config, proxy.value, {last: ev.last ?? true})
+                    if (proxy.listedOnChange === false) return
+                    renderer.methods.setValue(config, proxy.value_ ?? proxy.value, {last: ev.last ?? true}, proxy.forceOnChange || false)
                 })
             }
         } catch (e: any) {
@@ -184,9 +194,33 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
             )
         }
 
+        // placeholder for text input
+        (input?.controller_.valueController.view as TextView<any>).inputElement?.setAttribute('placeholder', getOrCall(config.placeholder) ?? '')
+
         input.refresh()
     }
     // console.log('refresh', input)
     // console.log(ev)
     return input
+}
+
+export const tpVecInputGenerator = (parent: FolderApi, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, params?: any) => {
+    if (!config.__proxy) config.__proxy = {}
+    config.__proxy.forceOnChange = true
+
+    // todo handle array type of values instead of {x,y,z,w}
+
+    const bounds = getOrCall(config.bounds)
+    if (!bounds || bounds.length < 1)
+        return tpInputGenerator(parent, config, renderer, {...params ?? {}})
+
+    // todo: bounds are not working properly
+    const max = (bounds.length ?? 0) >= 2 ? bounds[1] : 1
+    const min = (bounds.length ?? 0) >= 1 ? bounds[0] : 0
+    const step = config.stepSize ?? (max - min) / 100
+    const p = {min, max, step}
+    const pp: any = {x: p, y: p}
+    if (config.type === 'vec3' || config.type === 'vec4') pp.z = p
+    if (config.type === 'vec4') pp.w = p
+    return tpInputGenerator(parent, config, renderer, {...pp, ...params ?? {}})
 }

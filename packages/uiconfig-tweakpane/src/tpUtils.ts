@@ -21,7 +21,9 @@ export const tweakPaneMoveToParentIndex = (child: BladeApi<BladeController<View>
     const ind = cont.parent?.children?.indexOf(cont)
     const sameParent = tweakpaneCheckParent(child, newParent)
     if (!sameParent || ind !== index) {
-        if (ind !== undefined && ind >= 0) cont.parent?.remove(child as any)
+        // if (ind !== undefined && ind >= 0) {
+        //     cont.parent?.remove(cont)
+        // }
         newParent.add(child as any, index)
         return true
     }

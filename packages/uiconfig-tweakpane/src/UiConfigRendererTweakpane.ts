@@ -1,4 +1,4 @@
-import {createDiv, createStyles, css, getOrCall} from 'ts-browser-helpers'
+import {AnyOptions, createDiv, createStyles, css, getOrCall} from 'ts-browser-helpers'
 import {BladeApi, FolderApi, Pane} from 'tweakpane'
 import {TUiRefreshModes, UiConfigRendererBase, UiObjectConfig} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
@@ -8,7 +8,9 @@ import {
     tpFolderGenerator,
     tpInputGenerator,
     tpSliderInputGenerator,
+    tpVecInputGenerator,
 } from './tpGenerators'
+import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 
 export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
 
@@ -35,18 +37,18 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
           }
           #tweakpaneUiContainer {
             position: fixed;
-            top: 0px;
+            top: 1rem;
             padding-right: 4px;
-            padding-bottom: 10px;
-            right: 10px;
+            padding-bottom: 20px;
+            right: 1rem;
             width: var(--tweakpane-ui-container-width);
             height: auto;
             overflow-y: scroll;
             z-index: 100;
             pointer-events: auto;
-            max-height: calc(100% - 6rem);
+            max-height: calc(100% - 3rem);
             border-radius: 0.5rem;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "system-ui", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
           }
         `)
 
@@ -55,7 +57,8 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
     }
 
 
-    appendChild(config: UiObjectConfig) {
+    appendChild(config?: UiObjectConfig) {
+        if (!config) return
         super.appendChild(config)
         this.renderUiConfig(config)
     }
@@ -72,7 +75,7 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
             // console.log('Removing UI object because of type mismatch', uiConfig.uiRef)
             this.disposeUiConfig(uiConfig)
         }
-        const ui = uiConfig.type ? this._typeGenerators[uiConfig.type]?.(parent, uiConfig, this) as BladeApi<BladeController<View>> | undefined : undefined
+        const ui = uiConfig.type ? this.typeGenerators[uiConfig.type]?.(parent, uiConfig, this) as BladeApi<BladeController<View>> | undefined : undefined
         if (ui) {
             ui.hidden = getOrCall(uiConfig.hidden) ?? false
             ui.disabled = getOrCall(uiConfig.disabled) ?? false // todo: also see if property is writable?
@@ -83,6 +86,12 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
         uiConfig.uiRefresh =
             (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) =>
                 this.addToRefreshQueue(mode, uiConfig, deep, delay)
+        ui?.controller_.viewProps.handleDispose(()=>{
+            uiConfig.uiRef = undefined
+            uiConfig.uiRefType = undefined
+            uiConfig.uiRefresh = undefined
+        })
+
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
@@ -92,24 +101,41 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
         this.renderUiObject(config, config.__uiParent)
     }
 
-    protected _typeGenerators: any = {
-        panel: tpFolderGenerator,
-        folder: tpFolderGenerator,
-        input: tpInputGenerator,
-        number: tpInputGenerator,
-        slider: tpSliderInputGenerator,
-        dropdown: tpDropdownInputGenerator,
-        checkbox: tpInputGenerator,
-        toggle: tpInputGenerator,
-        button: tpButtonInputGenerator,
-        monitor: (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, params?: any) => {
-            config.readOnly = true
-            return tpInputGenerator(parent, config, plugin, params)
-        },
-        // dummy for creating new ones, do not remove.
-        dummy: (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, params?: any) => {
-            return tpInputGenerator(parent, config, plugin, params)
-        },
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    THREE: THREE|undefined = (window as any).THREE
+
+    readonly typeGenerators: typeof defaultGenerators & AnyOptions = {
+        ...defaultGenerators,
     }
 
+}
+
+const defaultGenerators = {
+    panel: tpFolderGenerator,
+    folder: tpFolderGenerator,
+    input: tpInputGenerator,
+    number: tpInputGenerator,
+    slider: tpSliderInputGenerator,
+    dropdown: tpDropdownInputGenerator,
+    checkbox: tpInputGenerator,
+    toggle: tpInputGenerator,
+    button: tpButtonInputGenerator,
+    vec: tpVecInputGenerator,
+    vector: tpVecInputGenerator,
+    vec2: tpVecInputGenerator,
+    vec3: tpVecInputGenerator,
+    vec4: tpVecInputGenerator,
+
+    // three
+    color: tpColorInputGenerator,
+
+    // others
+    monitor: (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, params?: any) => {
+        config.readOnly = true
+        return tpInputGenerator(parent, config, plugin, params)
+    },
+    // dummy for creating new ones, do not remove.
+    dummy: (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, params?: any) => {
+        return tpInputGenerator(parent, config, plugin, params)
+    },
 }
