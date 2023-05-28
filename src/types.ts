@@ -1,8 +1,15 @@
-import {Fof, StringKeyOf, ValOrArr, ValOrArrOp, ValOrFunc} from 'ts-browser-helpers'
+import type {Fof, StringKeyOf, ValOrArr, ValOrArrOp, ValOrFunc} from 'ts-browser-helpers'
 
 export type TUiRefreshModes = 'preRender' | 'postRender' | 'preFrame' | 'postFrame'
 export type UiObjectType = string
-export type ChangeArgs = any[]
+export interface ChangeEvent {
+    target?: UiObjectConfig,
+    type: 'change',
+    last?: boolean, // true if this is the last change event in a chain of changes
+    config?: UiObjectConfig, // the config that triggered the change
+    configPath?: UiObjectConfig[], // list of all configs from target to the one that triggered the change
+}
+export type ChangeArgs = [ChangeEvent, ...any[]] | never[]
 
 export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectType, TTarget = any> {
     /**
@@ -30,8 +37,9 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     /**
      * The property to bind to. This is used for inputs.
      * This can be an array of [target, key] or a function that returns an array of [target, key].
+     * key can be a number for arrays.
      */
-    property?: ValOrFunc<[TTarget, StringKeyOf<TTarget>]>,
+    property?: ValOrFunc<[TTarget, StringKeyOf<TTarget>|number]>,
     /**
      * Alias for property
      */
@@ -80,7 +88,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * onChange callbacks can be added to the config object to be called when the value of the object changes.
      * This can be a function or an array of functions.
      */
-    onChange?: ValOrArrOp<((...args: ChangeArgs) => void)>[];
+    onChange?: ValOrArrOp<((...args: ChangeArgs) => void)>;
 
     /**
      * A function to be called when the Ui element is clicked.
@@ -147,6 +155,12 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     uiRefresh?: (deep?: boolean, mode?: TUiRefreshModes | 'immediate', delay?: number) => void; // delay in ms
 
     dispatchMode?: TUiRefreshModes | 'immediate'; //  This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
+
+    /**
+     * @internal
+     * Can be set by the parent, if this is a child object.
+     */
+    parentOnChange?: (...args: ChangeArgs) => void;
 
     /**
      * Individual components can support custom options. These can be added to the config object.

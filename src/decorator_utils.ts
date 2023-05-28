@@ -5,9 +5,32 @@ export class UiConfigTypeMap {
     static Map = new Map<ObjectConstructor, any[]>()
 }
 
+function generateValueConfig(obj: any, key: string | number, label?: string, val?: any) {
+    val = val ?? obj[key]
+    const config = val?.uiConfig
+    let result: UiObjectConfig|undefined = undefined
+    if (config) {
+        result = config
+    } else {
+        const uiType = valueToUiType(val)
+        if (uiType === 'folder') {
+            result = generateUiFolder(key + '', val)
+        } else if (uiType)
+            result = {
+                type: uiType,
+                label: key + '',
+                property: [obj, key],
+            }
+    }
+    label = label ?? key + ''
+    if (result && !result.label) result.label = label
+    return result
+}
+
 export function generateUiConfig(obj: any): UiObjectConfig[] {
-    let type = obj?.constructor
-    if (!obj || !type) return []
+    if (!obj) return []
+    let type = obj.constructor || Object
+    if (type === Array) type = Object
 
     const result: UiObjectConfig[] = []
     const types: any[] = []
@@ -15,12 +38,22 @@ export function generateUiConfig(obj: any): UiObjectConfig[] {
         types.push(type)
         type = Object.getPrototypeOf(type)
     }
+    if (!types.length) {
+        const keys = typeof obj === 'object' ? Object.keys(obj) : Array.isArray(obj) ? obj.map((_, i)=>i) : []
+        for (const key of keys) {
+            const val = obj[key]
+            if (val === undefined || val === null) continue
+            // if (Array.isArray(obj)) debugger
+            const c = generateValueConfig(obj, key, key + '', val)
+            if (c) result.push(c)
+        }
+    }
     // reversing so we get the parent first
     types.reverse().forEach(t => {
         UiConfigTypeMap.Map.get(t)?.forEach(({params, propKey, uiType}: any) => {
             let config: any
             if (!uiType) {
-                config = obj[propKey]?.uiConfig
+                config = generateValueConfig(obj, propKey)
             }
             if (!config) {
                 config = {
@@ -59,4 +92,20 @@ export function generateUiFolder(label: string, obj: any, params: any = {}, type
         ...params,
     }
 }
+
+
+export function valueToUiType(val: any) {
+    if (val === null || val === undefined) return null
+    if (Array.isArray(val)) return 'folder'
+    if (typeof val === 'boolean') return 'checkbox'
+    if (typeof val === 'number') return 'number'
+    if (typeof val === 'string') return 'input'
+    if (typeof val === 'function') return 'button'
+    if (typeof val.x === 'number') return 'vec'
+    if (typeof val.r === 'number') return 'color'
+    if (val.isTexture) return 'image'
+    if (typeof val === 'object') return 'folder'
+    return null
+}
+
 

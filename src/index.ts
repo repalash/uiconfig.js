@@ -14,13 +14,21 @@ import {
     uiVector,
 } from './decorator_alias'
 import {generateUiConfig, generateUiFolder, UiConfigTypeMap} from './decorator_utils'
-import {ChangeArgs, IUiConfigContainer, TUiRefreshModes, UiConfigContainer, UiObjectConfig, UiObjectType} from './types'
+import {
+    ChangeArgs,
+    ChangeEvent,
+    IUiConfigContainer,
+    TUiRefreshModes,
+    UiConfigContainer,
+    UiObjectConfig,
+    UiObjectType,
+} from './types'
 import {UiConfigRendererBase} from './UiConfigRendererBase'
 import {UiConfigMethods} from './UiConfigMethods'
 
 
 export {UiConfigRendererBase, UiConfigMethods}
-export type {UiConfigContainer, IUiConfigContainer, UiObjectConfig, UiObjectType, TUiRefreshModes, ChangeArgs}
+export type {UiConfigContainer, IUiConfigContainer, UiObjectConfig, UiObjectType, TUiRefreshModes, ChangeArgs, ChangeEvent}
 
 // decorators
 export {uiConfig, uiContainer}
