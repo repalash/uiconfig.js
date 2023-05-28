@@ -1,21 +1,30 @@
-import {ValOrFunc} from 'ts-browser-helpers'
+import type {ValOrFunc} from 'ts-browser-helpers'
 import {UiObjectConfig} from './types'
 import {generateUiFolder, UiConfigTypeMap} from './decorator_utils'
 
 
-export type TParams = ValOrFunc<Partial<UiObjectConfig>, [Partial<UiObjectConfig>]>
+export type TParams<T> = ValOrFunc<Partial<UiObjectConfig>, [T]>
 
-// for properties
-export function uiConfig(uiType?: string, params?: Partial<UiObjectConfig> & {params?: TParams}): PropertyDecorator {
+/**
+ * Decorator for uiConfig
+ * @param action - function that will be called with the targetPrototype, propertyKey and uiConfigs, and should modify the uiConfigs
+ */
+export function uiConfigDecorator(action: (targetPrototype: any, propertyKey: string|symbol, uiConfigs: any[])=>void): PropertyDecorator {
     return (targetPrototype: any, propertyKey: string | symbol) => {
         const type = targetPrototype.constructor
-        if (type === Object) throw new Error('All properties in an object are serialized by default')
+        if (type === Object) throw new Error('Not possible to use uiConfig decorator on an object, use class instead')
         if (!UiConfigTypeMap.Map.has(type)) UiConfigTypeMap.Map.set(type, [])
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        action(targetPrototype, propertyKey, UiConfigTypeMap.Map.get(type)!)
+    }
+}
 
-        const arr = UiConfigTypeMap.Map.get(type)
-        const index = arr?.findIndex(item => item.propKey === propertyKey)
-        if (arr && index && index < 0)
-            arr.push({
+// for properties
+export function uiConfig<T=any>(uiType?: string, params?: Partial<UiObjectConfig> & {params?: TParams<T>, group?: string}): PropertyDecorator {
+    return uiConfigDecorator((_, propertyKey, uiConfigs) => {
+        const index = uiConfigs.findIndex(item => item.propKey === propertyKey)
+        if (index && index < 0)
+            uiConfigs.push({
                 params: params || {},
                 propKey: propertyKey as string,
                 uiType,
@@ -23,8 +32,7 @@ export function uiConfig(uiType?: string, params?: Partial<UiObjectConfig> & {pa
         else {
             throw new Error(`Property ${propertyKey as string} already has a uiConfig decorator`)
         }
-    }
-
+    })
 }
 
 // for classes

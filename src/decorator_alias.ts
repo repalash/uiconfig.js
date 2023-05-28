@@ -1,43 +1,43 @@
 import {UiObjectConfig} from './types'
 import {TParams, uiConfig, uiContainer} from './decorators'
 
-export function uiMonitor(label?: string, params?: TParams): PropertyDecorator {
+export function uiMonitor<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('monitor', {label, params})
 }
 
-export function uiSlider(label?: string, bounds?: [number, number], stepSize?: number, params?: TParams): PropertyDecorator {
+export function uiSlider<T=any>(label?: string, bounds?: [number, number], stepSize?: number, params?: TParams<T>): PropertyDecorator {
     return uiConfig('slider', {label, bounds, stepSize, params})
 }
 
-export function uiVector(label?: string, bounds?: [number, number], stepSize?: number, params?: TParams): PropertyDecorator {
+export function uiVector<T=any>(label?: string, bounds?: [number, number], stepSize?: number, params?: TParams<T>): PropertyDecorator {
     return uiConfig('vec', {label, bounds, stepSize, params})
 }
 
-export function uiDropdown(label?: string, children?: UiObjectConfig[], params?: TParams): PropertyDecorator {
+export function uiDropdown<T=any>(label?: string, children?: UiObjectConfig[], params?: TParams<T>): PropertyDecorator {
     return uiConfig('dropdown', {label, children, params})
 }
 
-export function uiButton(label?: string, params?: TParams): PropertyDecorator {
+export function uiButton<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('button', {label, params})
 }
 
-export function uiInput(label?: string, params?: TParams): PropertyDecorator {
+export function uiInput<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('input', {label, params})
 }
 
-export function uiNumber(label?: string, params?: TParams): PropertyDecorator {
+export function uiNumber<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('number', {label, params})
 }
 
-export function uiColor(label?: string, params?: TParams): PropertyDecorator {
+export function uiColor<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('color', {label, params})
 }
 
-export function uiImage(label?: string, params?: TParams): PropertyDecorator {
+export function uiImage<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('image', {label, params})
 }
 
-export function uiToggle(label?: string, params?: TParams): PropertyDecorator {
+export function uiToggle<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('checkbox', {label, params})
 }
 

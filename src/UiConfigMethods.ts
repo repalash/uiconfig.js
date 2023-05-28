@@ -1,4 +1,4 @@
-import {ChangeArgs, UiObjectConfig} from './types'
+import {ChangeArgs, ChangeEvent, UiObjectConfig} from './types'
 import {Fof, getOrCall, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererBase} from './UiConfigRendererBase'
 import {v4} from 'uuid'
@@ -21,36 +21,47 @@ export class UiConfigMethods {
         return tar ? tar[key] : undefined
     }
 
-    dispatchOnChange(config: UiObjectConfig, props: {last?: boolean}) {
-        const changeEvent = {
-            // todo; change event
+    dispatchOnChangeSync(config: UiObjectConfig, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[]}, ...args: any[]) {
+        const changeEvent: ChangeEvent = {
+            type: 'change',
             last: props.last ?? true,
+            config: props.config ?? config,
+            configPath: [config, ...props.configPath || []],
+            target: config,
         }
-        const changeArgs: ChangeArgs = [changeEvent]
-        ;[config.onChange].flat().forEach((c) =>
-            typeof c === 'function' && c?.(...changeArgs),
-        )
-        // console.log(value, changeEvent.last)
-        // if (typeof tar?.setDirty === 'function') tar.setDirty(changeEvent)
-        // todo: dispatch global change event? for setDirty etc
+        const changeArgs: ChangeArgs = [changeEvent, ...args]
+        if (typeof config.onChange === 'function') config.onChange(...changeArgs)
+        else if (Array.isArray(config.onChange)) {
+            config.onChange.flat().forEach((c) =>
+                typeof c === 'function' && c?.(...changeArgs), // todo .call with config if not a bound function
+            )
+        } else if (config.onChange) {
+            console.error('Invalid onChange type, must be a function or array of functions', config.onChange)
+        }
+        config.parentOnChange?.(...changeArgs)
     }
 
-    async setValue<T>(config: UiObjectConfig<T>, value: T, props: {last?: boolean}) {
+    async setValue<T>(config: UiObjectConfig<T>, value: T, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[]}, forceOnChange?: boolean) {
         return this.runAtEvent(config, () => {
             const [tar, key] = this.getBinding(config)
             if (!tar || value === tar[key] || !safeSetProperty(tar, key, value, true, true)) {
-                return false
+                if(!forceOnChange) return false
             }
-            this.dispatchOnChange(config, props)
+            this.dispatchOnChangeSync(config, props)
             return true
         })
     }
-
-    getLabel(config: UiObjectConfig) {
-        return getOrCall(config.label) ?? this.getBinding(config)[1]
+    async dispatchOnChange<T>(config: UiObjectConfig<T>, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[]}) {
+        return this.runAtEvent(config, () => {
+            this.dispatchOnChangeSync(config, props)
+        })
     }
 
-    getChildren(config: UiObjectConfig) {
+    getLabel(config: UiObjectConfig): string {
+        return (getOrCall(config.label) ?? this.getBinding(config)[1]) + ''
+    }
+
+    getChildren(config: UiObjectConfig): UiObjectConfig[] {
         return (config.children ?? []).map(v => getOrCall(v)).flat(2).filter(v => v) as UiObjectConfig[]
     }
 

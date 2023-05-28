@@ -1,5 +1,9 @@
 # UiConfig
 
+[![https://nodei.co/npm/uiconfig.js.png?downloads=true&downloadRank=true&stars=true](https://nodei.co/npm/uiconfig.js.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/uiconfig.js)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+
 A super small UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators. 
 
 It includes several themes with components for editor-like user interfaces like panels, sliders, pickers, inputs for string, number, file, vector, colors, etc. 
@@ -451,7 +455,7 @@ export interface UiObjectConfig<T=any, TType extends UiObjectType=UiObjectType> 
      * onChange callbacks can be added to the config object to be called when the value of the object changes.
      * This can be a function or an array of functions.
      */
-    onChange?: ValOrArrOp<((...args: ChangeArgs) => void)>[];
+    onChange?: ValOrArrOp<((...args: ChangeArgs) => void)>;
 
     /**
      * A function to be called when the Ui element is clicked.
@@ -571,4 +575,4 @@ renderer.appendUiConfig(config);
 
 ## Integration with three.js
 
-TODO
+See [uiconfig-tweakpane](https://github.com/repalash/uiconfig-tweakpane)
