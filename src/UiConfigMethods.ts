@@ -45,7 +45,7 @@ export class UiConfigMethods {
         return this.runAtEvent(config, () => {
             const [tar, key] = this.getBinding(config)
             if (!tar || value === tar[key] || !safeSetProperty(tar, key, value, true, true)) {
-                if(!forceOnChange) return false
+                if (!forceOnChange) return false
             }
             this.dispatchOnChangeSync(config, props)
             return true
