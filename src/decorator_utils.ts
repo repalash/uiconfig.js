@@ -1,5 +1,6 @@
 import {UiObjectConfig} from './types'
 import {v4} from 'uuid'
+import {Fof} from 'ts-browser-helpers'
 
 export class UiConfigTypeMap {
     static Map = new Map<ObjectConstructor, any[]>()
@@ -44,7 +45,7 @@ export function generateUiConfig(obj: any): UiObjectConfig[] {
             const val = obj[key]
             if (val === undefined || val === null) continue
             // if (Array.isArray(obj)) debugger
-            const c = generateValueConfig(obj, key, key + '', val)
+            const c = ()=>generateValueConfig(obj, key, key + '', val)
             if (c) result.push(c)
         }
     }
@@ -53,7 +54,7 @@ export function generateUiConfig(obj: any): UiObjectConfig[] {
         UiConfigTypeMap.Map.get(t)?.forEach(({params, propKey, uiType}: any) => {
             let config: any
             if (!uiType) {
-                config = generateValueConfig(obj, propKey)
+                config = ()=>generateValueConfig(obj, propKey)
             }
             if (!config) {
                 config = {
@@ -66,6 +67,10 @@ export function generateUiConfig(obj: any): UiObjectConfig[] {
             if (params) {
                 const extraParams = typeof params.params === 'function' ? params.params(obj) : params.params || {}
                 delete params.params
+                if (typeof config === 'function') {
+                    const c1: Fof<any, any> = config
+                    config = ()=>Object.assign(c1(), {...params, ...extraParams})
+                }
                 Object.assign(config, {...params, ...extraParams})
             }
             result.push(config)
