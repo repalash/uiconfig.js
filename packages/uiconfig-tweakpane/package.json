@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-tweakpane",
   "name:umd": "tpui",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
   "main": "src/index.ts",
   "module": "src/index.ts",
@@ -11,7 +11,7 @@
   "scripts": {
     "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
     "new:publish": "npm run prepare && clean-package && npm publish; clean-package restore",
-    "build": "NODE_ENV=production rollup -c",
+    "build": "rimraf dist && NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "docs": "npx typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
@@ -83,15 +83,16 @@
     "tslib": "^2.5.0",
     "tweakpane": "^3.1.9",
     "typescript": "^4.9.5",
-    "typedoc": "^0.23.26"
+    "typedoc": "^0.23.26",
+    "rimraf": "^5.0.1"
   },
   "dependencies": {
-    "uiconfig.js": "^0.0.4",
+    "uiconfig.js": "^0.0.5",
     "@types/three": "^0.152.1"
   },
   "//": {
     "dependencies": {
-      "uiconfig.js": "^0.0.4"
+      "uiconfig.js": "^0.0.5"
     },
     "local_dependencies": {
       "uiconfig.js": "file:./../uiconfig/"

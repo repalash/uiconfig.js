@@ -151,7 +151,7 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
     if (!input) {
         // Create input in parent and bind to property
         try {
-            if (getOrCall(config.readOnly)) {
+            if (!inputParams.view && getOrCall(config.readOnly)) {
                 const [tar, key] = renderer.methods.getBinding(config)
                 input = tar ? parent.addMonitor(tar, key, inputParams) : undefined
             } else {
