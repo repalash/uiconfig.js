@@ -10,7 +10,7 @@
     "scripts": {
         "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
         "new:publish": "npm run prepare && clean-package && npm publish; clean-package restore",
-        "build": "NODE_ENV=production rollup -c",
+        "build": "rimraf dist && NODE_ENV=production rollup -c",
         "dev": "rollup -c -w",
         "docs": "npx typedoc ./src/index.ts",
         "serve-docs": "ws -d docs -p 8080",
@@ -81,7 +81,8 @@
         "tslib": "^2.5.0",
         "typescript": "^4.9.5",
         "uuid": "^9.0.0",
-        "typedoc": "^0.23.26"
+        "typedoc": "^0.23.26",
+        "rimraf": "^5.0.1"
     },
     "optionalDependencies": {
         "win-node-env": "^0.6.1"
