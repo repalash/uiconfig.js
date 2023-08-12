@@ -1,5 +1,6 @@
 import {UiObjectConfig} from './types'
 import {TParams, uiConfig, uiContainer} from './decorators'
+import {ValOrFunc} from 'ts-browser-helpers'
 
 export function uiMonitor<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('monitor', {label, params})
@@ -41,11 +42,11 @@ export function uiToggle<T=any>(label?: string, params?: TParams<T>): PropertyDe
     return uiConfig('checkbox', {label, params})
 }
 
-export function uiPanelContainer(label: string, params?: any) {
+export function uiPanelContainer<TP = any>(label: ValOrFunc<string, [TP]>, params?: any) {
     return uiContainer(label, params, 'panel')
 }
 
-export function uiFolderContainer(label: string, params?: any) {
+export function uiFolderContainer<TP = any>(label: ValOrFunc<string, [TP]>, params?: any) {
     return uiContainer(label, params, 'folder')
 }
 
