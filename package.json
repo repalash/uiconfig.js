@@ -1,6 +1,6 @@
 {
     "name": "uiconfig.js",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "A framework for building user interface layouts with JSON configuration.",
     "main": "src/index.ts",
     "module": "dist/index.mjs",
