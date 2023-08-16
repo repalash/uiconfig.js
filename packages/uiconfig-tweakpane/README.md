@@ -9,6 +9,14 @@ It includes several components for editor-like user interfaces like folders, sli
 
 The UI components are bound to javascript/typescript objects and properties through a JSON configuration.
 
+### Examples
+
+Basic Examples: https://repalash.com/uiconfig.js/examples/index.html
+
+Threepipe Basic UI: https://threepipe.org/examples/#viewer-uiconfig/
+
+Threepipe Editor: https://threepipe.org/examples/#tweakpane-editor/
+
 ## Installation and Usage
 
 ### npm package
@@ -78,3 +86,14 @@ Check the documentation at [uiconfig.js](https://github.com/repalash/uiconfig.js
 8. `color` - A color picker for colors.
 9. `vector/vec2/vec3/vec4` - Multiple number input fields in a row for vectors.
 
+## Three.js integration
+
+Set the three.js classes for Color, Vector2, Vector3, Vector4 in the renderer and the color and vector components will automatically use them.
+
+```typescript
+import { UI } from 'uiconfig-tweakpane';
+import { Color, Vector4, Vector3, Vector2 } from 'three';
+
+const ui = new UI();
+ui.THREE = {Color, Vector4, Vector3, Vector2}
+```
