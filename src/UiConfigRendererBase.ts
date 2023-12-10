@@ -87,8 +87,9 @@ export abstract class UiConfigRendererBase<TUiNode = any> extends SimpleEventDis
     //     this._renderUiConfig(uiConfig)
     // }
 
-    appendChild(config?: UiObjectConfig) {
+    appendChild(config?: UiObjectConfig, params?: UiObjectConfig) {
         if (!config) return
+        Object.assign(config, params)
         this.config.children!.push(config)
         this.refreshRoot()
     }

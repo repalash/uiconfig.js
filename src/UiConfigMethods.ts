@@ -21,13 +21,15 @@ export class UiConfigMethods {
         return tar ? tar[key] : undefined
     }
 
-    dispatchOnChangeSync(config: UiObjectConfig, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[]}, ...args: any[]) {
+    dispatchOnChangeSync(config: UiObjectConfig, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], value?: any, lastValue?: any}, ...args: any[]) {
         const changeEvent: ChangeEvent = {
             type: 'change',
             last: props.last ?? true,
             config: props.config ?? config,
             configPath: [config, ...props.configPath || []],
             target: config,
+            value: props.value,
+            lastValue: props.lastValue,
         }
         const changeArgs: ChangeArgs = [changeEvent, ...args]
         if (typeof config.onChange === 'function') config.onChange(...changeArgs)
@@ -41,17 +43,18 @@ export class UiConfigMethods {
         config.parentOnChange?.(...changeArgs)
     }
 
-    async setValue<T>(config: UiObjectConfig<T>, value: T, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[]}, forceOnChange?: boolean) {
+    async setValue<T>(config: UiObjectConfig<T>, value: T, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], lastValue?: T}, forceOnChange?: boolean) {
         return this.runAtEvent(config, () => {
             const [tar, key] = this.getBinding(config)
-            if (!tar || value === tar[key] || !safeSetProperty(tar, key, value, true, true)) {
+            const lastValue = props.lastValue ?? tar[key]
+            if (!tar || value === lastValue || !safeSetProperty(tar, key, value, true, true)) {
                 if (!forceOnChange) return false
             }
-            this.dispatchOnChangeSync(config, props)
+            this.dispatchOnChangeSync(config, {...props, value, lastValue})
             return true
         })
     }
-    async dispatchOnChange<T>(config: UiObjectConfig<T>, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[]}) {
+    async dispatchOnChange<T>(config: UiObjectConfig<T>, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], value?: any, lastValue?: any}) {
         return this.runAtEvent(config, () => {
             this.dispatchOnChangeSync(config, props)
         })
