@@ -8,6 +8,8 @@ export interface ChangeEvent {
     last?: boolean, // true if this is the last change event in a chain of changes
     config?: UiObjectConfig, // the config that triggered the change
     configPath?: UiObjectConfig[], // list of all configs from target to the one that triggered the change
+    value?: any, // the new value
+    lastValue?: any, // the old value
 }
 export type ChangeArgs = [ChangeEvent, ...any[]] | never[]
 
