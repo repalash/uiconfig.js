@@ -57,9 +57,9 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
     }
 
 
-    appendChild(config?: UiObjectConfig) {
+    appendChild(config?: UiObjectConfig, params?: UiObjectConfig) {
         if (!config) return
-        super.appendChild(config)
+        super.appendChild(config, params)
         this.renderUiConfig(config)
     }
 

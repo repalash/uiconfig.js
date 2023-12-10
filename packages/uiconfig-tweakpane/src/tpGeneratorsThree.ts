@@ -20,7 +20,7 @@ export const tpColorInputGenerator = (parent: FolderApi, config: UiObjectConfig,
         const tempColor = new renderer.THREE.Color()
         Object.defineProperty(config.__proxy, 'value', {
             get: () => {
-                config.__proxy.value_ = renderer.methods.getValue(config)
+                // config.__proxy.value_ = renderer.methods.getValue(config) // this is done below so it will be triggered on ui refresh
                 const cc: any = config.__proxy.value_
                 if (cc)
                     return tempColor.set(cc).getHex(uiColorSpace)
