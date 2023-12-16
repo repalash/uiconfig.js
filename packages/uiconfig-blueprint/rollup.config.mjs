@@ -3,15 +3,16 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
-import terser from '@rollup/plugin-terser';
 import license from 'rollup-plugin-license'
 import packageJson from './package.json' assert {type: 'json'};
+import del from 'rollup-plugin-delete';
 import replace from '@rollup/plugin-replace';
 import postcss from 'rollup-plugin-postcss'
 import autoprefixer from 'autoprefixer'
 import path from 'path'
 
-const { name, version, main, module, browser, author } = packageJson
+const { name, version, author } = packageJson
+const { main, module } = packageJson["clean-package"].replace
 const isProduction = process.env.NODE_ENV === 'production'
 
 const settings = {
@@ -22,24 +23,31 @@ const settings = {
 
 export default {
   input: './src/index.ts',
-  output: [{
-    file: main,
-    name: main,
-    ...settings,
-    format: 'umd',
-    plugins: [
-      isProduction && terser()
-    ]
-  }, {
-    file: module,
+  output: [
+  //     {
+  //   file: main,
+  //   name: packageJson['name:umd'],
+  //   ...settings,
+  //   format: 'umd',
+  //   plugins: [
+  //     isProduction && terser()
+  //   ]
+  // },
+    {
+    dir: 'dist',
     ...settings,
     name: name,
-    format: 'es'
+    format: 'es',
   }],
-  external: [ "uiconfig" ],
+  external: [ ],
   plugins: [
+    del({
+      targets: 'dist/*',
+      runOnce: true
+    }),
     replace({
-      'process.env.NODE_ENV': JSON.stringify( isProduction ? 'production' : 'development' )
+      'process.env.NODE_ENV': JSON.stringify( isProduction ? 'production' : 'development' ),
+      preventAssignment: true
     }),
     json(),
     postcss({
@@ -59,6 +67,11 @@ export default {
     resolve({
     }),
     typescript({
+      compilerOptions: {
+        "sourceRoot": "../src",
+        "declarationDir": "dist",
+        "declarationMap": true,
+      }
     }),
     commonjs({
       include: 'node_modules/**',
@@ -68,8 +81,10 @@ export default {
     }),
     license({
       banner: `
+        @license
         ${name} v${version}
         Copyright 2022<%= moment().format('YYYY') > 2022 ? '-' + moment().format('YYYY') : null %> ${author}
+        ${packageJson.license} License
       `
     })
   ]

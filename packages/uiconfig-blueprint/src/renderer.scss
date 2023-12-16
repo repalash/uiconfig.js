@@ -1,19 +1,48 @@
-@import "~normalize.css";
+@import "~normalize.css/normalize";
 
-@import "~@blueprintjs/core/lib/scss/variables.scss";
+//@import "~@blueprintjs/core/lib/scss/variables.scss";
 
-@import "~@blueprintjs/core/lib/css/blueprint.css";
-@import "~@blueprintjs/select/lib/css/blueprint-select.css";
-@import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+//@import "~@blueprintjs/core/lib/css/blueprint";
+@import "~@blueprintjs/select/lib/css/blueprint-select";
+@import "~@blueprintjs/icons/lib/css/blueprint-icons";
+
+@import "~blueprint-styler/base/blueprint-tokens";
+@import "~blueprint-styler/base/blueprint";
+//@import "~blueprint-styler/base/tokens.scss"; // dont add
 
 @import "components/common";
 @import "bpComponents/index";
 
 //@import "~@blueprintjs/core/src/blueprint";
 //@import "~@blueprintjs/select/src/blueprint-select.scss";
-//@import "~@blueprintjs/popover2/src/blueprint-popover2.scss";
+//@import "~@blueprintjs/icons/src/blueprint-icons.scss";
 
-.bp4-form-group.bp4-inline label.bp4-label{
+//@import "~blueprint-styler/overrides/bpv3/custom-tokens";
+//@import "~blueprint-styler/overrides/bpv3/override";
+//@import "~blueprint-styler/overrides/bpv3/override-tokens";
+
+//@import "~blueprint-styler/overrides/antd/custom-tokens";
+//@import "~blueprint-styler/overrides/antd/override";
+//@import "~blueprint-styler/overrides/antd/override-tokens";
+
+//@import "~blueprint-styler/overrides/carbon/custom-tokens";
+@import "~blueprint-styler/overrides/carbon/override";
+@import "~blueprint-styler/overrides/carbon/override-tokens";
+
+//@import "~blueprint-styler/overrides/flat/custom-tokens";
+//@import "~blueprint-styler/overrides/flat/override";
+//@import "~blueprint-styler/overrides/flat/override-tokens";
+
+//@import "~blueprint-styler/overrides/fluent/custom-tokens";
+//@import "~blueprint-styler/overrides/fluent/override";
+//@import "~blueprint-styler/overrides/fluent/override-tokens";
+
+//@import "~blueprint-styler/overrides/pnnl/custom-tokens";
+//@import "~blueprint-styler/overrides/pnnl/override";
+//@import "~blueprint-styler/overrides/pnnl/override-tokens";
+
+
+.bp5-form-group.bp5-inline label.bp5-label{
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -39,13 +68,13 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: $pt-grid-size/2;
+  gap: calc($pt-grid-size / 2);
   height: $pt-input-height;
   flex-grow: 1;
 }
 
-.bp4-panel-stack-view {
-  .bp4-dark & {
+.bp5-panel-stack-view {
+  .bp5-dark & {
     background-color: $dark-gray2 !important;
 
   }
@@ -72,7 +101,7 @@
 }
 
 .numericInput {
-  .bp4-input-group {
+  .bp5-input-group {
     flex-shrink: 1;
   }
 }
@@ -114,15 +143,15 @@
     cursor: ns-resize;
   }
 }
-.bp4-control-group {
-  .bp4-input-group{
+.bp5-control-group {
+  .bp5-input-group{
     flex-grow: 1;
     flex-shrink: 1;
   }
 }
 
 .color-picker-popover{
-  padding: $pt-grid-size/2;
+  padding: calc($pt-grid-size / 2);
   width: max-content;
   background: $dark-gray1;
 }
@@ -138,12 +167,12 @@
   height: 100%;
 }
 
-.bp4-slider:not(.bp4-slider-vertical) {
+.bp5-slider:not(.bp5-slider-vertical) {
   min-width: $pt-grid-size * 11;
 }
 
-.bp4-input, .bp4-file-upload-input {
-  .bp4-dark & {
+.bp5-input, .bp5-file-upload-input {
+  .bp5-dark & {
     box-shadow: inset 0 0 0 1px $dark-gray5, inset 0 -1px 1px 0 $dark-gray1;;
   }
 }

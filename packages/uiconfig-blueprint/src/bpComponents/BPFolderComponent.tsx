@@ -4,7 +4,7 @@ import {Button, Collapse, Icon, Intent} from "@blueprintjs/core";
 import {ConfigObject} from "../ConfigObject";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
-import {UiObjectConfig} from 'uiconfig'
+import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
 
 export type BPFolderComponentState = BPLabelledComponentState & {

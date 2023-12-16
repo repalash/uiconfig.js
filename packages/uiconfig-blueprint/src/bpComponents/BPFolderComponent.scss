@@ -14,7 +14,7 @@
   }
 }
 
-.bp4-dark .folder-card {
+.bp5-dark .folder-card {
   background-color: $dark-gray2 !important;
 }
 
@@ -65,7 +65,7 @@
 .folder-head-card-minimal {
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: flex-end;
   flex-direction: row;
 
   > .folder-trigger-button {
@@ -85,7 +85,7 @@
     border-radius: 0;
   }
 
-  .bp4-dark & {
+  .bp5-dark & {
     box-shadow: 0 1px $pt-dark-divider-white;
     //background-color: $dark-gray1;
   }

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object Syntax JS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background: #111;">
+
+<script type="module">
+    import {UI} from '../../dist/index.js'
+
+    const data = {
+        name: 'John',
+        age: 30,
+        city: 'New York',
+        uiConfig: undefined,
+    };
+    data.uiConfig = {
+        type: 'folder',
+        label: 'Person',
+        expanded: true,
+        children: [
+            {
+                type: 'input',
+                label: 'Name',
+                property: [data, 'name'],
+            },
+            {
+                type: 'number',
+                label: 'Age',
+                bounds: [0, 150],
+                stepSize: 1,
+                property: [data, 'age'],
+            },
+            {
+                type: 'dropdown',
+                label: 'City',
+                property: [data, 'city'],
+                children: ['New York', 'Paris', 'London'].map((v) => ({label: v})),
+            },
+            {
+                type: 'button',
+                label: 'Reset',
+                onClick: () => {
+                    data.name = 'John';
+                    data.age = 30;
+                    data.city = 'New York';
+                    // Update/Re-render the UI so that the changes are reflected
+                    data.uiConfig.uiRefresh(true);
+                },
+            },
+        ],
+    }
+
+    const ui = new UI();
+    ui.appendChild(data.uiConfig)
+
+</script>
+</body>
+</html>

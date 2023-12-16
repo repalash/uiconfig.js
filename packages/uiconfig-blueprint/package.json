@@ -1,21 +1,46 @@
 {
   "name": "uiconfig-blueprint",
-  "version": "1.0.0",
+  "name:umd": "bpui",
+  "version": "0.0.1",
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "browser": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
   "source": "src/index.ts",
+  "sideEffects": false,
   "scripts": {
-    "build": "NODE_ENV=production rollup -c",
+    "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
+    "new:publish": "npm run prepare && clean-package && npm publish; clean-package restore",
+    "build": "rimraf dist && NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
+    "docs": "npx typedoc ./src/index.ts",
+    "serve-docs": "ws -d docs -p 8080",
+    "prepare": "npm run build && npm run docs",
+    "build-examples": "NODE_ENV=production rollup --config examples/rollup.config.mjs",
     "dev-examples": "rollup -w --config examples/rollup.config.mjs",
-    "test": "node test/test.spec.js",
-    "pretest": "npm run build",
     "serve": "ws",
-    "prepare": "npm run build"
+    "lint": "eslint src examples --fix"
   },
+  "clean-package": {
+    "remove": [
+      "clean-package",
+      "scripts",
+      "devDependencies",
+      "optionalDependencies"
+    ],
+    "replace": {
+      "main": "dist/index.js",
+      "module": "dist/index.mjs",
+      "browser": "dist/index.js",
+      "types": "dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "docs",
+    "tsconfig.json"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/repalash/uiconfig-blueprint.git"
@@ -31,15 +56,15 @@
     "library"
   ],
   "author": "repalash <palash@shaders.app>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/repalash/uiconfig/issues"
+    "url": "https://github.com/repalash/uiconfig-blueprint/issues"
   },
-  "homepage": "https://github.com/repalash/uiconfig#readme",
+  "homepage": "https://github.com/repalash/uiconfig-blueprint#readme",
   "devDependencies": {
-    "@blueprintjs/core": "^4.17.4",
-    "@blueprintjs/icons": "^4.14.3",
-    "@blueprintjs/select": "^4.9.8",
+    "@blueprintjs/core": "^5.7.2",
+    "@blueprintjs/icons": "^5.5.0",
+    "@blueprintjs/select": "^5.0.20",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -51,26 +76,39 @@
     "@types/uuid": "^9.0.1",
     "autoprefixer": "^10.4.13",
     "local-web-server": "^5.3.0",
-    "node-sass": "^8.0.0",
-    "postcss": "^8.4.21",
+    "sass": "^1.69.5",
+    "postcss": "^8.4.32",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rollup": "^3.17.2",
+    "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-license": "^3.0.1",
     "rollup-plugin-multi-input": "^1.3.3",
     "rollup-plugin-postcss": "^4.0.2",
-    "ts-browser-helpers": "git://github.com/repalash/ts-browser-helpers#master",
+    "ts-browser-helpers": "^0.8.0",
     "tslib": "^2.5.0",
     "typescript": "^4.9.5",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "typedoc": "^0.23.26",
+    "rimraf": "^5.0.1",
+    "blueprint-styler": "^5.0.2"
   },
   "dependencies": {
-    "uiconfig": "file:./../uiconfig"
+    "uiconfig.js": "^0.0.7"
+  },
+  "//": {
+    "dependencies": {
+      "uiconfig.js": "^0.0.7"
+    },
+    "local_dependencies": {
+      "uiconfig.js": "file:./../uiconfig/"
+    }
   },
   "optionalDependencies": {
     "win-node-env": "^0.6.1"
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "type": "module"
 }

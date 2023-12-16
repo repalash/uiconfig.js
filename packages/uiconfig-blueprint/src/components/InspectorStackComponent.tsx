@@ -1,7 +1,7 @@
 import React from "react";
 import {Card, Panel, PanelStack2} from "@blueprintjs/core";
 import {ConfigObject, ConfigProps} from "../ConfigObject";
-import {UiObjectConfig} from 'uiconfig'
+import {UiObjectConfig} from 'uiconfig.js'
 import {UiConfigRendererContext} from '../bpComponents/BPComponent'
 
 // import {ViewerAppContext} from "./ViewerAppComponent";
@@ -31,7 +31,7 @@ export function InspectorStackComponent({config}: { config: UiObjectConfig<any, 
 
     return (
         <Card id="bpInspectorCard" style={{height: "100%", flexGrow: "1"}}>
-            <PanelStack2 className="inspectorPanelStack bp4-dark"
+            <PanelStack2 className="inspectorPanelStack bp5-dark"
                          renderActivePanelOnly={true}
                          onOpen={(p) => setCurrentPanelStack([...currentPanelStack, p] as any)}
                          onClose={() => setCurrentPanelStack(currentPanelStack.slice(0, -1))}

@@ -9,7 +9,7 @@ export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledC
     }
 
     onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        console.log('her')
+        // console.log('her')
         this.context.methods.clickButton(this.props.config, {args: [event]})
     }
 

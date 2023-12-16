@@ -11,7 +11,7 @@ import {BPDropdownInputComponent} from "./bpComponents/BPDropdownInputComponent"
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {BPPanelComponent} from "./bpComponents/BPPanelComponent";
 import {BPTreeFolderComponent} from "./bpComponents/BPTreeFolderComponent";
-import {UiObjectConfig} from 'uiconfig'
+import {UiObjectConfig} from 'uiconfig.js'
 // import {BPVectorInputComponent} from "./bpComponents/BPVectorInputComponent";
 // import {BPFileComponent} from "./bpComponents/BPFileComponent";
 // import {BPColorInputComponent} from "./bpComponents/BPColorInputComponent";
@@ -62,7 +62,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
 
         // hacks
         if (type === 'input' && typeof val === 'number') this.props.config.type = type = 'number'
-        if (val && type === 'input' && typeof val.x === 'number') this.props.config.type = type = 'vec'
+        if (val && type === 'input' && typeof (val as any).x === 'number') this.props.config.type = type = 'vec'
 
         let BPComp = generators[type]
         if (type === 'panel' && !this.props.isPanel) {

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object Syntax TS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background: #111;">
+<script type="module">
+    import {UI} from '../../dist/index.js'
+    import {data} from '../dist/class_decorator_syntax.js'
+
+    // Create a UI for the data object
+    const ui = new UI();
+    ui.appendChild(data.uiConfig)
+</script>
+</body>
+</html>

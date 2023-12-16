@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "allowJs": true,
+        "baseUrl": "./",
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "isolatedModules": true,
@@ -8,7 +9,6 @@
         "jsx": "react",
         "noImplicitAny": true,
         "declaration": true,
-        "declarationDir": "../dist",
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,

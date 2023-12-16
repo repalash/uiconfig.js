@@ -1,5 +1,5 @@
 import {createDiv, createStyles, css} from "ts-browser-helpers";
-import {UiConfigRendererBase, UiObjectConfig} from "uiConfig";
+import {UiConfigRendererBase, UiObjectConfig} from "uiconfig.js";
 import React from 'react'
 import {createRoot, Root} from 'react-dom/client'
 import {InspectorStackComponent} from './components/InspectorStackComponent'

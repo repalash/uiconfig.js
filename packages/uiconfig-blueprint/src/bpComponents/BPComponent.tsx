@@ -1,6 +1,6 @@
 import React, {createContext} from "react";
 import type {UiConfigRendererBlueprint} from '../UiConfigRendererBlueprint'
-import {UiObjectConfig} from 'uiconfig'
+import {UiObjectConfig} from 'uiconfig.js'
 
 export type BPComponentProps<T> = {
     config: UiObjectConfig<T>,

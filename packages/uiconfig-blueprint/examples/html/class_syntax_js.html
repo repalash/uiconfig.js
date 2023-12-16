@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object Syntax JS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background: #111;">
+
+<script type="module">
+    import {UI} from '../../dist/index.js'
+
+    class SampleDataClass {
+        constructor () {
+            this.name = 'John';
+            this.age = 30;
+            this.city = 'New York';
+
+            this.uiConfig = {
+                type: 'folder',
+                label: 'Person',
+                children: [
+                    {
+                        type: 'input',
+                        label: 'Name',
+                        property: [this, 'name'],
+                    },
+                    {
+                        type: 'number',
+                        label: 'Age',
+                        bounds: [0, 150],
+                        stepSize: 1,
+                        property: [this, 'age'],
+                    },
+                    {
+                        type: 'dropdown',
+                        label: 'City',
+                        property: [this, 'city'],
+                        children: ['New York', 'Paris', 'London'].map((v) => ({label: v})),
+                    },
+                    {
+                        type: 'button',
+                        label: 'Reset',
+                        onClick: () => {
+                            this.name = 'John';
+                            this.age = 30;
+                            this.city = 'New York';
+                            // Update/Re-render the UI so that the changes are reflected
+                            this.uiConfig.uiRefresh(true);
+                        },
+                    },
+                ],
+            }
+        }
+    }
+
+    const data = new SampleDataClass();
+
+    // Create a UI for the data object
+    const ui = new UI();
+    ui.appendChild(data.uiConfig)
+
+</script>
+</body>
+</html>

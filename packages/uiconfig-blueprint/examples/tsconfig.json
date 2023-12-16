@@ -1,0 +1,28 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "uiconfig-blueprint": ["../src/index.ts"]
+        },
+        "declaration": false,
+        "declarationDir": null,
+        "downlevelIteration": true,
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "target": "es6",
+        "lib": [
+            "esnext",
+            "dom"
+        ]
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "**/*.spec.ts",
+        "../src/**/*"
+    ]
+}

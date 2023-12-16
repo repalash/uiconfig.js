@@ -1,7 +1,7 @@
 import {v4} from "uuid";
 import {TreeNodeInfo} from "@blueprintjs/core";
 import {BPTreeComponent} from "./BPTreeComponent";
-import {UiObjectConfig} from 'uiconfig'
+import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
 
 export class BPTreeFolderComponent extends BPTreeComponent<UiObjectConfig> {
