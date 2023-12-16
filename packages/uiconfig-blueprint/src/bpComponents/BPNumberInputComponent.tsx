@@ -1,11 +1,11 @@
 import React from "react";
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {BPInputComponent} from "./BPInputComponent";
 import {ExtendedNumericInput} from "../components/ExtendedNumericInput";
 import {BPValueComponentState} from "./BPValueComponent";
 
 export class BPNumberInputComponent extends BPInputComponent<number> {
-    constructor(props: BPComponentProps<number>, context: any) {
+    constructor(props: BPComponentProps<number>, context: UiConfigRendererContextType) {
         super(props, context, {value: 0, label: 'Number'});
     }
 
@@ -24,6 +24,8 @@ export class BPNumberInputComponent extends BPInputComponent<number> {
         return (
             <ExtendedNumericInput
                 className="numericInput"
+                disabled={this.state.disabled}
+                readOnly={this.state.readOnly}
                 defaultValue={this.state.value}
                 ref={this._inputs[0]}
                 key={this.props.config.uuid}

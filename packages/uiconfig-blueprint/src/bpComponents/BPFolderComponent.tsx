@@ -1,5 +1,5 @@
 import React, {DOMAttributes} from "react";
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {Button, Collapse, Icon, Intent} from "@blueprintjs/core";
 import {ConfigObject} from "../ConfigObject";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
@@ -13,7 +13,7 @@ export type BPFolderComponentState = BPLabelledComponentState & {
 }
 
 export class BPFolderComponent extends BPLabelledComponent<void, BPFolderComponentState, BPComponentProps<void>&PanelActions> {
-    constructor(props: BPComponentProps<void>&PanelActions, context: any) {
+    constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
         super(props, context, {children: [], expanded: false, label: 'Folder'});
     }
 
@@ -34,12 +34,14 @@ export class BPFolderComponent extends BPLabelledComponent<void, BPFolderCompone
             // if (e) this.state.children.forEach(c => Array.isArray(c) ? null : c.uiRefresh?.("postFrame", true, 1)) // todo: handle array and functions
         }
 
-        return (
+        return !this.state.hidden ? (
             <FolderHeadCard
                 key={this.props.config.uuid}
                 open={this.state.expanded}
+                disabled={this.state.disabled}
                 minimal={(this.props.level ?? 0) > 0}
                 onClick={() => {
+                    if(this.state.readOnly) return
                     setExpanded(!this.state.expanded)
                 }}
                 label={this.state.label}
@@ -51,11 +53,11 @@ export class BPFolderComponent extends BPLabelledComponent<void, BPFolderCompone
                     </div>
                 </Collapse>
             </FolderHeadCard>
-        )
+        ) : null
     }
 }
 
-export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
+export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, disabled?: boolean, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
     return (
         <div
             // interactive={!props.open}
@@ -83,6 +85,7 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                 <Button
                     className="folder-trigger-button" fill={!props.minimal} onClick={props.onClick}
                     minimal={true}
+                    disabled={props.disabled}
                     small={props.minimal}
                     style={props.minimal ? {} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
                     intent={props.open ? Intent.PRIMARY : Intent.NONE}

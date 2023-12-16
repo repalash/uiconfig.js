@@ -1,7 +1,7 @@
 import {FormGroup} from "@blueprintjs/core";
 import React, {PropsWithChildren} from "react";
 
-export function FormGroupComponent(props: PropsWithChildren<{ label: string, flexBasis?: string }>) {
+export function FormGroupComponent(props: PropsWithChildren<{ label: string, flexBasis?: string, disabled?: boolean }>) {
     return (
         <FormGroup className="xPaddedContent folderContent" contentClassName="formGroupContent"
                    style={{
@@ -13,6 +13,7 @@ export function FormGroupComponent(props: PropsWithChildren<{ label: string, fle
             // helperText="Helper text with details..."
                    label={(<span title={props.label}>{props.label}</span>)}
                    inline={true}
+                   disabled={props.disabled}
             // labelInfo="(required)"
         >
             {props.children}

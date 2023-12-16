@@ -1,4 +1,4 @@
-import {BPComponent, BPComponentProps, BPComponentState} from "./BPComponent";
+import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
 import {Tree, TreeNodeInfo} from "@blueprintjs/core";
 import React from "react";
 
@@ -15,7 +15,7 @@ export function forEachTreeNode<T>(nodes: TreeNodeInfo<T>[] | undefined, callbac
 }
 
 export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
-    constructor(props: BPComponentProps<TConfigVal>, context: any) {
+    constructor(props: BPComponentProps<TConfigVal>, context: UiConfigRendererContextType) {
         super(props, context, {nodes: []});
     }
 
@@ -73,9 +73,9 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
             return this.buildData([], c)[0]
         }).filter(v => v)
         console.log('update', nodes, children)
-        return {
+        return super.getUpdatedState({
             nodes
-        };
+        })
     }
 
     deselectAll() {
@@ -101,7 +101,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
     render() {
         console.log('render tree', this.state.nodes)
         const TreeT = Tree.ofType<T>()
-        return (
+        return !this.state.hidden ? (
             <TreeT
                 contents={this.state.nodes}
                 className="folderContent"
@@ -121,7 +121,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
                     this._onNodeContextMenu(node)
                 }}
             />
-        )
+        ) : null
     }
 }
 

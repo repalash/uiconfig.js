@@ -1,10 +1,10 @@
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import React from "react";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 import {Button} from "@blueprintjs/core";
 
 export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledComponentState> {
-    constructor(props: BPComponentProps<()=>void>, context: any) {
+    constructor(props: BPComponentProps<()=>void>, context: UiConfigRendererContextType) {
         super(props, context, {label: 'Button'});
     }
 
@@ -14,13 +14,14 @@ export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledC
     }
 
     render() {
-        return (
+        return !this.state.hidden ? (
             <div className="bpButtonComponent xPaddedContent">
                 <Button className="bpButton"
-                    // small={true}
+                        disabled={this.state.disabled}
+                        // small={true}
                         text={this.state.label} style={{}} onClick={this.onClick}/>
             </div>
-        )
+        ) : null
     }
 
 }

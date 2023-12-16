@@ -1,9 +1,9 @@
 import React from "react";
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {Button, MenuItem} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";
 import {BPValueComponentState} from "./BPValueComponent";
-import {ItemRenderer, Select2} from "@blueprintjs/select";
+import {ItemRenderer, Select} from "@blueprintjs/select";
 
 export interface DropdownItem{
     label: string,
@@ -31,7 +31,7 @@ const renderDropdownItem: ItemRenderer<DropdownItem> = (item, { handleClick, han
 };
 
 export class BPDropdownInputComponent extends BPInputComponent<string|number, BPDropdownComponentState> {
-    constructor(props: BPComponentProps<string|number>, context: any) {
+    constructor(props: BPComponentProps<string|number>, context: UiConfigRendererContextType) {
         super(props, context, {
             value: '0',
             label: 'Dropdown',
@@ -55,16 +55,18 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
     renderInput() {
         const item = this.state.options.find(o=>o.value===this.state.value)||this.state.options[0]
         return (
-            <Select2<DropdownItem>
+            <Select<DropdownItem>
                 filterable={false}
                 activeItem={item}
                 key={this.props.config.uuid}
+                disabled={this.state.disabled}
                 popoverProps={{
                     minimal: true
                 }}
                 noResults={<MenuItem disabled={true} text="No results."  roleStructure="listoption" />}
                 items={this.state.options}
                 onItemSelect={(item)=> {
+                    if(this.state.readOnly) return
                     this.setValue(item.value)
                 }}
                 itemRenderer={renderDropdownItem}
@@ -72,7 +74,7 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
                 {/* children become the popover target; render value here */}
                 <Button rightIcon="double-caret-vertical" small={true}
                         style={{whiteSpace: 'nowrap', textOverflow: "ellipsis"}}>{item.label}</Button>
-            </Select2>
+            </Select>
         )
     }
 }

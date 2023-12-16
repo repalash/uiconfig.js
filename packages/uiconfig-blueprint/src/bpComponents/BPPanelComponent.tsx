@@ -1,5 +1,5 @@
 import React from "react";
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {ConfigObject} from "../ConfigObject";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
@@ -12,7 +12,7 @@ export type BPPanelComponentState = BPLabelledComponentState & {
 }
 
 export class BPPanelComponent extends BPLabelledComponent<void, BPPanelComponentState, BPComponentProps<void>&PanelActions> {
-    constructor(props: BPComponentProps<void>&PanelActions, context: any) {
+    constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
         super(props, context, {
             children: [],
             expanded: false,
@@ -49,12 +49,12 @@ export class BPPanelComponent extends BPLabelledComponent<void, BPPanelComponent
     }
 
     render() {
-        return (
+        return !this.state.hidden ? (
             <div
                 key={this.props.config.uuid}
                 className="folder-children" style={{listStyleType: "none", paddingLeft: "0"}}>
                 {this.state.children.map((c, i) => <ConfigObject key={'c' + i} {...this.props} config={c}/>)}
             </div>
-        )
+        ) : null
     }
 }

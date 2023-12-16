@@ -1,5 +1,5 @@
 import React from "react";
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {NumericInput, Slider} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";
 import {BPValueComponentState} from "./BPValueComponent";
@@ -12,7 +12,7 @@ export type BPSliderComponentState = BPValueComponentState<number> & {
 }
 
 export class BPSliderInputComponent extends BPInputComponent<number, BPSliderComponentState> {
-    constructor(props: BPComponentProps<number>, context: any) {
+    constructor(props: BPComponentProps<number>, context: UiConfigRendererContextType) {
         super(props, context, {
             value: 0,
             label: 'Slider',
@@ -40,11 +40,13 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
             <Slider
                 value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
                 key={this.props.config.uuid + '_slider'}
+                disabled={this.state.disabled}
                 min={this.state.min} max={this.state.max} stepSize={this.state.step}
                 labelRenderer={false}
                 // labelStepSize={(max - min)}
                 // labelValues={[]}
                 onChange={(v) => {
+                    if(this.state.readOnly) return
                     this.setValue(v)
                 }}
             />
@@ -52,6 +54,7 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
             <NumericInput
                 style={{maxWidth: "4rem", minWidth: "3rem"}}
                 // defaultValue={state}
+                disabled={this.state.disabled}
                 value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
                 key={this.props.config.uuid + '_input'}
                 min={this.state.min} max={this.state.max} stepSize={this.state.step}
@@ -59,6 +62,7 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
                 majorStepSize={this.state.step*10}
                 buttonPosition="none"
                 onValueChange={(v) => {
+                    if(this.state.readOnly) return
                     this.setValue(v)
                 }}
             />)

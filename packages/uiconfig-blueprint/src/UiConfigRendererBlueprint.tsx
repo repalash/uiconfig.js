@@ -7,6 +7,7 @@ import {BPComponent, UiConfigRendererContext} from './bpComponents/BPComponent'
 // @ts-ignore
 import rendererCss from './renderer.scss'
 import {FocusStyleManager} from '@blueprintjs/core'
+import {THREE} from "./threejs";
 
 export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
 
@@ -60,6 +61,9 @@ export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
     renderUiConfig(_: UiObjectConfig): void {
         return;
     }
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    THREE: THREE|undefined = (window as any).THREE
 
     // todo: hidden and disabled
 

@@ -12,6 +12,9 @@ import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/pa
 import {BPPanelComponent} from "./bpComponents/BPPanelComponent";
 import {BPTreeFolderComponent} from "./bpComponents/BPTreeFolderComponent";
 import {UiObjectConfig} from 'uiconfig.js'
+import {BPColorInputComponent} from './bpComponents/BPColorInputComponent'
+import {BPFileComponent} from "./bpComponents/BPFileComponent";
+import {BPVectorInputComponent} from './bpComponents/BPVectorInputComponent'
 // import {BPVectorInputComponent} from "./bpComponents/BPVectorInputComponent";
 // import {BPFileComponent} from "./bpComponents/BPFileComponent";
 // import {BPColorInputComponent} from "./bpComponents/BPColorInputComponent";
@@ -19,7 +22,7 @@ import {UiObjectConfig} from 'uiconfig.js'
 
 export type UiConfigTypes = 'input' | 'button' | 'folder' | 'checkbox' | 'toggle' |
     'dropdown' | 'slider' | 'color' | 'image' | 'number' | 'panel' | 'tree' | 'hierarchy' |
-    'vec' | 'vec2' | 'vec3' | 'vec4'
+    'vec' | 'vec2' | 'vec3' | 'vec4' | 'monitor'
 
 export interface ConfigProps extends PanelActions {
     config: UiObjectConfig;
@@ -40,12 +43,12 @@ const generators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponent
     dropdown: BPDropdownInputComponent,
     slider: BPSliderInputComponent,
     tree: BPTreeFolderComponent,
-    // color: BPColorInputComponent,
-    // image: BPFileComponent,
-    // vec: BPVectorInputComponent,
-    // vec2: BPVectorInputComponent,
-    // vec3: BPVectorInputComponent,
-    // vec4: BPVectorInputComponent,
+    color: BPColorInputComponent,
+    image: BPFileComponent,
+    vec: BPVectorInputComponent,
+    vec2: BPVectorInputComponent,
+    vec3: BPVectorInputComponent,
+    vec4: BPVectorInputComponent,
     // hierarchy: BPHierarchyComponent,
 }
 
@@ -62,6 +65,11 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
 
         // hacks
         if (type === 'input' && typeof val === 'number') this.props.config.type = type = 'number'
+        if (type === 'input' && typeof val === 'boolean') this.props.config.type = type = 'toggle'
+        if (type === 'monitor') {
+            this.props.config.type = type = 'input'
+            this.props.config.readOnly = true
+        }
         if (val && type === 'input' && typeof (val as any).x === 'number') this.props.config.type = type = 'vec'
 
         let BPComp = generators[type]

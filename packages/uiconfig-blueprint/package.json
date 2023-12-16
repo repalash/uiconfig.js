@@ -91,10 +91,12 @@
     "uuid": "^9.0.0",
     "typedoc": "^0.23.26",
     "rimraf": "^5.0.1",
-    "blueprint-styler": "^5.0.2"
+    "blueprint-styler": "^5.0.2",
+    "react-colorful": "^5.6.1"
   },
   "dependencies": {
-    "uiconfig.js": "^0.0.7"
+    "uiconfig.js": "^0.0.7",
+    "@types/three": "^0.152.1"
   },
   "//": {
     "dependencies": {

@@ -1,4 +1,4 @@
-import {BPComponentProps} from "./BPComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 
 export type BPValueComponentState<TStateValue> = BPLabelledComponentState & {
@@ -7,7 +7,7 @@ export type BPValueComponentState<TStateValue> = BPLabelledComponentState & {
 
 export abstract class BPValueComponent<TValue, TState extends BPValueComponentState<TStateValue>, TStateValue> extends BPLabelledComponent<TValue, TState> {
 
-    protected constructor(props: BPComponentProps<TValue>, context: any, state: TState) {
+    protected constructor(props: BPComponentProps<TValue>, context: UiConfigRendererContextType, state: TState) {
         super(props, context, state);
     }
 
@@ -31,14 +31,15 @@ export abstract class BPValueComponent<TValue, TState extends BPValueComponentSt
         return this.updateStateValue({...this.state, value}, last)
     }
 
+    forceOnChange: boolean = false
+
     async updateStateValue(state: TState, last?: boolean) {
         if (!this.doesNeedRefresh(state, last)) {
             await this.setStatePromise(state)
             return
         }
         let val = await this.convertStateToValue(state)
-        // console.log(val)
-        await this.context.methods.setValue(this.props.config, val, {last})
+        await this.context.methods.setValue(this.props.config, val, {last}, this.forceOnChange)
         await this.refreshConfigState(state)
     }
 
