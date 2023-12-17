@@ -1,33 +1,24 @@
 import React from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {ConfigObject} from "../ConfigObject";
-import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
+import {BPLabelledComponentState} from "./BPLabelledComponent";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {UiObjectConfig} from 'uiconfig.js'
-import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
+import {safeSetProperty} from 'ts-browser-helpers'
+import {BPContainerComponent} from './BPContainerComponent'
 
 export type BPPanelComponentState = BPLabelledComponentState & {
     children: UiObjectConfig[]
     expanded: boolean
 }
 
-export class BPPanelComponent extends BPLabelledComponent<void, BPPanelComponentState, BPComponentProps<void>&PanelActions> {
+export class BPPanelComponent extends BPContainerComponent<BPPanelComponentState> {
     constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
         super(props, context, {
             children: [],
             expanded: false,
             label: 'Panel'
         });
-    }
-
-    getUpdatedState(state: BPPanelComponentState) {
-        // console.log('update folder')
-        return {
-            ...super.getUpdatedState(state),
-            // children: (this.props.config.children || []).map(c => getOrCall(c) || {}).flat(2),
-            children: this.context.methods.getChildren(this.props.config),
-            expanded: getOrCall(this.props.config.expanded) ?? false,
-        }
     }
 
     setExpanded = (e: boolean) => {
@@ -41,7 +32,6 @@ export class BPPanelComponent extends BPLabelledComponent<void, BPPanelComponent
         super.componentDidMount();
         this.setExpanded(true)
     }
-
 
     componentWillUnmount() {
         this.setExpanded(false)

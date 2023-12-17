@@ -2,28 +2,16 @@ import React, {DOMAttributes} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {Button, Collapse, Icon, Intent} from "@blueprintjs/core";
 import {ConfigObject} from "../ConfigObject";
-import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
-import {UiObjectConfig} from 'uiconfig.js'
-import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
+import {safeSetProperty} from 'ts-browser-helpers'
+import {BPContainerComponent, BPContainerComponentState} from './BPContainerComponent'
 
-export type BPFolderComponentState = BPLabelledComponentState & {
-    children: UiObjectConfig[]
-    expanded: boolean
+export type BPFolderComponentState = BPContainerComponentState & {
 }
 
-export class BPFolderComponent extends BPLabelledComponent<void, BPFolderComponentState, BPComponentProps<void>&PanelActions> {
+export class BPFolderComponent extends BPContainerComponent<BPFolderComponentState> {
     constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
         super(props, context, {children: [], expanded: false, label: 'Folder'});
-    }
-
-    getUpdatedState(state:BPFolderComponentState) {
-        return {
-            ...super.getUpdatedState(state),
-            // children: (this.props.config.children || []).map(c => getOrCall(c) || {}).flat(2),
-            children: this.context.methods.getChildren(this.props.config),
-            expanded: getOrCall(this.props.config.expanded) ?? false,
-        }
     }
 
     render() {

@@ -65,6 +65,10 @@ export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     THREE: THREE|undefined = (window as any).THREE
 
+    dispose() {
+        // todo
+    }
+
     // todo: hidden and disabled
 
     // protected _renderUiConfig(uiConfig: UiObjectConfig<any, string>, parent: any): any {
