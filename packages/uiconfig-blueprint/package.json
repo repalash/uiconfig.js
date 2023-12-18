@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
   "main": "src/index.ts",
   "module": "src/index.ts",
@@ -17,11 +17,12 @@
   "scripts": {
     "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
     "new:publish": "npm run prepare && clean-package && npm publish; clean-package restore",
-    "build": "vite build",
     "dev": "vite",
+    "build": "vite build",
+    "build-examples": "vite build -c vite.examples.config.js",
     "docs": "npx typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
-    "prepare": "npm run build && npm run docs",
+    "prepare": "npm run build && npm run build-examples && npm run docs",
     "lint": "eslint src examples --fix"
   },
   "clean-package": {
@@ -70,6 +71,7 @@
     "@blueprintjs/select": "^5.0.20",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
+    "clean-package": "^2.2.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.0",
@@ -103,7 +105,7 @@
   "dependencies": {
     "@types/three": "^0.152.1",
     "@types/webxr": "^0.5.10",
-    "uiconfig.js": "^0.0.7",
+    "uiconfig.js": "^0.0.8",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "react": "^18.2.0",
@@ -111,7 +113,7 @@
   },
   "//": {
     "dependencies": {
-      "uiconfig.js": "^0.0.7"
+      "uiconfig.js": "^0.0.8"
     },
     "local_dependencies": {
       "uiconfig.js": "file:./../uiconfig/"

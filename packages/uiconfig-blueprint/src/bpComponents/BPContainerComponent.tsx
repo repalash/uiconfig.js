@@ -11,17 +11,30 @@ export type BPContainerComponentState = BPLabelledComponentState & {
 export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState> extends BPLabelledComponent<void, TState, BPComponentProps<void> & PanelActions> {
 
     protected _childParentOnChange: UiObjectConfig['parentOnChange'] = (ev, ...args) => {
-        console.warn('child change', ev, this.props.config)
+        // console.warn('child change', ev, this.props.config)
         this.context.methods.dispatchOnChangeSync(this.props.config, {...ev}, ...args)
     }
 
     protected _registerChild(child: UiObjectConfig) {
         child.parentOnChange = this._childParentOnChange
+        if(child.property === undefined &&
+            child.value === undefined &&
+            child.getValue === undefined &&
+            child.setValue === undefined &&
+            child.type !== 'button' &&
+            (this.props.config.property !== undefined || this.props.config.value !== undefined)
+        ) child.property = this.props.config.property !== undefined ? this.props.config.property : [this.props.config, 'value']
     }
 
     protected _unregisterChild(child: UiObjectConfig) {
         if (child.parentOnChange !== this._childParentOnChange)
             child.parentOnChange = undefined
+        if(Array.isArray(child.property) &&
+            (child.property === this.props.config.property ||
+                (child.property[0] === this.props.config &&
+                    child.property[1] === 'value')
+            )
+        ) delete child.property
     }
 
     constructor(props: BPComponentProps<void> & PanelActions, context: UiConfigRendererContextType, state: TState) {

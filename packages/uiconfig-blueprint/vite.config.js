@@ -8,6 +8,9 @@ import license from 'rollup-plugin-license'
 const { name, version, author } = packageJson
 
 export default defineConfig({
+    optimizeDeps: {
+        exclude: ['uiconfig.js'],
+    },
     build: {
         sourcemap: true,
         outDir: 'dist',
@@ -18,14 +21,24 @@ export default defineConfig({
             fileName: (format) => (format === 'umd' ? packageJson["clean-package"].replace.main : packageJson["clean-package"].replace.module).replace('dist/', ''),
         },
         emptyOutDir: true,
-        // rollupOptions: {
-        //     external: ['react', 'react-dom'],
-        //     output: {
-        //         globals: {
-        //             react: 'React',
-        //         },
-        //     },
-        // }
+        commonjsOptions: {
+            exclude: [/uiconfig.js/],
+        },
+        rollupOptions: {
+            // external: ['react', 'react-dom'],
+            output: {
+                // globals: {
+                //     react: 'React',
+                // },
+                // inlineDynamicImports: false,
+            },
+            // input: {
+            //     main: 'index.html',
+            //     ...Object.fromEntries(readdirSync('examples')
+            //         .filter(f=>f.endsWith('.html'))
+            //         .map((file) => [file.replace('.html', ''), `examples/${file}`])),
+            // },
+        }
     },
     resolve: {
         alias: [
@@ -42,7 +55,7 @@ export default defineConfig({
                 {
                     postcssPlugin: 'modify-css-content',
                     Once(root) {
-                        // Modify to fix :root.bpx-carbon :root twice when imported in renderer.scss
+                        // Modify to fix :root.bpx-flat :root twice when imported in renderer.scss
                         root.walkRules(rule => {
                             rule.selector = rule.selector.replace(/:root.bpx-(.*) :root/g, ':root.bpx-$1');
                         });

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object Syntax JS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #blueprintUiContainer{
+            top: 50% !important;
+            left: 50% !important;
+            translate: -50% -50% !important;
+        }
+    </style>
+</head>
+<body style="background: #111;">
+
+<script type="module">
+    import {UI} from '../src/index.ts'
+
+    const data = {
+        name: {
+            first: 'John',
+            last: 'Doe',
+        },
+        dob: {
+            year: 1990,
+            month: 1,
+            day: 1,
+        },
+        city: 'New York'
+    };
+    const uiConfig = {
+        type: 'folder',
+        label: 'Person',
+        value: data,
+        expanded: true,
+        children: [
+            {
+                type: 'input',
+                label: 'Name',
+                path: 'name.first',
+            },
+            {
+                type: 'input',
+                label: 'Last Name',
+                path: 'name.last',
+            },
+            {
+                type: 'folder',
+                label: 'Date of Birth',
+                expanded: true,
+                children: [
+                    {
+                        type: 'number',
+                        label: 'Year',
+                        bounds: [1900, 2021],
+                        stepSize: 1,
+                        path: 'dob.year',
+                    },
+                    {
+                        type: 'number',
+                        label: 'Month',
+                        bounds: [1, 12],
+                        stepSize: 1,
+                        path: 'dob.month',
+                    },
+                    {
+                        type: 'number',
+                        label: 'Day',
+                        bounds: [1, 31],
+                        stepSize: 1,
+                        path: 'dob.day',
+                    },
+                ],
+            },
+            {
+                type: 'dropdown',
+                label: 'City',
+                path: 'city',
+                children: ['New York', 'Paris', 'London'].map((v) => ({label: v})),
+            },
+            {
+                type: 'button',
+                label: 'Reset',
+                onClick: () => {
+                    data.name.first = 'John';
+                    data.name.last = 'Doe';
+                    data.dob.year = 1990;
+                    data.dob.month = 1;
+                    data.dob.day = 1;
+                    data.city = 'New York';
+                    // Update/Re-render the UI so that the changes are reflected
+                    uiConfig.uiRefresh(true);
+                },
+            },
+            {
+                type: 'button',
+                label: 'Download',
+                onClick: () => {
+                    console.log(data);
+                    const json = JSON.stringify(data, null, 2);
+                    const blob = new Blob([json], {type: 'application/json'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'data.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                },
+            }
+        ],
+    }
+
+    const ui = new UI();
+    ui.appendChild(uiConfig)
+
+</script>
+</body>
+</html>

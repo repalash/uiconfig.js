@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Icon, IconName, MaybeElement} from "@blueprintjs/core";
 
-export class DraggableIcon extends React.Component<{ icon: IconName | MaybeElement, value: number, stepSize?: number, onChange: (v: number, last?: boolean) => void }> {
+export class DraggableIcon extends React.Component<{ icon: IconName | MaybeElement, size?: number, value: number, stepSize?: number, small?: boolean, onChange: (v: number, last?: boolean) => void }> {
     private cursor = 'auto'
     private dragStartOffset = -Infinity
     private dragStartValue = -Infinity
@@ -54,7 +54,7 @@ export class DraggableIcon extends React.Component<{ icon: IconName | MaybeEleme
         // const [dragging, setDragging] = React.useState(false)
 
         return (
-            <div style={{cursor: 'ew-resize', margin: "6px"}}
+            <div style={{cursor: 'ew-resize', marginLeft: "6px", marginRight: "6px", marginTop: this.props.small ? "3px" : "6px", marginBottom: this.props.small ? "3px" : "6px"}}
                  onMouseDown={(ev) => {
                      // if(dragging) return
                      this.dragStartOffset = ev.clientX
@@ -68,7 +68,7 @@ export class DraggableIcon extends React.Component<{ icon: IconName | MaybeEleme
                      // setDragging(true)
                  }}
             >
-                <Icon icon={this.props.icon}/>
+                <Icon icon={this.props.icon} size={this.props.size}/>
             </div>
         )
     }

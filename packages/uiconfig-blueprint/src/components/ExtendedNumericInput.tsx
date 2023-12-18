@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
-//https://github.com/palantir/blueprint/blob/develop/packages/docs-app/src/examples/core-examples/numericInputExtendedExample.tsx
+/**
+ * Many changes over the original implementation here: https://github.com/palantir/blueprint/blob/develop/packages/docs-app/src/examples/core-examples/numericInputExtendedExample.tsx
+ */
 
 import React from "react";
 
@@ -55,6 +57,8 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
                 {...props2}
                 leftElement={(
                     <DraggableIcon icon={this.props.leftIcon ?? "variable"}
+                                   size={16}
+                                   small={this.props.small}
                                    value={parseFloat(value ?? '0')}
                                    stepSize={this.props.stepSize}
                                    onChange={(v, last) => {
@@ -62,9 +66,11 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
                                    }}/>
                 )}
                 // leftIcon={"variable"}
+                buttonPosition={this.props.disabled ? "none" : "right"}
                 allowNumericCharactersOnly={false}
                 onBlur={this.handleBlur}
                 onKeyDown={this.handleKeyDown}
+                onButtonClick={this.handleButtonClick}
                 onValueChange={this.handleValueChange}
                 placeholder="Enter a number or expression..."
                 value={value}
@@ -76,18 +82,39 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
         this.handleConfirm((e.target as HTMLInputElement).value);
     };
 
+
+    private _lastChangedValue = null as [number, string] | null
     private handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.code === 'Enter') {
             this.handleConfirm((e.target as HTMLInputElement).value);
+        }else if(e.code === 'ArrowUp' || e.code === 'ArrowDown'){
+            if(this._lastChangedValue) {
+                if(!this._lastChangedValue[1].length && (e.target as HTMLInputElement).value.length){
+                    // could be because of NaN, so we need to evaluate the expression
+                    // note: to test this type in "1+1" and press up/down. the output should be 2 and not 1 or 0
+                    this.handleConfirm((e.target as HTMLInputElement).value)
+                    // todo: should we increment the value here? (also need to take care of ctrl and alt and step sizes)
+                }else this.handleValueChange(this._lastChangedValue[0], this._lastChangedValue[1], e.target as HTMLInputElement, true, true)
+            }
+            else {
+                this.handleConfirm((e.target as HTMLInputElement).value);
+                // todo: should we increment the value here? (also need to take care of ctrl and alt and step sizes)
+            }
         }
+        this._lastChangedValue = null
     };
 
     private handleValueChange = (_valueAsNumber: number, valueAsString: string, inputElement: HTMLInputElement | null, last?: boolean, dispatchOnChange2 = false) => {
+        this._lastChangedValue = [_valueAsNumber, valueAsString]
         this.setState({value: valueAsString}, () => {
             this.props.onValueChange?.(_valueAsNumber, valueAsString, inputElement)
             if(dispatchOnChange2)
                 this.props.onChange2?.(_valueAsNumber, last)
         });
+    };
+
+    private handleButtonClick = (_valueAsNumber: number, valueAsString: string) => {
+        this.handleValueChange(_valueAsNumber, valueAsString, null, true, true)
     };
 
     private handleConfirm = (value: string) => {
