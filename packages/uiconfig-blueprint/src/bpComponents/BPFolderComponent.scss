@@ -16,10 +16,6 @@
   }
 }
 
-.bp5-dark .folder-card {
-  background-color: $dark-gray2 !important;
-}
-
 .folder-card {
   user-select: none;
   width: 100%;
@@ -30,6 +26,10 @@
   //border-bottom: 1px solid #444 !important;
   display: flex;
   flex-direction: column;
+  background-color: $light-gray4 !important;
+}
+.bp5-dark .folder-card {
+  background-color: $dark-gray3 !important;
 }
 
 
@@ -48,14 +48,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: $dark-gray1 !important;
+  transition: background-color 0.1s ease-in-out;
+  background-color: $light-gray5 !important;
 
   &:hover {
-    background-color: $dark-gray3 !important;
+    background-color: $light-gray3 !important;
   }
 
   &:active {
-    background-color: $dark-gray5 !important;
+    background-color: $gray4 !important;
+  }
+}
+.bp5-dark .folder-trigger-button {
+  background-color: $dark-gray1 !important;
+
+  &:hover {
+      background-color: $dark-gray3 !important;
+  }
+
+  &:active {
+      background-color: $dark-gray5 !important;
   }
 }
 

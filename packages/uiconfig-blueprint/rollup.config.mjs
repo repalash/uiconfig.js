@@ -54,7 +54,16 @@ export default {
       extensions: ['.sass', '.scss', '.css'],
       sourceMap: true,
       plugins: [
-        autoprefixer
+        {
+          postcssPlugin: 'modify-css-content',
+          Once(root) {
+            // Modify to fix :root.bpx-carbon :root twice when imported in renderer.scss
+            root.walkRules(rule => {
+              rule.selector = rule.selector.replace(/:root.bpx-(.*) :root/g, ':root.bpx-$1');
+            });
+          },
+        },
+        autoprefixer,
       ],
       use: [
         [

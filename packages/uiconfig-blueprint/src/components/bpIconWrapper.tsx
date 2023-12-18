@@ -3,7 +3,7 @@ import React, {ReactNode} from "react";
 
 export const bpIconWrapper = (path: ReactNode, viewbox = 16) => {
     return (
-        <span className="bp4-icon">
+        <span className="bp5-icon">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0"

@@ -3,12 +3,12 @@
 //@import "~@blueprintjs/core/lib/scss/variables.scss";
 
 //@import "~@blueprintjs/core/lib/css/blueprint";
-@import "~@blueprintjs/select/lib/css/blueprint-select";
+//@import "~@blueprintjs/select/lib/css/blueprint-select";
 @import "~@blueprintjs/icons/lib/css/blueprint-icons";
 
 @import "~blueprint-styler/base/blueprint-tokens";
 @import "~blueprint-styler/base/blueprint";
-//@import "~blueprint-styler/base/tokens.scss"; // dont add
+@import "~blueprint-styler/base/tokens.scss";
 
 @import "components/common";
 @import "bpComponents/index";
@@ -17,30 +17,41 @@
 //@import "~@blueprintjs/select/src/blueprint-select.scss";
 //@import "~@blueprintjs/icons/src/blueprint-icons.scss";
 
-//@import "~blueprint-styler/overrides/bpv3/custom-tokens";
-//@import "~blueprint-styler/overrides/bpv3/override";
-//@import "~blueprint-styler/overrides/bpv3/override-tokens";
+:root.bpx-bpv3{
+  @import "~blueprint-styler/overrides/bpv3/custom-tokens.scss";
+  @import "~blueprint-styler/overrides/bpv3/override";
+  @import "~blueprint-styler/overrides/bpv3/override-tokens";
+}
 
-//@import "~blueprint-styler/overrides/antd/custom-tokens";
-//@import "~blueprint-styler/overrides/antd/override";
-//@import "~blueprint-styler/overrides/antd/override-tokens";
+:root.bpx-antd {
+  @import "~blueprint-styler/overrides/antd/custom-tokens.scss";
+  @import "~blueprint-styler/overrides/antd/override";
+  @import "~blueprint-styler/overrides/antd/override-tokens";
+}
 
-//@import "~blueprint-styler/overrides/carbon/custom-tokens";
-//@import "~blueprint-styler/overrides/carbon/override";
-//@import "~blueprint-styler/overrides/carbon/override-tokens";
+:root.bpx-carbon {
+  @import "~blueprint-styler/overrides/carbon/custom-tokens.scss";
+  @import "~blueprint-styler/overrides/carbon/override";
+  @import "~blueprint-styler/overrides/carbon/override-tokens";
+}
 
-//@import "~blueprint-styler/overrides/flat/custom-tokens";
-//@import "~blueprint-styler/overrides/flat/override";
-//@import "~blueprint-styler/overrides/flat/override-tokens";
+:root.bpx-flat {
+  @import "~blueprint-styler/overrides/flat/custom-tokens.scss";
+  @import "~blueprint-styler/overrides/flat/override";
+  @import "~blueprint-styler/overrides/flat/override-tokens";
+}
 
-//@import "~blueprint-styler/overrides/fluent/custom-tokens";
-//@import "~blueprint-styler/overrides/fluent/override";
-//@import "~blueprint-styler/overrides/fluent/override-tokens";
+:root.bpx-fluent {
+  @import "~blueprint-styler/overrides/fluent/custom-tokens.scss";
+  @import "~blueprint-styler/overrides/fluent/override";
+  @import "~blueprint-styler/overrides/fluent/override-tokens";
+}
 
-//@import "~blueprint-styler/overrides/pnnl/custom-tokens";
-//@import "~blueprint-styler/overrides/pnnl/override";
-//@import "~blueprint-styler/overrides/pnnl/override-tokens";
-
+:root.bpx-pnnl {
+  @import "~blueprint-styler/overrides/pnnl/custom-tokens.scss";
+  @import "~blueprint-styler/overrides/pnnl/override";
+  @import "~blueprint-styler/overrides/pnnl/override-tokens";
+}
 
 .bp5-form-group.bp5-inline label.bp5-label{
   text-overflow: ellipsis;
@@ -159,7 +170,7 @@
 .inputGroupFile{
   input[type='file'] {
     width: 100%;
-    min-width: $pt-grid-size * 15;
+    min-width: calc($pt-grid-size * 15);
   }
 }
 
@@ -168,11 +179,15 @@
 }
 
 .bp5-slider:not(.bp5-slider-vertical) {
-  min-width: $pt-grid-size * 11;
+  min-width: calc($pt-grid-size * 11);
 }
 
 .bp5-input, .bp5-file-upload-input {
   .bp5-dark & {
-    //box-shadow: inset 0 0 0 1px $dark-gray5, inset 0 -1px 1px 0 $dark-gray1;;
+    //box-shadow: inset 0 0 0 1px $dark-gray5, inset 0 -1px 1px 0 $dark-gray1;
   }
+}
+
+.bp5-menu{
+  padding: 0;
 }
