@@ -66,7 +66,7 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
                                    }}/>
                 )}
                 // leftIcon={"variable"}
-                buttonPosition={this.props.disabled ? "none" : "right"}
+                buttonPosition={this.props.buttonPosition ?? (this.props.disabled ? "none" : "right")}
                 allowNumericCharactersOnly={false}
                 onBlur={this.handleBlur}
                 onKeyDown={this.handleKeyDown}

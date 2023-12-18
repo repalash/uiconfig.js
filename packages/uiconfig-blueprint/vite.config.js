@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 import json from "@rollup/plugin-json";
 import dts from 'vite-plugin-dts'
 import packageJson from "./package.json";
-import license from 'rollup-plugin-license'
+import license from 'rollup-plugin-license';
+import replace from '@rollup/plugin-replace';
 
 const { name, version, author } = packageJson
 
@@ -11,6 +12,9 @@ export default defineConfig({
     optimizeDeps: {
         exclude: ['uiconfig.js'],
     },
+    // define: {
+    //     'process.env': process.env
+    // },
     build: {
         sourcemap: true,
         outDir: 'dist',
@@ -72,10 +76,10 @@ export default defineConfig({
         //     targets: 'dist/*',
         //     runOnce: true
         // }),
-        // replace({
-        //     'process.env.NODE_ENV': JSON.stringify( isProduction ? 'production' : 'development' ),
-        //     preventAssignment: true
-        // }),
+        replace({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+            preventAssignment: true
+        }),
         json(),
         // postcss({
         //     extensions: ['.sass', '.scss', '.css'],

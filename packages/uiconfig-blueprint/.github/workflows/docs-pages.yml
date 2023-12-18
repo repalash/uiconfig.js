@@ -44,7 +44,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: mkdir docs/examples
-    - run: md dist-examples/* docs/examples/
+    - run: mv dist-examples/* docs/examples/
     - name: Setup Pages
       uses: actions/configure-pages@v3
     - name: Upload artifact
