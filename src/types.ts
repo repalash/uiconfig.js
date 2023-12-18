@@ -39,7 +39,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     /**
      * The property to bind to. This is used for inputs.
      * This can be an array of [target, key] or a function that returns an array of [target, key].
-     * key can be a number for arrays.
+     * key can be a number for arrays, or a dot separated path for json objects.
      */
     property?: ValOrFunc<[TTarget, StringKeyOf<TTarget>|number]>,
     /**
@@ -53,16 +53,22 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     /**
      * getValue function. This is used for inputs, if property, value is not specified.
      * This is called to get the value of the input on each render/update.
+     * It is ignored if property or value is specified.
      */
     getValue?: () => T,
     /**
      * setValue function. This is used for inputs, if property, value is not specified.
      * This is called when the value of the input changes.
+     * It is ignored if property or value is specified.
      * @param value - The value to set
      * @param args - other arguments like the config, renderer, etc. See source code for details.
      */
     setValue?: (value: T, ...args: ChangeArgs) => void,
-
+    /**
+     * Path of the binding inside the value. (dot separated json path)
+     * In case of property it is appended to the property path.
+     */
+    path?: ValOrFunc<string>,
     /**
      * The Ui element will be hidden if this is true.
      * This can be a boolean or a function that returns a boolean.
@@ -89,6 +95,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     /**
      * onChange callbacks can be added to the config object to be called when the value of the object changes.
      * This can be a function or an array of functions.
+     * When it's specified with a container(with children) object, it will be called when any of the children change, and the config of the child that's changed will be available in the arguments
      */
     onChange?: ValOrArrOp<((...args: ChangeArgs) => void)>;
 
@@ -155,8 +162,10 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * @param delay - The delay in ms to wait before re-rendering. This is useful if multiple changes are made in quick succession. If another refresh event is in the queue for the same object, it will be postponed by this amount. This is not exact for small values.
      */
     uiRefresh?: (deep?: boolean, mode?: TUiRefreshModes | 'immediate', delay?: number) => void; // delay in ms
-
-    dispatchMode?: TUiRefreshModes | 'immediate'; //  This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
+    /**
+     * This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
+     */
+    dispatchMode?: TUiRefreshModes | 'immediate';
 
     /**
      * @internal

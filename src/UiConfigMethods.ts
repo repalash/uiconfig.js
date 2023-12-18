@@ -8,11 +8,28 @@ export class UiConfigMethods {
     }
 
     getBinding(config: UiObjectConfig) {
-        const prop = getOrCall(config.property)
+        let prop = getOrCall(config.property)
+        const path = getOrCall(config.path)
         if (!prop || typeof prop[0] !== 'object' || !prop[1]) {
             // console.warn('cannot determine property', config)
             return [undefined, ''] as [undefined, string]
         }
+        if (typeof prop[1] === 'string' && path && path.length) prop = [prop[0], prop[1] + '.' + path]
+        if (typeof prop[1] === 'string' && prop[1].includes('.')) {
+            // json path
+            const path1 = prop[1].split('.')
+            let tar = prop[0]
+            const key = path1.pop() || ''
+            for (const p of path1) {
+                tar = Array.isArray(tar) ? tar[parseInt(p)] : tar[p]
+                if (!tar) {
+                    console.warn('Cannot determine property, invalid property path', config, prop)
+                    return [undefined, ''] as [undefined, string]
+                }
+            }
+            prop = [tar, key]
+        }
+        if (Array.isArray(prop[0]) && typeof prop[1] === 'string') prop[1] = parseInt(prop[1])
         return prop
     }
 
@@ -112,10 +129,12 @@ export class UiConfigMethods {
             else if (config.value === undefined) {
                 if (config.getValue || config.setValue) {
                     Object.defineProperty(config, 'value', {
-                        get: () => config.getValue?.(),
-                        set: (v) => config.setValue?.(v),
+                        get: () => config.getValue && config.getValue(),
+                        set: (v) => config.setValue && config.setValue(v),
                     })
                 }
+            } else if (config.getValue || config.setValue) {
+                console.warn('getValue/setValue is ignored since value is provided', config)
             }
             if (config.property === undefined && config.value !== undefined) {
                 config.property = [config, 'value']
