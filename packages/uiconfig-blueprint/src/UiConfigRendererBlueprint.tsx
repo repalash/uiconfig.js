@@ -5,7 +5,7 @@ import {createRoot, Root} from 'react-dom/client'
 import {InspectorStackComponent} from './components/InspectorStackComponent'
 import {BPComponent, UiConfigRendererContext} from './bpComponents/BPComponent'
 // @ts-ignore
-import rendererCss from './renderer.scss?inline'
+import rendererCss from './renderer.scss?inline' // for rollup build remove ?inline
 import {FocusStyleManager} from '@blueprintjs/core'
 import {THREE} from "./threejs";
 

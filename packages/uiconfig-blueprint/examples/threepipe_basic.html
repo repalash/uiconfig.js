@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Threepipe blueprint example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body, #canvas-container, #mcanvas {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+
+<body style="background: #111;">
+<div id="canvas-container">
+    <canvas id="mcanvas"></canvas>
+</div>
+<script type="module">
+    import {ThreeViewer, Color, Vector2, Vector3, Vector4, Texture} from 'https://threepipe.org/dist/index.mjs'
+    import {UI} from '../src/index.ts'
+
+    const viewer = new ThreeViewer({canvas: document.getElementById('mcanvas')})
+
+    // Load an environment map
+    const envPromise = viewer.setEnvironmentMap('https://threejs.org/examples/textures/equirectangular/venice_sunset_1k.hdr')
+    const modelPromise = viewer.load('https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf', {
+        autoCenter: true,
+        autoScale: true,
+    })
+
+    // Create a UI for the data object
+    const ui = new UI();
+    ui.THREE = {Color, Vector2, Vector3, Vector4, Texture}
+    ui.fileLoader = viewer
+    viewer.uiConfig.children.forEach(child => ui.appendChild(child))
+
+    Promise.all([envPromise, modelPromise]).then(([env, model])=>{
+        console.log('Loaded', model, env, viewer)
+        const mesh = model?.getObjectByName('node_damagedHelmet_-6514')
+        ui.appendChild(mesh?.uiConfig)
+    })
+
+</script>
+</body>
+</html>

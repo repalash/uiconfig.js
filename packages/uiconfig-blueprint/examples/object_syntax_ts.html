@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <title>Object Syntax TS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #blueprintUiContainer{
+            top: 50% !important;
+            left: 50% !important;
+            translate: -50% -50% !important;
+        }
+    </style>
 </head>
 <body style="background: #111;">
 <script type="module">
-    import {UI} from '../../dist/index.js'
-    import {data} from '../dist/class_syntax.js'
+    import {UI} from '../src/index.ts'
+    import {data} from './ts/object_syntax.ts'
 
     // Create a UI for the data object
     const ui = new UI();
