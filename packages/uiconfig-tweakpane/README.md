@@ -13,7 +13,7 @@ The UI components are bound to javascript/typescript objects and properties thro
 
 Basic Examples: https://repalash.com/uiconfig.js/examples/index.html
 
-Threepipe Basic UI: https://threepipe.org/examples/#viewer-uiconfig/
+Threepipe Basic UI: https://threepipe.org/examples/#tweakpane-ui-plugin/
 
 Threepipe Editor: https://threepipe.org/examples/#tweakpane-editor/
 
@@ -65,7 +65,7 @@ The module can be accessed with the short-form `tpui`
         },
     }
     
-    const ui = new tpUi.UI()
+    const ui = new tpui.UI()
     ui.appendChild(config)
 </script>
 ```

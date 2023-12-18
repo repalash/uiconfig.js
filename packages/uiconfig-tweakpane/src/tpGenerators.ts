@@ -38,6 +38,13 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
             plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
         }
+        if (child.property === undefined &&
+            child.value === undefined &&
+            child.getValue === undefined &&
+            child.setValue === undefined &&
+            child.type !== 'button' &&
+            (config.property !== undefined || config.value !== undefined)
+        ) child.property = config.property !== undefined ? config.property : [config, 'value']
 
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
@@ -72,6 +79,17 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         const rm = ch[ch.length - 1]
         folder.remove(rm) // todo; remove listeners etc
         ch = folder.children
+        const child = (rm as any).srcUiConfig as UiObjectConfig
+        if (child) {
+            child.parentOnChange = undefined
+            if (Array.isArray(child.property) &&
+                (child.property === config.property ||
+                    child.property[0] === config &&
+                        child.property[1] === 'value'
+                )
+            ) delete child.property
+            // todo: remove uiRef here?
+        }
         // todo: do we need to do disposeUiConfig?
     }
 

@@ -79,6 +79,7 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
         if (ui) {
             ui.hidden = getOrCall(uiConfig.hidden) ?? false
             ui.disabled = getOrCall(uiConfig.disabled) ?? false // todo: also see if property is writable?
+            ;(ui as any).srcUiConfig = uiConfig
         }
         uiConfig.uiRef = ui
         uiConfig.uiRefType = ui ? uiConfig.type : undefined
