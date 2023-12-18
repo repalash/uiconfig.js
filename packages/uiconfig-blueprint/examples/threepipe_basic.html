@@ -40,8 +40,8 @@
 
     Promise.all([envPromise, modelPromise]).then(([env, model])=>{
         console.log('Loaded', model, env, viewer)
-        const mesh = model?.getObjectByName('node_damagedHelmet_-6514')
-        ui.appendChild(mesh?.uiConfig)
+        const mesh = model.getObjectByName('node_damagedHelmet_-6514')
+        ui.appendChild(mesh.uiConfig)
     })
 
 </script>

@@ -1,9 +1,9 @@
-# UiConfig Blurprint.js
+# UiConfig Blueprint.js
 
 [![NPM Package](https://img.shields.io/npm/v/uiconfig-blueprint.svg)](https://www.npmjs.com/package/uiconfig-blueprint)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/license/apache-2-0/)
 
-Blurprint.js theme/wrapper library for [uiconfig.js](https://github.com/repalash/uiconfig.js): A UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators. 
+Blueprint.js theme/wrapper library for [uiconfig.js](https://github.com/repalash/uiconfig.js): A UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators. 
 
 It includes several components for editor-like user interfaces like folders, panels, sliders, pickers, inputs for string, number, file, vector, colors, etc.
 

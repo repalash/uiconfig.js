@@ -14,6 +14,12 @@
   width: 100%;
   background: transparent;
   box-shadow: none;
+  pointer-events: none;
+  border: none;
+}
+
+.bpPanelStackHeaderOverlay * {
+  pointer-events: auto;
 }
 
 .hidden{
