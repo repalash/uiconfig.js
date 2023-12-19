@@ -10,6 +10,8 @@ A super small UI renderer framework to dynamically generate website/configuratio
 
 It includes several themes with components for editor-like user interfaces like panels, sliders, pickers, inputs for string, number, file, vector, colors, etc. 
 
+Available Renderers: [uiconfig-tweakpane](https://github.com/repalash/uiconfig-tweakpane), [uiconfig-blueprint](https://github.com/repalash/uiconfig-blueprint)
+
 The UI components are bound to javascript/typescript objects and properties through a JSON configuration.
 
 This can be used to quickly create simple configuration panels for web applications or games or to create a full-blown editor for games and applications.
@@ -122,7 +124,7 @@ It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdeli
         },
     }
     
-    const ui = new tpUi.UI()
+    const ui = new tpui.UI() // use bpui.UI() for blueprint
     ui.appendChild(config)
 </script>
 ```
