@@ -13,7 +13,7 @@ import {
     uiToggle,
     uiVector,
 } from './decorator_alias'
-import {generateUiConfig, generateUiFolder, UiConfigTypeMap} from './decorator_utils'
+import {generateUiConfig, generateUiFolder, generateValueConfig, UiConfigTypeMap} from './decorator_utils'
 import {
     ChangeArgs,
     ChangeEvent,
@@ -37,6 +37,6 @@ export {
     uiColor, uiImage, uiToggle, uiNumber,
 }
 export {uiPanelContainer, uiFolderContainer}
-export {generateUiConfig, generateUiFolder, UiConfigTypeMap}
+export {generateUiConfig, generateUiFolder, generateValueConfig, UiConfigTypeMap}
 export type {TParams}
 

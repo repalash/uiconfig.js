@@ -94,7 +94,7 @@ export class UiConfigMethods {
             const binding = this.getBinding(config)
             const tar = binding[0] ?? config
             const key = binding[1] || 'onClick'
-            const action = tar[key] as Fof<any>
+            const action = (tar[key] ?? tar.value) as Fof<any>
             if (typeof action === 'function') {
                 action.call(tar, ...options?.args ?? [])
             } else if (action) {
