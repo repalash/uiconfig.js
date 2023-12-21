@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-tweakpane",
   "name:umd": "tpui",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
   "main": "src/index.ts",
   "module": "src/index.ts",
@@ -87,7 +87,7 @@
     "rimraf": "^5.0.1"
   },
   "dependencies": {
-    "uiconfig.js": "^0.0.8",
+    "uiconfig.js": "^0.0.9",
     "@types/three": "^0.152.1"
   },
   "//": {
