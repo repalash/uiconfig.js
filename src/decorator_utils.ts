@@ -6,7 +6,7 @@ export class UiConfigTypeMap {
     static Map = new Map<ObjectConstructor, any[]>()
 }
 
-function generateValueConfig(obj: any, key: string | number, label?: string, val?: any) {
+export function generateValueConfig(obj: any, key: string | number, label?: string, val?: any) {
     val = val ?? obj[key]
     const config = val?.uiConfig
     let result: UiObjectConfig|undefined = undefined
@@ -66,12 +66,13 @@ export function generateUiConfig(obj: any): UiObjectConfig[] {
             }
             if (params) {
                 const extraParams = typeof params.params === 'function' ? params.params(obj) : params.params || {}
-                delete params.params
+                const params1 = {...params}
+                delete params1.params
                 if (typeof config === 'function') {
                     const c1: Fof<any, any> = config
-                    config = ()=>Object.assign(c1(), {...params, ...extraParams})
+                    config = ()=>Object.assign(c1(), {...params1, ...extraParams})
                 }
-                Object.assign(config, {...params, ...extraParams})
+                Object.assign(config, {...params1, ...extraParams})
             }
             result.push(config)
 
