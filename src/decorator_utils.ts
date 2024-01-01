@@ -1,6 +1,5 @@
 import {UiObjectConfig} from './types'
-import {v4} from 'uuid'
-import {Fof} from 'ts-browser-helpers'
+import {Fof, uuidV4} from 'ts-browser-helpers'
 
 export class UiConfigTypeMap {
     static Map = new Map<ObjectConstructor, any[]>()
@@ -28,12 +27,12 @@ export function generateValueConfig(obj: any, key: string | number, label?: stri
     return result
 }
 
-export function generateUiConfig(obj: any): UiObjectConfig[] {
+export function generateUiConfig(obj: any): UiObjectConfig['children'] {
     if (!obj) return []
     let type = obj.constructor || Object
     if (type === Array) type = Object
 
-    const result: UiObjectConfig[] = []
+    const result: UiObjectConfig['children'] = []
     const types: any[] = []
     while (type && type !== Object) {
         types.push(type)
@@ -94,7 +93,7 @@ export function generateUiFolder(label: string, obj: any, params: any = {}, type
     return {
         type, label,
         children: generateUiConfig(obj),
-        uuid: v4(),
+        uuid: uuidV4(),
         ...params,
     }
 }

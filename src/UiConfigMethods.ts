@@ -1,7 +1,6 @@
 import {ChangeArgs, ChangeEvent, UiObjectConfig} from './types'
-import {Fof, getOrCall, safeSetProperty} from 'ts-browser-helpers'
+import {Fof, getOrCall, safeSetProperty, uuidV4} from 'ts-browser-helpers'
 import {UiConfigRendererBase} from './UiConfigRendererBase'
-import {v4} from 'uuid'
 
 export class UiConfigMethods {
     constructor(protected _renderer: UiConfigRendererBase) {
@@ -122,7 +121,7 @@ export class UiConfigMethods {
             console.warn('No type for config', config)
             config.type = 'input'
         }
-        if (!config.uuid) config.uuid = v4()
+        if (!config.uuid) config.uuid = uuidV4()
 
         if (config.property === undefined) {
             if (config.binding) config.property = config.binding
