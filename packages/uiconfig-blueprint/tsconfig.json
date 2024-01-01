@@ -6,7 +6,7 @@
         "experimentalDecorators": true,
         "isolatedModules": true,
         "module": "es2015",
-        "jsx": "react",
+        "jsx": "react-jsx",
         "noImplicitAny": true,
         "declaration": true,
         "noImplicitThis": true,

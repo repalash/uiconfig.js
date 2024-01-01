@@ -1,5 +1,5 @@
 // https://github.com/palantir/blueprint/issues/2348#issuecomment-389322440
-import React, {ReactNode} from "react";
+import {ReactNode} from "react";
 
 export const bpIconWrapper = (path: ReactNode, viewbox = 16) => {
     return (

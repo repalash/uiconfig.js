@@ -1,4 +1,3 @@
-import React from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {ConfigObject} from "../ConfigObject";
 import {BPLabelledComponentState} from "./BPLabelledComponent";

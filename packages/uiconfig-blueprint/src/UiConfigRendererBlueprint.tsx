@@ -2,7 +2,7 @@ import {createDiv, createStyles, css} from "ts-browser-helpers";
 import {UiConfigRendererBase, UiObjectConfig} from "uiconfig.js";
 import React from 'react'
 import {createRoot, Root} from 'react-dom/client'
-import {InspectorStackComponent} from './components/InspectorStackComponent'
+import {ConfigurationPanelComponent} from './components/ConfigurationPanelComponent'
 import {BPComponent, UiConfigRendererContext} from './bpComponents/BPComponent'
 // @ts-ignore
 import rendererCss from './renderer.scss?inline' // for rollup build remove ?inline
@@ -47,7 +47,7 @@ export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
         this._root.render(
             <React.StrictMode>
             <UiConfigRendererContext.Provider value={this}>
-                <InspectorStackComponent config={this.config}/>
+                <ConfigurationPanelComponent config={this.config}/>
             </UiConfigRendererContext.Provider>
             </React.StrictMode>
         )
@@ -68,18 +68,5 @@ export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
     dispose() {
         // todo
     }
-
-    // todo: hidden and disabled
-
-    // protected _renderUiConfig(uiConfig: UiObjectConfig<any, string>, parent: any): any {
-    //     const ui = uiConfig.type ? this._typeGenerators[uiConfig.type]?.(parent, uiConfig, this) as BladeApi<BladeController<View>> | undefined : undefined
-    //     if (ui) {
-    //         ui.hidden = getOrCall(uiConfig.hidden) ?? false
-    //         ui.disabled = getOrCall(uiConfig.disabled) ?? false // todo: also see if property is writable?
-    //     }
-    //
-    //     return ui
-    //
-    // }
 
 }

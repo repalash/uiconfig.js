@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler} from "react";
+import {ChangeEventHandler} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {InputGroup} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";

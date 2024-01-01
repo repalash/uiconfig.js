@@ -1,6 +1,7 @@
 import * as React from "react";
 import {Icon, IconName, MaybeElement} from "@blueprintjs/core";
 
+// todo: bounds and stepsize
 export class DraggableIcon extends React.Component<{ icon: IconName | MaybeElement, size?: number, value: number, stepSize?: number, small?: boolean, onChange: (v: number, last?: boolean) => void }> {
     private cursor = 'auto'
     private dragStartOffset = -Infinity

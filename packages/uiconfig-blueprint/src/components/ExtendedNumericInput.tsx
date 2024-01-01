@@ -35,7 +35,7 @@ const NumberAbbreviation = {
 
 const NUMBER_ABBREVIATION_REGEX = /((\.\d+)|(\d+(\.\d+)?))(k|m|b)\b/gi;
 const SCIENTIFIC_NOTATION_REGEX = /((\.\d+)|(\d+(\.\d+)?))(e\d+)\b/gi;
-
+// todo: bounds and stepsize
 export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & NumericInputProps & { onChange2: (v: number, last?: boolean) => void }, IExtendedNumericInputState> {
     public state: IExtendedNumericInputState = {
         value: (this.props.value ?? this.props.defaultValue ?? '').toString(),

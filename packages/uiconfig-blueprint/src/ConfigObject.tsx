@@ -30,7 +30,7 @@ export interface ConfigProps extends PanelActions {
     level?: number,
 }
 
-const generators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponentProps<any>, BPComponentState>>> = {
+export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponentProps<any>, BPComponentState>>> = {
     input: BPTextInputComponent,
     number: BPNumberInputComponent,
     button: BPButtonComponent,
@@ -54,7 +54,7 @@ const generators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponent
 
 export class ConfigObject extends React.Component<ConfigProps, {}> {
     static contextType = UiConfigRendererContext
-    context!: React.ContextType<typeof UiConfigRendererContext>
+    declare context: React.ContextType<typeof UiConfigRendererContext>
     state = {}
 
     render() {
@@ -72,7 +72,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
         }
         if (val && type === 'input' && typeof (val as any).x === 'number') this.props.config.type = type = 'vec'
 
-        let BPComp = generators[type]
+        let BPComp = ConfigObjectGenerators[type]
         if (type === 'panel' && !this.props.isPanel) {
             const label = this.context.methods.getLabel(this.props.config)
             return (
@@ -107,7 +107,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
         // }
         // if (!this.props.uiConfig.type) return (<li key={v4()}></li>)
         // if (!this.props.uiConfig.uuid) this.props.uiConfig.uuid = v4()
-        // const g = generators[this.props.uiConfig.type as any as UiConfigTypes]
+        // const g = ConfigObjectGenerators[this.props.uiConfig.type as any as UiConfigTypes]
         // // console.log(props.uiConfig)
         // if (!g) return <li key={this.props.uiConfig.uuid}></li>
         // this.props.uiConfig.uiRefresh = (mode, deep, delay) => {

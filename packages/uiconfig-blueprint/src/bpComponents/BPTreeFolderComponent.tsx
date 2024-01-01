@@ -20,11 +20,11 @@ export class BPTreeFolderComponent extends BPTreeComponent<UiObjectConfig> {
         return (this.props.config.children || []).map(c => getOrCall(c) || {}).flat(2) as UiObjectConfig[]
     }
 
-    protected async _onNodeClick(_node: TreeNodeInfo<UiObjectConfig>) {
+    protected async _onNodeClick(_id: string|number) {
         console.log("TODO: Tree node clicked")
     }
 
-    protected async _onNodeDoubleClick(_node: TreeNodeInfo<UiObjectConfig>) {
+    protected async _onNodeDoubleClick(_id: string|number) {
         console.log("TODO: Tree node double clicked")
     }
 

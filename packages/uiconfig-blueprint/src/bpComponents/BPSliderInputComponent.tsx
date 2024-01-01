@@ -1,4 +1,3 @@
-import React from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {NumericInput, Slider} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";

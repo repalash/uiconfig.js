@@ -1,5 +1,5 @@
 import {FormGroup} from "@blueprintjs/core";
-import React, {PropsWithChildren} from "react";
+import {PropsWithChildren} from "react";
 
 export function FormGroupComponent(props: PropsWithChildren<{ label: string, flexBasis?: string, disabled?: boolean }>) {
     return (

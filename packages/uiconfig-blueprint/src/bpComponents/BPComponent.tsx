@@ -1,7 +1,8 @@
 import React, {createContext} from "react";
-import type {UiConfigRendererBlueprint} from '../UiConfigRendererBlueprint'
+import type {UiConfigRendererBase} from 'uiconfig.js'
 import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
+import {THREE} from "../threejs";
 
 export type BPComponentProps<T> = {
     config: UiObjectConfig<T>,
@@ -12,11 +13,16 @@ export type BPComponentState = {
     disabled?: boolean
     readOnly?: boolean // same as disabled(for most inputs)
 }
-export const UiConfigRendererContext = createContext<UiConfigRendererBlueprint>(null as any)
+export interface UiConfigRendererBaseBp extends UiConfigRendererBase{
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    THREE: THREE|undefined
+}
+
+export const UiConfigRendererContext = createContext<UiConfigRendererBaseBp>(null as any)
 export type UiConfigRendererContextType = React.ContextType<typeof UiConfigRendererContext>
 export abstract class BPComponent<TValue, TState, TProps extends BPComponentProps<TValue> = BPComponentProps<TValue>> extends React.Component<TProps, TState> {
     static contextType = UiConfigRendererContext
-    context!: UiConfigRendererContextType
+    declare context: UiConfigRendererContextType
 
     protected constructor(props: TProps, context: UiConfigRendererContextType, state: TState) {
         super(props, context);

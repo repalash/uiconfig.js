@@ -1,6 +1,6 @@
 import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import React, {ReactNode} from "react";
+import {ReactNode} from "react";
 import {FormGroupComponent} from "../components/FormGroupComponent";
 
 export abstract class BPInputComponent<

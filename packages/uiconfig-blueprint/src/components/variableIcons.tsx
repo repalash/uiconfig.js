@@ -1,4 +1,3 @@
-import React from "react";
 import {bpIconWrapper} from "./bpIconWrapper";
 
 export const xIcon1 = bpIconWrapper(

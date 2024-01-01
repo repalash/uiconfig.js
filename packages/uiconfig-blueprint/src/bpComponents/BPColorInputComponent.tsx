@@ -1,4 +1,4 @@
-import React, {createRef} from "react";
+import {createRef} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {Button, Icon, InputGroup, Popover} from "@blueprintjs/core";
 import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";

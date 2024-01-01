@@ -1,25 +1,19 @@
 import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
 import {Tree, TreeNodeInfo} from "@blueprintjs/core";
-import React from "react";
 
 export type BPTreeComponentState<T = {}> = BPComponentState & {
     nodes: TreeNodeInfo<T>[]
 }
 
-export function forEachTreeNode<T>(nodes: TreeNodeInfo<T>[] | undefined, callback: (node: TreeNodeInfo<T>) => void) {
-    if (!nodes) return;
-    for (const node of nodes) {
-        callback(node);
-        forEachTreeNode(node.childNodes, callback);
-    }
-}
+// https://github.com/palantir/blueprint/blob/develop/packages/docs-app/src/examples/core-examples/treeExample.tsx
+type NodePath = number[];
 
 export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
     constructor(props: BPComponentProps<TConfigVal>, context: UiConfigRendererContextType) {
         super(props, context, {nodes: []});
     }
 
-    protected _infoMap = new Map<string, TreeNodeInfo<T>>()
+    protected _infoMap = new Map<string | number, TreeNodeInfo<T>>()
 
     protected _createNodeInfo(id: string, obj: T) {
         return {
@@ -27,6 +21,8 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
             label: 'unnamed',
             nodeData: obj,
             childNodes: [],
+            isExpanded: false,
+            isSelected: false,
         }
     }
 
@@ -36,23 +32,48 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
 
     protected abstract _getRootNodes(): T[]
 
-    protected async _onNodeClick(_node: TreeNodeInfo<T>) {
+    protected async _onNodeClick(_id: string | number, _path: number[]) {
     }
 
-    protected async _onNodeDoubleClick(_node: TreeNodeInfo<T>) {
+    protected async _onNodeDoubleClick(_id: string | number, _path: number[]) {
     }
 
-    protected async _onNodeExpand(node: TreeNodeInfo<T>) {
+    protected _cloneNodes(callback?: (t:TreeNodeInfo<T>)=>void, state?: TreeNodeInfo<T>[]): TreeNodeInfo<T>[] {
+        return (state ?? this.state.nodes).map(n => {
+            let res: TreeNodeInfo<T> = {
+                ...n,
+                childNodes: n.childNodes ? this._cloneNodes(callback, n.childNodes) : undefined
+            }
+            if(callback) callback(res)
+            this._infoMap.set(n.id, res)
+            return res
+        })
+    }
+
+    protected _forEachNode<T>(nodes: TreeNodeInfo<T>[] | undefined, callback: (node: TreeNodeInfo<T>) => void) {
+        if (nodes === undefined) {
+            return nodes;
+        }
+        for (const node of nodes) {
+            callback(node);
+            this._forEachNode(node.childNodes, callback);
+        }
+        return nodes
+    }
+    protected _forNodeAtPath<T>(nodes: TreeNodeInfo<T>[], path: NodePath, callback: (node: TreeNodeInfo<T>) => void) {
+        callback(Tree.nodeFromPath(path, nodes));
+    }
+
+    protected async _onNodeExpandCollapse(_id: string | number, _path: number[]) {
+        const nodes = this._cloneNodes()
+        const node = this._infoMap.get(_id)
+        if (!node) return
         node.isExpanded = !node.isExpanded
-        await this.setStatePromise(this.state)
+        // forNodeAtPath(nodes, _path, node => (node.isExpanded = !node.isExpanded));
+        await this.setStatePromise({...this.state, nodes})
     }
 
-    protected async _onNodeCollapse(node: TreeNodeInfo<T>) {
-        node.isExpanded = !node.isExpanded
-        await this.setStatePromise(this.state)
-    }
-
-    protected async _onNodeContextMenu(_node: TreeNodeInfo<T>) {
+    protected async _onNodeContextMenu(_id: string | number, _path: number[]) {
     }
 
     protected buildData(data: TreeNodeInfo<T>[], obj: T, _?: any, _2?: any) {
@@ -72,22 +93,19 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
         const nodes = children.map(c => {
             return this.buildData([], c)[0]
         }).filter(v => v)
-        console.log('update', nodes, children)
         return super.getUpdatedState({
             nodes
         })
     }
 
     deselectAll() {
-        forEachTreeNode(this.state.nodes, (n) => n.isSelected = false)
+        const nodes = this._cloneNodes(n => n.isSelected = false)
+        return this.setStatePromise({...this.state, nodes})
     }
 
-    async setSelected(node?: TreeNodeInfo<T>) {
-        this.deselectAll()
-        if (node) {
-            node.isSelected = true
-            await this.setStatePromise(this.state)
-        }
+    async setSelected(id?: string) {
+        const nodes = this._cloneNodes(n => n.isSelected = n.id === id)
+        return this.setStatePromise({...this.state, nodes})
     }
 
     componentDidMount() {
@@ -99,26 +117,25 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
     }
 
     render() {
-        console.log('render tree', this.state.nodes)
         const TreeT = Tree.ofType<T>()
         return !this.state.hidden ? (
             <TreeT
                 contents={this.state.nodes}
                 className="folderContent"
                 onNodeExpand={(node, _path, _e) => {
-                    this._onNodeExpand(node)
+                    this._onNodeExpandCollapse(node.id, _path)
                 }}
                 onNodeCollapse={(node, _path, _e) => {
-                    this._onNodeCollapse(node)
+                    this._onNodeExpandCollapse(node.id, _path)
                 }}
                 onNodeClick={(node, _path, _e) => {
-                    this._onNodeClick(node)
+                    this._onNodeClick(node.id, _path)
                 }}
                 onNodeDoubleClick={(node, _path, _e) => {
-                    this._onNodeDoubleClick(node)
+                    this._onNodeDoubleClick(node.id, _path)
                 }}
                 onNodeContextMenu={(node, _path, _e) => {
-                    this._onNodeContextMenu(node)
+                    this._onNodeContextMenu(node.id, _path)
                 }}
             />
         ) : null

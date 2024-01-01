@@ -1,4 +1,3 @@
-import React from "react";
 import {FileComponent} from "../components/FileComponent";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";
@@ -14,8 +13,8 @@ type BPFileComponentExtras = {fileLoader?: {load: (v: string|File|{path: string,
 type BPFileComponentContextType = UiConfigRendererContextType & BPFileComponentExtras
 
 export class BPFileComponent extends BPValueComponent<FileImportType | null, BPFileComponentState, StateValue> {
-    context!: BPFileComponentContextType
-    props!: BPComponentProps<FileImportType | null> & BPFileComponentExtras
+    declare context: BPFileComponentContextType
+    declare props: BPComponentProps<FileImportType | null> & BPFileComponentExtras
     constructor(props: BPComponentProps<FileImportType | null> & BPFileComponentExtras, context: BPFileComponentContextType) {
         super(props, context, {
             mode: 'file',

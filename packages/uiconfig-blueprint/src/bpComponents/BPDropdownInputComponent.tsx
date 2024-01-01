@@ -1,4 +1,3 @@
-import React from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {Button, MenuItem} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";

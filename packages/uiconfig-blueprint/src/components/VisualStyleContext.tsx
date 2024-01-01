@@ -22,9 +22,38 @@ export const defaultVisualStyle = {
 export const VisualStyleContext = React.createContext<typeof defaultVisualStyle>(defaultVisualStyle)
 export const useVisualStyle = () => React.useContext(VisualStyleContext)
 
+const localStoragePrefix = 'bpUi'
+const localStorageIds = {
+    'darkMode': localStoragePrefix + 'DarkMode',
+    'theme': localStoragePrefix + 'Theme',
+}
+export function setupVisualStyle(){
+    const [darkMode, setDarkMode] = React.useState(localStorage.getItem(localStorageIds.darkMode) !== (defaultVisualStyle.darkMode ? 'false' : 'true'))
+    React.useEffect(() => {
+        localStorage.setItem('bpUiDarkMode', darkMode ? 'true' : 'false')
+        const clas = Classes.DARK
+        if(!darkMode)  document.body.classList.remove(clas)
+        else document.body.classList.add(clas)
+    }, [darkMode])
+    const [theme, setTheme] = React.useState(localStorage.getItem(localStorageIds.theme) || defaultVisualStyle.theme)
+    React.useEffect(() => {
+        localStorage.setItem('bpUiTheme', theme)
+        document.documentElement.classList.remove(...Object.keys(defaultVisualStyle.themes).map(k => k))
+        document.documentElement.classList.add(theme)
+    }, [theme])
+    return {darkMode, setDarkMode, theme, setTheme}
+}
+
+export function VisualStyleProvider({children}: {children: React.ReactNode}) {
+    const visualStyle = setupVisualStyle()
+    return <VisualStyleContext.Provider value={{...defaultVisualStyle, ...visualStyle}}>
+        {children}
+    </VisualStyleContext.Provider>
+}
+
 export function ThemeSettingsMenuComponent() {
     const visualStyle = useVisualStyle()
-    return <Menu className={Classes.ELEVATION_0}  >
+    return <Menu className={Classes.ELEVATION_0}>
         <MenuItem
             icon="contrast"
             text="Color"
@@ -35,11 +64,13 @@ export function ThemeSettingsMenuComponent() {
                 <>
                     <MenuItem icon="flash" text="Light Mode"
                               shouldDismissPopover={false}
+                              key="light"
                               selected={!visualStyle.darkMode}
                               onClick={() => visualStyle.setDarkMode(false)}
                               roleStructure="listoption"/>
                     <MenuItem icon="moon" text="Dark Mode"
                               shouldDismissPopover={false}
+                              key="dark"
                               selected={visualStyle.darkMode}
                               onClick={() => visualStyle.setDarkMode(true)}
                               roleStructure="listoption"/>
@@ -57,6 +88,7 @@ export function ThemeSettingsMenuComponent() {
                     {Object.entries(visualStyle.themes).map(([key, value]) => (
                         <MenuItem
                                   shouldDismissPopover={false}
+                                  key={key}
                                   text={value.label}
                                   selected={visualStyle.theme === key}
                                   onClick={() => visualStyle.setTheme(key)}

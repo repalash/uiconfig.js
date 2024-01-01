@@ -17,13 +17,13 @@ export default defineConfig({
     // },
     build: {
         sourcemap: true,
-        outDir: 'dist',
         lib: {
             entry: 'src/index.ts',
             formats: ['es', 'umd'],
             name: packageJson["name:umd"],
             fileName: (format) => (format === 'umd' ? packageJson["clean-package"].replace.main : packageJson["clean-package"].replace.module).replace('dist/', ''),
         },
+        outDir: 'dist',
         emptyOutDir: true,
         commonjsOptions: {
             exclude: [/uiconfig.js/],
@@ -57,7 +57,7 @@ export default defineConfig({
         postcss: {
             plugins: [
                 {
-                    postcssPlugin: 'modify-css-content',
+                    postcssPlugin: 'modify-css-content', // todo: this should run when doing compile:css also
                     Once(root) {
                         // Modify to fix :root.bpx-flat :root twice when imported in renderer.scss
                         root.walkRules(rule => {

@@ -1,4 +1,4 @@
-@import "~@blueprintjs/core/lib/scss/variables.scss";
+@import "@blueprintjs/core/lib/scss/variables.scss";
 
 // todo: style for bp5-disabled
 
@@ -93,7 +93,7 @@
   justify-content: space-between;
   flex-direction: row;
   box-shadow: 0 1px $pt-divider-black;
-  z-index: 1;
+  //z-index: 1;
 
   > button {
     border-radius: 0;

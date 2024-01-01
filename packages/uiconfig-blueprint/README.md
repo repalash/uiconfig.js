@@ -7,7 +7,7 @@ Blueprint.js theme/wrapper library for [uiconfig.js](https://github.com/repalash
 
 It includes several components for editor-like user interfaces like folders, panels, sliders, pickers, inputs for string, number, file, vector, colors, etc.
 
-The UI components are bound to javascript/typescript objects and properties through a simple and flexible JSON configuration.
+The UI components are bound to javascript/typescript    objects and properties through a simple and flexible JSON configuration.
 
 ### Examples
 
@@ -127,3 +127,15 @@ npm publish
 
 ## License
 All code is licensed under [Apache 2.0](LICENSE).
+
+## Library usage in react
+
+This part is still a WIP.
+
+Note: First check the dependencies.
+
+Import from `uiconfig-blueprint/lib` build.
+
+```javascript
+import {ConfigurationPanelComponent} from 'uiconfig-blueprint/lib/esm/lib'
+```
