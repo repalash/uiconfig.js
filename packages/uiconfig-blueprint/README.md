@@ -29,6 +29,8 @@ npm install uiconfig-blueprint
 Use in any javascript/typescript file.
 ```typescript
 import { UI } from 'uiconfig-blueprint';
+// or for the browser
+// import { UI } from 'https://unpkg.com/uiconfig-blueprint/dist/index.mjs';
 
 const config = {
     type: "slider",
@@ -132,10 +134,21 @@ All code is licensed under [Apache 2.0](LICENSE).
 
 This part is still a WIP.
 
-Note: First check the dependencies.
+Note: First check the dependencies. (Install all the required peerDependencies)
 
 Import from `uiconfig-blueprint/lib` build.
 
+In JS/TS/JSX/TSX files:
 ```javascript
 import {ConfigurationPanelComponent} from 'uiconfig-blueprint/lib/esm/lib'
+```
+
+In SCSS
+```scss
+@import 'uiconfig-blueprint/src/renderer';
+```
+or 
+In CSS
+```css
+@import 'uiconfig-blueprint/lib/css/renderer.css';
 ```

@@ -1,13 +1,13 @@
-import {v4} from "uuid";
 import {TreeNodeInfo} from "@blueprintjs/core";
 import {BPTreeComponent} from "./BPTreeComponent";
 import {UiObjectConfig} from 'uiconfig.js'
-import {getOrCall} from 'ts-browser-helpers'
+import {getOrCall, uuidV4} from 'ts-browser-helpers'
 
 export class BPTreeFolderComponent extends BPTreeComponent<UiObjectConfig> {
 
     protected _getNodeId(obj: UiObjectConfig) {
-        return obj.uuid || v4();
+        if(!obj.uuid) obj.uuid = uuidV4();
+        return obj.uuid;
     }
 
     protected _updateNodeInfo(node: TreeNodeInfo<UiObjectConfig>, obj: UiObjectConfig) {
