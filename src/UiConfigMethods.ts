@@ -81,7 +81,7 @@ export class UiConfigMethods {
     }
 
     getChildren(config: UiObjectConfig): UiObjectConfig[] {
-        return (config.children ?? []).map(v => getOrCall(v)).flat(2).filter(v => v) as UiObjectConfig[]
+        return (getOrCall(config.children) ?? []).map(v => getOrCall(v)).flat(2).filter(v => v) as UiObjectConfig[]
     }
 
     async clickButton(config: UiObjectConfig, options?: {args: any[]}) {

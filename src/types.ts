@@ -33,6 +33,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     /**
      * Children of this object. This is used for folders and dropdowns.
      * This can be an array of UiObjectConfig objects, or an array of functions that returns an array of UiObjectConfig objects.
+     * Note: it could be a function that returns an array as well, but its not added to the type yet.
      */
     children?: (UiObjectConfig | Fof<ValOrArrOp<UiObjectConfig>>)[],
 
