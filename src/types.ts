@@ -167,6 +167,13 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
      */
     dispatchMode?: TUiRefreshModes | 'immediate';
+    /**
+     * Specifies whether to send the click event etc to the onClick/value function.
+     * Only for buttons, and only if the value is a function.
+     * This can be a boolean or a function that returns a boolean.
+     * Default is false.
+     */
+    sendArgs?: ValOrFunc<boolean>
 
     /**
      * @internal

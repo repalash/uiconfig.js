@@ -59,6 +59,13 @@ export class UiConfigMethods {
         config.parentOnChange?.(...changeArgs)
     }
 
+    /**
+     *
+     * @param config
+     * @param value
+     * @param props - only the prop `last` need to be set, rest are optional. `lastValue` can be set if known. `config`, `configPath` are for parentOnChange, no need to set that.
+     * @param forceOnChange
+     */
     async setValue<T>(config: UiObjectConfig<T>, value: T, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], lastValue?: T}, forceOnChange?: boolean) {
         return this.runAtEvent(config, () => {
             const [tar, key] = this.getBinding(config)
@@ -70,6 +77,12 @@ export class UiConfigMethods {
             return true
         })
     }
+
+    /**
+     *
+     * @param config
+     * @param props - only last needs to be set. check the docs for `setValue`
+     */
     async dispatchOnChange<T>(config: UiObjectConfig<T>, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], value?: any, lastValue?: any}) {
         return this.runAtEvent(config, () => {
             this.dispatchOnChangeSync(config, props)
@@ -95,7 +108,7 @@ export class UiConfigMethods {
             const key = binding[1] || 'onClick'
             const action = (tar[key] ?? tar.value) as Fof<any>
             if (typeof action === 'function') {
-                action.call(tar, ...options?.args ?? [])
+                action.call(tar, ...getOrCall(config.sendArgs) === false ? [] : options?.args ?? [])
             } else if (action) {
                 console.warn('Invalid action type for button', action)
             }
