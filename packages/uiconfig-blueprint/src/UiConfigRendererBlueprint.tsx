@@ -10,7 +10,6 @@ import {FocusStyleManager} from '@blueprintjs/core'
 import {THREE} from "./threejs";
 
 export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
-
     constructor(container: HTMLElement = document.body, {autoPostFrame = true} = {}) {
         super(container, autoPostFrame);
         // this._root.expanded = expanded

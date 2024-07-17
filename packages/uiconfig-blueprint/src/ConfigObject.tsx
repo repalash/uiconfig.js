@@ -75,9 +75,15 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
         let BPComp = ConfigObjectGenerators[type]
         if (type === 'panel' && !this.props.isPanel) {
             const label = this.context.methods.getLabel(this.props.config)
+            const children = this.context.methods.getChildren(this.props.config)
+            const enabledToggle = children[0] && this.context.methods.getLabel(children[0]).toLowerCase() === 'enabled' ? children[0] : undefined
+            enabledToggle && (enabledToggle.hidden = true)
             return (
                 <div key={this.props.config.uuid}>
-                    <FolderHeadCard label={label} minimal={false} open={false} onClick={() => {
+                    <FolderHeadCard
+                        enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
+                        onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
+                        label={label} minimal={false} open={false} onClick={() => {
                         this.props.openPanel<{ config: UiObjectConfig<any> }>({
                             props: {config: this.props.config},
                             title: label,

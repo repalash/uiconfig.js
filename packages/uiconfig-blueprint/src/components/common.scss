@@ -25,3 +25,17 @@
 .hidden{
   display: none;
 }
+
+
+// see iconMapping.ts
+// https://stackoverflow.com/a/19563399/2229899
+// https://stackoverflow.com/a/72792696/2229899
+.bpIconWrapperMonoFilter{
+  filter: sepia(1) hue-rotate(calc(215deg - 50deg)) saturate(0.5) brightness(0.5);
+  .bp5-dark & {
+    filter: sepia(1) hue-rotate(calc(215deg - 50deg)) saturate(0.5) brightness(0.8);
+    :hover{
+      filter: sepia(1) hue-rotate(calc(215deg - 50deg)) saturate(0.5) brightness(1.1);
+    }
+  }
+}

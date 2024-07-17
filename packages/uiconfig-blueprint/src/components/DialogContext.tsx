@@ -23,10 +23,20 @@ export function setupDialog(){
         setDialog({...dialog, isOpen: true, ...d})
     }, [dialog, setDialog])
     const close = useCallback(()=>setDialog({...dialog, isOpen: false}), [dialog, setDialog])
-    return {dialog, open, close, setDialog}
+    const setDialogState = useCallback((state: any)=>{
+        setDialog({...dialog, state})
+    }, [dialog, setDialog])
+    return {dialog, open, close, setDialog, state: dialog.state, setState: setDialogState}
 }
-export const DialogContext = createContext<{dialog: DialogStateType, open: (d: Partial<DialogStateType>)=>void, close: ()=>void, setDialog: Dispatch<SetStateAction<DialogStateType>>}>(
-    {dialog: defaultDialogContext, open: ()=>{}, close: ()=>{}, setDialog: ()=>{}}
+export const DialogContext = createContext<{
+    dialog: DialogStateType,
+    open: (d: Partial<DialogStateType>)=>void,
+    close: ()=>void,
+    setDialog: Dispatch<SetStateAction<DialogStateType>>,
+    setState: Dispatch<SetStateAction<any>>,
+    state: any
+}>(
+    {dialog: defaultDialogContext, open: ()=>{}, close: ()=>{}, setDialog: ()=>{}, setState: ()=>{}, state: {}}
 )
 export const useDialog = () => useContext(DialogContext)
 
@@ -48,6 +58,21 @@ export function DialogComponent(){
     </Dialog>)
 }
 
+interface DialogPromptState {
+    value: string,
+    intent: Intent,
+    helperText: string,
+}
+interface DialogPromptProps extends Partial<DialogStateType>{
+    closeButtonText?: string,
+    submitButtonText?: string,
+    message?: string,
+    placeholder?: string,
+    value?: string,
+    showInput?: boolean,
+    onClose?: (value: string)=>boolean|undefined|Promise<boolean|undefined>, // does not close if false
+    onSubmit?: (value: string)=>boolean|undefined|any|Promise<boolean|undefined|any>, // does not close if false
+}
 /**
  * Usage:
  * ```tsx
@@ -66,9 +91,6 @@ export function DialogComponent(){
  */
 export function useDialogPrompt(){
     const {open, close} = useDialog()
-    const {loadingState, updateLoading} = useLoadingState()
-    const [intent, setIntent] = useState<Intent>(Intent.NONE)
-    const [helperText, setHelperText] = useState('')
     const prompt = useCallback(({
         closeButtonText = 'Close',
         submitButtonText = 'Okay',
@@ -77,74 +99,98 @@ export function useDialogPrompt(){
         value = '',
         showInput = true,
         onClose, onSubmit,
-        ...props}: Partial<DialogStateType> &
-        {
-            closeButtonText?: string,
-            submitButtonText?: string,
-            message?: string,
-            placeholder?: string,
-            value?: string,
-            showInput?: boolean,
-            onClose?: (value: string)=>boolean|undefined|Promise<boolean|undefined>, // does not close if false
-            onSubmit?: (value: string)=>boolean|undefined|any|Promise<boolean|undefined|any>, // does not close if false
-    }) => {
+        ...props}: DialogPromptProps) => {
         return new Promise<string|null>((resolve)=>{
-            const state = {value}
-            const doClose = async()=> {
-                if (onClose && (await onClose(state.value)) !== false) return
-                close()
-                resolve(null)
-            }
-            const doSubmit = async()=> {
-                if (onSubmit) {
-                    const res = await onSubmit(state.value)
-                    if(res.error){
-                        setIntent(Intent.DANGER)
-                        setHelperText(res.error)
-                    }
-                    if(res !== false) return
-                }
-                close()
-                resolve(state.value)
-            }
             open({
                 canClose: false,
                 ...props,
-                state,
+                state: {
+                    value,
+                    intent: Intent.NONE,
+                    helperText: '',
+                } as DialogPromptState,
                 content: (
-                    <FormGroup
-                        helperText={helperText||undefined}
-                        intent={intent}
-                        label={message}
-                        labelFor="dialog-prompt-text-input"
-                    >
-                        <InputGroup
-                            intent={intent}
-                            id="dialog-prompt-text-input"
-                            placeholder={placeholder}
-                            defaultValue={state.value}
-                            style={{display: showInput ? 'block' : 'none'}}
-                            onChange={(e: any) => {
-                                state.value = e.target.value
-                                if(helperText) setHelperText('')
-                                if(intent !== Intent.NONE) setIntent(Intent.NONE)
-                            }} // todo: submit on enter
-                        />
-                    </FormGroup>
+                    <DialogPromptContent message={message} showInput={showInput} placeholder={placeholder}/>
                 ),
                 actions: (
-                    <>
-                        <Button text={closeButtonText}
-                                loading={loadingState['popup-close']}
-                                onClick={() => updateLoading('popup-close', doClose())}/>
-                        <Button text={submitButtonText}
-                                intent="primary"
-                                loading={loadingState['popup-submit']}
-                                onClick={() => updateLoading('popup-submit', doSubmit())}/>
-                    </>
+                    <DialogPromptButtons closeButtonText={closeButtonText} submitButtonText={submitButtonText} onClose={onClose} onSubmit={onSubmit} resolve={resolve}/>
                 ),
             })
         })
-    }, [open, close, loadingState, updateLoading])
+    }, [open, close])
     return {prompt, close}
+}
+
+function DialogPromptButtons({
+    closeButtonText = 'Close',
+    submitButtonText = 'Okay',
+    onClose, onSubmit, resolve
+ }:{
+    closeButtonText?: string,
+    submitButtonText?: string,
+    onClose?: (value: string)=>boolean|undefined|Promise<boolean|undefined>, // does not close if false
+    onSubmit?: (value: string)=>boolean|undefined|any|Promise<boolean|undefined|any>, // does not close if false
+    resolve: (value: string|null)=>void,
+}){
+    const {loadingState, updateLoading} = useLoadingState()
+    const {state, setState, close} = useDialog() as {state: DialogPromptState, setState: Dispatch<SetStateAction<DialogPromptState>>, close: ()=>void}
+    const doClose = async()=> {
+        if (onClose && (await onClose(state.value)) !== true) return
+        close()
+        resolve(null)
+    }
+    const doSubmit = async()=> {
+        if (onSubmit) {
+            const res = await onSubmit(state.value)
+            if(res.error){
+                setState({...state, intent: Intent.DANGER, helperText: res.error})
+            }
+            if(res !== true) return
+        }
+        close()
+        resolve(state.value)
+    }
+    return <>
+        <Button text={closeButtonText}
+                loading={loadingState['popup-close']}
+                onClick={() => updateLoading('popup-close', doClose())}/>
+        <Button text={submitButtonText}
+                intent="primary"
+                loading={loadingState['popup-submit']}
+                onClick={() => updateLoading('popup-submit', doSubmit())}/>
+    </>
+
+}
+
+function DialogPromptContent({
+    message = 'Enter some text: ',
+    placeholder = '',
+    showInput = true,
+}: {
+    message?: string,
+    placeholder?: string,
+    showInput?: boolean,
+}){
+    const {state, setState} = useDialog() as {state: DialogPromptState, setState: Dispatch<SetStateAction<DialogPromptState>>}
+    return <FormGroup
+        helperText={state.helperText||undefined}
+        intent={state.intent}
+        label={message}
+        labelFor="dialog-prompt-text-input"
+    >
+        <InputGroup
+            intent={state.intent}
+            id="dialog-prompt-text-input"
+            placeholder={placeholder}
+            defaultValue={state.value}
+            style={{display: showInput ? 'block' : 'none'}}
+            onChange={(e: any) => {
+                state.value = e.target.value
+                state.helperText = ''
+                state.intent = Intent.NONE
+                setState({...state})
+            }} // todo: submit on enter
+        />
+    </FormGroup>
+
 }

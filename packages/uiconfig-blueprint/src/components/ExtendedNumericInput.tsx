@@ -58,6 +58,7 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
                 leftElement={(
                     <DraggableIcon icon={this.props.leftIcon ?? "variable"}
                                    size={16}
+                                   disabled={this.props.readOnly}
                                    small={this.props.small}
                                    value={parseFloat(value ?? '0')}
                                    stepSize={this.props.stepSize}

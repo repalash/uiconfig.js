@@ -56,7 +56,8 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
                 disabled={this.state.disabled}
                 value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
                 key={this.props.config.uuid + '_input'}
-                min={this.state.min} max={this.state.max} stepSize={this.state.step}
+                min={this.state.min} max={this.state.max}
+                stepSize={this.state.step}
                 minorStepSize={this.state.step/10}
                 majorStepSize={this.state.step*10}
                 buttonPosition="none"

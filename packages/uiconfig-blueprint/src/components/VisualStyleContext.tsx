@@ -30,14 +30,14 @@ const localStorageIds = {
 export function setupVisualStyle(){
     const [darkMode, setDarkMode] = React.useState(localStorage.getItem(localStorageIds.darkMode) !== (defaultVisualStyle.darkMode ? 'false' : 'true'))
     React.useEffect(() => {
-        localStorage.setItem('bpUiDarkMode', darkMode ? 'true' : 'false')
+        localStorage.setItem(localStorageIds.darkMode, darkMode ? 'true' : 'false')
         const clas = Classes.DARK
         if(!darkMode)  document.body.classList.remove(clas)
         else document.body.classList.add(clas)
     }, [darkMode])
     const [theme, setTheme] = React.useState(localStorage.getItem(localStorageIds.theme) || defaultVisualStyle.theme)
     React.useEffect(() => {
-        localStorage.setItem('bpUiTheme', theme)
+        localStorage.setItem(localStorageIds.theme, theme)
         document.documentElement.classList.remove(...Object.keys(defaultVisualStyle.themes).map(k => k))
         document.documentElement.classList.add(theme)
     }, [theme])

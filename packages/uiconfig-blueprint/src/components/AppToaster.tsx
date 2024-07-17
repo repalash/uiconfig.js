@@ -8,6 +8,26 @@ import {OverlayToaster, Toaster} from "@blueprintjs/core";
 
 // hack for blueprint 5, remove in blueprint 6
 export const AppToasterRef = {ref: null as Toaster | null}
+
+/**
+ * Usage
+ * ```
+ * AppToaster().show({
+ *    message: 'Message',
+ *    intent: 'primary',
+ *    icon: "tick",
+ *    isCloseButtonShown: false,
+ *    // action: {
+ *    //     onClick: () => {},
+ *    //     text: "Cancel",
+ *    // },
+ *    timeout: 5000,
+ * }, 'toast-id')
+ *
+ * AppToaster().dismiss('toast-id')
+ * ```
+ *
+ */
 export const AppToaster = ()=>AppToasterRef.ref ?? {show: ()=>{}, dismiss: ()=>{}} as any as Toaster
 
 /**

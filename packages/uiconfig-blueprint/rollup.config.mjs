@@ -51,7 +51,7 @@ export default {
     }),
     json(),
     postcss({
-      extensions: ['.sass', '.scss', '.css', '.scss?inline'],
+      extensions: ['.sass', '.scss', '.css', '.scss?inline', '.css?inline'],
       sourceMap: true,
       plugins: [
         {

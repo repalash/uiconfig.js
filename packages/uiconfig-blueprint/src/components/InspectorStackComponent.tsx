@@ -30,7 +30,7 @@ export function InspectorStackComponent({config}: { config: UiObjectConfig<any, 
     }, [setCurrentPanelStack, stackItem])
 
     return (
-        <Card id="bpInspectorCard" style={{height: "100%", flexGrow: "1", position: "relative"}}>
+        <Card className="bpInspectorCard" style={{borderRadius: 0}}>
             <PanelStack2 className="inspectorPanelStack"
                          showPanelHeader={true}
                          renderActivePanelOnly={true}

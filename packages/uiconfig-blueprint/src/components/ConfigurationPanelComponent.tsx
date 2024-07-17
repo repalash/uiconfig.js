@@ -40,7 +40,7 @@ export function ConfigurationPanelComponent({config}: { config: UiObjectConfig<a
 
     return (
         <VisualStyleContext.Provider value={{...defaultVisualStyle, ...style}}>
-        <Card id="bpInspectorCard" className={style.darkMode?Classes.DARK:""} style={{height: "100%", flexGrow: "1", position: "relative"}}>
+        <Card className={`bpInspectorCard ${style.darkMode?Classes.DARK:""}`}>
             <PanelStack2 className="inspectorPanelStack"
                          showPanelHeader={true}
                          renderActivePanelOnly={true}

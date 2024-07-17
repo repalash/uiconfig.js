@@ -2,13 +2,13 @@ import * as React from "react";
 import {Icon, IconName, MaybeElement} from "@blueprintjs/core";
 
 // todo: bounds and stepsize
-export class DraggableIcon extends React.Component<{ icon: IconName | MaybeElement, size?: number, value: number, stepSize?: number, small?: boolean, onChange: (v: number, last?: boolean) => void }> {
+export class DraggableIcon extends React.Component<{ icon: IconName | MaybeElement, size?: number, value: number, stepSize?: number, small?: boolean, disabled?: boolean, onChange: (v: number, last?: boolean) => void }> {
     private cursor = 'auto'
     private dragStartOffset = -Infinity
     private dragStartValue = -Infinity
     private lastValue = -Infinity
     private removeEvents = () => {
-        if (isFinite(this.lastValue)) this.props.onChange(this.lastValue)
+        if (isFinite(this.lastValue) && !this.props.disabled) this.props.onChange(this.lastValue)
         this.lastValue = -Infinity
         this.dragStartOffset = -Infinity
         this.dragStartValue = -Infinity
@@ -42,7 +42,7 @@ export class DraggableIcon extends React.Component<{ icon: IconName | MaybeEleme
                 let val = this.dragStartValue - off;
                 // val = Math.min(props.max, Math.max(props.min, val)); // todo
                 val = Number(val.toFixed(Math.max(1, -Math.log10(stepSize / 10)))); // clip decimal places depending on step size
-                this.props.onChange(val, false)
+                if(!this.props.disabled) this.props.onChange(val, false)
                 this.lastValue = val;
             }
         } else {
@@ -55,9 +55,10 @@ export class DraggableIcon extends React.Component<{ icon: IconName | MaybeEleme
         // const [dragging, setDragging] = React.useState(false)
 
         return (
-            <div style={{cursor: 'ew-resize', marginLeft: "6px", marginRight: "6px", marginTop: this.props.small ? "3px" : "6px", marginBottom: this.props.small ? "3px" : "6px"}}
+            <div style={{cursor: !this.props.disabled ? 'ew-resize': 'auto', marginLeft: "6px", marginRight: "6px", marginTop: this.props.small ? "3px" : "6px", marginBottom: this.props.small ? "3px" : "6px"}}
                  onMouseDown={(ev) => {
                      // if(dragging) return
+                     if(this.props.disabled) return
                      this.dragStartOffset = ev.clientX
                      this.dragStartValue = this.props.value
                      ev.stopPropagation()
@@ -69,7 +70,7 @@ export class DraggableIcon extends React.Component<{ icon: IconName | MaybeEleme
                      // setDragging(true)
                  }}
             >
-                <Icon icon={this.props.icon} size={this.props.size}/>
+                <Icon icon={this.props.icon} size={this.props.size} aria-disabled={this.props.disabled} />
             </div>
         )
     }

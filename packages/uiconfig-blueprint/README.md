@@ -152,3 +152,16 @@ In CSS
 ```css
 @import 'uiconfig-blueprint/lib/css/renderer.css';
 ```
+
+postcss plugin for themes
+```javascript
+{
+  postcssPlugin: 'modify-css-content',
+  Once(root) {
+    // Modify to fix :root.bpx-flat :root twice when imported in renderer.scss
+    root.walkRules(rule => {
+      rule.selector = rule.selector.replace(/:root.bpx-(.*) :root/g, ':root.bpx-$1');
+    });
+  },
+}
+```

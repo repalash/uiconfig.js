@@ -1,6 +1,6 @@
-import React, {DOMAttributes} from "react";
+import React, {ChangeEventHandler, DOMAttributes} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import {Button, Collapse, Icon, Intent} from "@blueprintjs/core";
+import {Button, Checkbox, Collapse, Icon, Intent} from "@blueprintjs/core";
 import {ConfigObject} from "../ConfigObject";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {safeSetProperty} from 'ts-browser-helpers'
@@ -21,7 +21,9 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
             safeSetProperty(this.props.config, "expanded", e, true)
             // if (e) this.state.children.forEach(c => Array.isArray(c) ? null : c.uiRefresh?.("postFrame", true, 1)) // todo: handle array and functions
         }
-
+        const children = this.context.methods.getChildren(this.props.config)
+        const enabledToggle = children[0] && this.context.methods.getBinding(children[0])[1] === 'enabled' ? children[0] : undefined
+        enabledToggle && (enabledToggle.hidden = true)
         return !this.state.hidden ? (
             <FolderHeadCard
                 key={this.props.config.uuid}
@@ -33,6 +35,8 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                     setExpanded(!this.state.expanded)
                 }}
                 label={this.state.label}
+                enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
+                onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
             >
                 <Collapse isOpen={this.state.expanded} keepChildrenMounted={false}>
                     <div className="folder-children" style={{listStyleType: "none", paddingLeft: "0"}}>
@@ -45,7 +49,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
     }
 }
 
-export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, disabled?: boolean, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
+export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, disabled?: boolean, enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
     return (
         <div
             // interactive={!props.open}
@@ -77,6 +81,7 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                     small={props.minimal}
                     style={props.minimal ? {} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
                     intent={props.open ? Intent.PRIMARY : Intent.NONE}
+                    icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
                     rightIcon={(
                         <Icon icon="chevron-right" style={{
                             rotate: props.open ? "90deg" : "0deg",
@@ -84,6 +89,14 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                         }}/>
                     )}>{props.label}
                 </Button>
+                {(props.enabled !== undefined) && <Checkbox
+                    style={{margin: 0, position: 'absolute', left: '5px'}}
+                    large inline
+                    defaultChecked={props.enabled}
+                    onChange={props.onEnabledChange}
+                    disabled={props.disabled}
+                    onClick={(e) => e.stopPropagation()}
+                />}
             </div>
             {props.children}
         </div>
