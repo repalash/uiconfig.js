@@ -129,7 +129,7 @@ function DialogPromptButtons({
     closeButtonText?: string,
     submitButtonText?: string,
     onClose?: (value: string)=>boolean|undefined|Promise<boolean|undefined>, // does not close if false
-    onSubmit?: (value: string)=>boolean|undefined|any|Promise<boolean|undefined|any>, // does not close if false
+    onSubmit?: (value: string)=>boolean|undefined|{error: string}|Promise<boolean|undefined|{error: string}>, // does not close if false
     resolve: (value: string|null)=>void,
 }){
     const {loadingState, updateLoading} = useLoadingState()
@@ -142,8 +142,8 @@ function DialogPromptButtons({
     const doSubmit = async()=> {
         if (onSubmit) {
             const res = await onSubmit(state.value)
-            if(res.error){
-                setState({...state, intent: Intent.DANGER, helperText: res.error})
+            if(res && (res as any).error){
+                setState({...state, intent: Intent.DANGER, helperText: (res as any).error})
             }
             if(res !== true) return
         }

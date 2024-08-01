@@ -58,6 +58,11 @@
   &:active {
     background-color: $gray4 !important;
   }
+
+  .bp5-button-text {
+    text-align: left;
+    flex: 1 1 auto;
+  }
 }
 .bp5-dark .folder-trigger-button {
   background-color: $dark-gray1 !important;

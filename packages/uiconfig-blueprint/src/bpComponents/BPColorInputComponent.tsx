@@ -20,7 +20,7 @@ export class BPColorInputComponent extends BPValueComponent<ColorRepresentation,
     constructor(props: BPComponentProps<ColorRepresentation>, context: UiConfigRendererContextType) {
         super(props, context, {
             label: 'Color',
-            value: "#000000",
+            value: '#000000',
             mode: 'number',
             srgbConvert: false,
         });
