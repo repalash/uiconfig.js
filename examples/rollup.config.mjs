@@ -33,7 +33,7 @@ export default {
       runOnce: true
     }),
     json(),
-    multiInput.default({
+    multiInput({
       relative: 'examples/src',
       // transformOutputPath: (output, input) => {
       //   console.log(output, input)

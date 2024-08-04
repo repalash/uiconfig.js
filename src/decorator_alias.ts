@@ -14,7 +14,7 @@ export function uiVector<T=any>(label?: string, bounds?: [number, number], stepS
     return uiConfig('vec', {label, bounds, stepSize, params})
 }
 
-export function uiDropdown<T=any>(label?: string, children?: string[] | UiObjectConfig[], params?: TParams<T>): PropertyDecorator {
+export function uiDropdown<T=any>(label?: string, children?: string[] | ValOrFunc<UiObjectConfig[]>, params?: TParams<T>): PropertyDecorator {
     if (Array.isArray(children) && typeof children[0] === 'string')
         children = (children as string[]).map((c) => ({label: c, value: c}))
     return uiConfig('dropdown', {label, children: children as UiObjectConfig[], params})
