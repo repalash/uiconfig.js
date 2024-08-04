@@ -141,6 +141,7 @@ export abstract class UiConfigRendererBase<TUiNode = any> extends SimpleEventDis
         list = list ?? []
         if (!uiC || !uiC.uiRef) return list
         list.push(uiC)
+        if (typeof uiC.children === 'function') return list // todo call function, see below.
         uiC.children?.forEach(value => {
             if (typeof value === 'function') {
                 return

@@ -27,7 +27,7 @@ export function generateValueConfig(obj: any, key: string | number, label?: stri
     return result
 }
 
-export function generateUiConfig(obj: any): UiObjectConfig['children'] {
+export function generateUiConfig(obj: any): Required<UiObjectConfig>['children'] {
     if (!obj) return []
     let type = obj.constructor || Object
     if (type === Array) type = Object
