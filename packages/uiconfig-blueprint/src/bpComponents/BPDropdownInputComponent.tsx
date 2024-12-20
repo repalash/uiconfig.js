@@ -31,11 +31,7 @@ const renderDropdownItem: ItemRenderer<DropdownItem> = (item, { handleClick, han
 
 export class BPDropdownInputComponent extends BPInputComponent<string|number, BPDropdownComponentState> {
     constructor(props: BPComponentProps<string|number>, context: UiConfigRendererContextType) {
-        super(props, context, {
-            value: '0',
-            label: 'Dropdown',
-            options: [{label: 'none', value: ''}]
-        });
+        super(props, context);
     }
 
     getUpdatedState(state: BPDropdownComponentState): BPDropdownComponentState {

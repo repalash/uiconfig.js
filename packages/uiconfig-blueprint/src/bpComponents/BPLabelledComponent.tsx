@@ -1,12 +1,13 @@
-import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
+import {BPComponent, BPComponentProps2, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
 
 export type BPLabelledComponentState = BPComponentState & {
     label: string
 }
-export abstract class BPLabelledComponent<TValue, TState, TProps extends BPComponentProps<TValue> = BPComponentProps<TValue>> extends BPComponent<TValue, TState&BPLabelledComponentState, TProps> {
+export class BPLabelledComponent
+<TValue, TState> extends BPComponent<TValue, TState&BPLabelledComponentState> {
 
-    protected constructor(props: TProps, context: UiConfigRendererContextType, state: TState) {
-        super(props, context, {label: 'Input', ...state});
+    constructor(props: BPComponentProps2<TValue, TState&BPLabelledComponentState>, context: UiConfigRendererContextType) {
+        super(props, context);
     }
 
     getUpdatedState(state: TState & BPLabelledComponentState): TState & BPLabelledComponentState {

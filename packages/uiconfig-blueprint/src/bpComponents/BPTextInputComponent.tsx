@@ -5,7 +5,7 @@ import {BPInputComponent} from "./BPInputComponent";
 
 export class BPTextInputComponent extends BPInputComponent<string> {
     constructor(props: BPComponentProps<string>, context: UiConfigRendererContextType) {
-        super(props, context, {value: '', label: 'Input'});
+        super({...props, initialState: {value: '', label: 'Input'}}, context);
     }
 
     private _onChange: ChangeEventHandler<HTMLInputElement> = (e) => {

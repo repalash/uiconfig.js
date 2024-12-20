@@ -1,8 +1,5 @@
 import React, {ChangeEventHandler, DOMAttributes} from "react";
-import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import {Button, Checkbox, Collapse, Icon, Intent} from "@blueprintjs/core";
-import {ConfigObject} from "../ConfigObject";
-import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
+import {BPComponentProps, BPComponentProps2, UiConfigRendererContextType} from "./BPComponent";
 import {safeSetProperty} from 'ts-browser-helpers'
 import {BPContainerComponent, BPContainerComponentState} from './BPContainerComponent'
 
@@ -10,10 +7,10 @@ export type BPFolderComponentState = BPContainerComponentState & {
 }
 
 export class BPFolderComponent extends BPContainerComponent<BPFolderComponentState> {
-    constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
-        super(props, context, {children: [], expanded: false, label: 'Folder'});
+    constructor(props: BPComponentProps2<void, BPFolderComponentState>, context: UiConfigRendererContextType) {
+        super(props, context);
     }
-
+// {children: [], expanded: false, label: 'Folder'}
     render() {
         const setExpanded = (e: boolean) => {
             if (e === this.state.expanded) return
@@ -25,26 +22,26 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
         const enabledToggle = children[0] && this.context.methods.getBinding(children[0])[1] === 'enabled' ? children[0] : undefined
         enabledToggle && (enabledToggle.hidden = true)
         return !this.state.hidden ? (
-            <FolderHeadCard
-                key={this.props.config.uuid}
-                open={this.state.expanded}
-                disabled={this.state.disabled}
-                minimal={(this.props.level ?? 0) > 0}
-                onClick={() => {
-                    if(this.state.readOnly) return
-                    setExpanded(!this.state.expanded)
-                }}
-                label={this.state.label}
-                enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
-                onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
-            >
-                <Collapse isOpen={this.state.expanded} keepChildrenMounted={false}>
-                    <div className="folder-children" style={{listStyleType: "none", paddingLeft: "0"}}>
-                        {this.state.children.map((c, i) => <ConfigObject key={'c' + i} {...this.props} config={c}
-                                                                         level={(this.props.level ?? 0) + 1}/>)}
-                    </div>
-                </Collapse>
-            </FolderHeadCard>
+            // <FolderHeadCard
+            //     key={this.props.config.uuid}
+            //     open={this.state.expanded}
+            //     disabled={this.state.disabled}
+            //     minimal={(this.props.level ?? 0) > 0}
+            //     onClick={() => {
+            //         if(this.state.readOnly) return
+            //         setExpanded(!this.state.expanded)
+            //     }}
+            //     label={this.state.label}
+            //     enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
+            //     onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
+            // >
+            //     <Collapse isOpen={this.state.expanded} keepChildrenMounted={false}>
+            //         <div className="folder-children" style={{listStyleType: "none", paddingLeft: "0"}}>
+            //             {this.state.children.map((c, i) => <ConfigObject key={'c' + i} {...this.props} config={c}
+            //                                                              level={(this.props.level ?? 0) + 1}/>)}
+            //         </div>
+            //     </Collapse>
+            // </FolderHeadCard>
         ) : null
     }
 }
@@ -102,3 +99,4 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
         </div>
     )
 }
+

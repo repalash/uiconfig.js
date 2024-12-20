@@ -1,33 +1,47 @@
-import React, {createContext} from "react";
+import React, {createContext, ReactNode} from "react";
 import type {UiConfigRendererBase} from 'uiconfig.js'
 import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
-import {THREE} from "../threejs";
 
 export type BPComponentProps<T> = {
     config: UiObjectConfig<T>,
     level?: number
+
+}
+export type BPComponentProps2<T, TState extends BPComponentState, C extends BPComponent<T, TState> = BPComponent<T, TState>> = {
+    config: UiObjectConfig<T>,
+    level?: number
+
+    render?: (props: C) => ReactNode
+    initialState: TState
 }
 export type BPComponentState = {
     hidden?: boolean
     disabled?: boolean
     readOnly?: boolean // same as disabled(for most inputs)
 }
+
 export interface UiConfigRendererBaseBp extends UiConfigRendererBase{
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    THREE: THREE|undefined
+    // THREE: THREE|undefined
 }
 
 export const UiConfigRendererContext = createContext<UiConfigRendererBaseBp>(null as any)
 export type UiConfigRendererContextType = React.ContextType<typeof UiConfigRendererContext>
-export abstract class BPComponent<TValue, TState, TProps extends BPComponentProps<TValue> = BPComponentProps<TValue>> extends React.Component<TProps, TState> {
+// todo rename to UiConfigComponent?
+export class BPComponent<TValue, TState extends BPComponentState=BPComponentState> extends React.Component<BPComponentProps2<TValue, TState, BPComponent<TValue, TState>>, TState> {
     static contextType = UiConfigRendererContext
     declare context: UiConfigRendererContextType
 
-    protected constructor(props: TProps, context: UiConfigRendererContextType, state: TState) {
+    // private _render?: (props: TState & {setValue: (state: TState) => Promise<void>}) => ReactNode
+    private _render?: (props: BPComponent<TValue, TState>) => ReactNode
+
+    constructor(props: BPComponentProps2<TValue, TState, BPComponent<TValue, TState>>, context: UiConfigRendererContextType) {
         super(props, context);
-        this.state = this.getUpdatedState(state)
+        this.state = this.getUpdatedState(props.initialState)
         // this.state = state
+        this._render = props.render
+        this.setState = this.setState.bind(this)
     }
 
     /**
@@ -96,4 +110,8 @@ export abstract class BPComponent<TValue, TState, TProps extends BPComponentProp
 
     // abstract updateStateValue(state: TState): Promise<void>;
 
+    render() {
+        // return this._render ? this._render({...this.state, setValue: this.setValue}) : null
+        return this._render && !this.state.hidden ? this._render(this) : null
+    }
 }

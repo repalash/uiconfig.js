@@ -1,6 +1,5 @@
 import {BPLabelledComponent, BPLabelledComponentState} from './BPLabelledComponent'
-import {BPComponentProps, UiConfigRendererContextType} from './BPComponent'
-import {PanelActions} from '@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes'
+import {BPComponentProps2, UiConfigRendererContextType} from './BPComponent'
 import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
 
@@ -8,7 +7,7 @@ export type BPContainerComponentState = BPLabelledComponentState & {
     children: UiObjectConfig[]
     expanded: boolean
 }
-export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState> extends BPLabelledComponent<void, TState, BPComponentProps<void> & PanelActions> {
+export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState> extends BPLabelledComponent<void, TState> {
 
     protected _childParentOnChange: UiObjectConfig['parentOnChange'] = (ev, ...args) => {
         // console.warn('child change', ev, this.props.config)
@@ -37,8 +36,8 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
         ) delete child.property
     }
 
-    constructor(props: BPComponentProps<void> & PanelActions, context: UiConfigRendererContextType, state: TState) {
-        super(props, context, state);
+    constructor(props: BPComponentProps2<void, TState&BPLabelledComponentState>, context: UiConfigRendererContextType) {
+        super(props, context);
     }
 
     getUpdatedState(state: TState) {

@@ -1,8 +1,8 @@
-import {UiConfigRendererBlueprint} from "./UiConfigRendererBlueprint";
+import {UiConfigRendererReact} from "./UiConfigRendererReact";
 
-class UI extends UiConfigRendererBlueprint{
+class UI extends UiConfigRendererReact{
 
 }
 
-export {UiConfigRendererBlueprint, UI};
+export {UiConfigRendererReact, UI};
 

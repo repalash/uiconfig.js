@@ -1,4 +1,4 @@
-import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
+import {BPComponentProps2, UiConfigRendererContextType} from "./BPComponent";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 
 export type BPValueComponentState<TStateValue> = BPLabelledComponentState & {
@@ -6,9 +6,9 @@ export type BPValueComponentState<TStateValue> = BPLabelledComponentState & {
 }
 
 export abstract class BPValueComponent<TValue, TState extends BPValueComponentState<TStateValue>, TStateValue> extends BPLabelledComponent<TValue, TState> {
-
-    protected constructor(props: BPComponentProps<TValue>, context: UiConfigRendererContextType, state: TState) {
-        super(props, context, state);
+    protected constructor(props: BPComponentProps2<TValue, TState>, context: UiConfigRendererContextType) {
+        super(props, context);
+        this.setValue = this.setValue.bind(this)
     }
 
     abstract convertValueToState(value: TValue, state: TState): TState;
