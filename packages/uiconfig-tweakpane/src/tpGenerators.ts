@@ -179,7 +179,7 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
                 input = parent.addInput(proxy, 'value', inputParams).on('change', ev => {
                     if (proxy.listedOnChange === false) return // used in tpImageInputGenerator
                     // console.log(ev.last ?? true)
-                    config.dispatchMode = "immediate" // this is required so that the value is set before the next uiRefresh.
+                    config.dispatchMode = 'immediate' // this is required so that the value is set before the next uiRefresh.
                     renderer.methods.setValue(config, proxy.value_ ?? proxy.value, {last: ev.last ?? true}, proxy.forceOnChange || false)
                 })
             }

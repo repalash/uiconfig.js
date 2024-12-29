@@ -19,12 +19,11 @@
     "docs": "npx typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
     "serve": "ws",
-    "lint": "eslint src examples --fix",
-    "check": "tsc -p tsconfig.json --noEmit && eslint src examples",
-    "prepublishOnly": "npm run test",
+    "lint": "eslint src --fix",
+    "check": "tsc -p tsconfig.json --noEmit && eslint src",
 
     "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-    "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version"
+    "new:publish": "npm run test && git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version"
   },
   "exports": {
     ".": {
@@ -75,7 +74,7 @@
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-replace": "^6.0.2",
     "@tweakpane/core": "^1.1.9",
-    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
     "clean-package": "^2.2.0",
     "eslint": "^8.57.1",
     "eslint-plugin-deprecation": "^3.0.0",
