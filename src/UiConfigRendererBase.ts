@@ -5,6 +5,7 @@ import {UiConfigMethods} from './UiConfigMethods'
 export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFrame'|'preRender'|'postRender'|'postFrame'> {
     public readonly methods: UiConfigMethods
     private _undoManager?: JSUndoManager
+
     get undoManager() {
         return this._undoManager
     }
@@ -17,7 +18,7 @@ export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFra
     protected constructor(autoFrameEvents = true, methods?: UiConfigMethods, undoManager?: JSUndoManager|false) {
         super()
         this.methods = methods || new UiConfigMethods(this)
-        this._undoManager = undoManager === false ? undefined : undoManager || new JSUndoManager({bindHotKeys: true, limit: 1000, debug: getUrlQueryParam('debugUndo') !== null})
+        this.undoManager = undoManager === false ? undefined : undoManager || new JSUndoManager({bindHotKeys: true, limit: 1000, debug: getUrlQueryParam('debugUndo') !== null})
         this._autoFrameEvents = autoFrameEvents
         if (autoFrameEvents) {
             this.addEventListener('preFrame', () => this.refreshQueue('preFrame'))
