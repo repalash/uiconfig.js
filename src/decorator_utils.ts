@@ -14,7 +14,7 @@ export function generateValueConfig(obj: any, key: string | number, label?: stri
     } else {
         const uiType = valueToUiType(val)
         if (uiType === 'folder') {
-            result = generateUiFolder(key + '', val)
+            result = generateUiFolder(key + '', val, {}, 'folder', true)
         } else if (uiType)
             result = {
                 type: uiType,
@@ -90,10 +90,10 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
     return result
 }
 
-export function generateUiFolder(label: string, obj: any, params: any = {}, type = 'folder'): UiObjectConfig {
+export function generateUiFolder(label: string, obj: any, params: any = {}, type = 'folder', dynamic = false): UiObjectConfig {
     return {
         type, label,
-        children: generateUiConfig(obj),
+        children: !dynamic ? generateUiConfig(obj) : [()=> generateUiConfig(obj)],
         uuid: uuidV4(),
         ...params,
     }

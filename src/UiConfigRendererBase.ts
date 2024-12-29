@@ -1,34 +1,54 @@
-import {createDiv, now, SimpleEventDispatcher, timeout} from 'ts-browser-helpers'
+import {getUrlQueryParam, JSUndoManager, now, SimpleEventDispatcher, timeout} from 'ts-browser-helpers'
 import {TUiRefreshModes, UiObjectConfig} from './types'
 import {UiConfigMethods} from './UiConfigMethods'
 
-export abstract class UiConfigRendererBase<TUiNode = any> extends SimpleEventDispatcher<'preFrame'|'preRender'|'postRender'|'postFrame'> {
+export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFrame'|'preRender'|'postRender'|'postFrame'> {
     public readonly methods: UiConfigMethods
-
-    readonly config: UiObjectConfig<any, 'panel'> = {
-        type: 'panel',
-        label: 'Configuration',
-        children: [],
+    private _undoManager?: JSUndoManager
+    get undoManager() {
+        return this._undoManager
     }
-    protected constructor(container: HTMLElement = document.body, autoFrameEvents = true, methods?: UiConfigMethods) {
+    set undoManager(value: JSUndoManager|undefined) {
+        this._undoManager = value
+        if (this._undoManager) Object.assign(this._undoManager.presets, this.methods.undoPresets)
+    }
+
+    protected _autoFrameEvents: boolean
+    protected constructor(autoFrameEvents = true, methods?: UiConfigMethods, undoManager?: JSUndoManager|false) {
         super()
         this.methods = methods || new UiConfigMethods(this)
-        const uiContainer = this._createUiContainer()
-        container.appendChild(uiContainer)
-
+        this._undoManager = undoManager === false ? undefined : undoManager || new JSUndoManager({bindHotKeys: true, limit: 1000, debug: getUrlQueryParam('debugUndo') !== null})
+        this._autoFrameEvents = autoFrameEvents
         if (autoFrameEvents) {
             this.addEventListener('preFrame', () => this.refreshQueue('preFrame'))
             this.addEventListener('postFrame', () => this.refreshQueue('postFrame'))
             this.addEventListener('preRender', () => this.refreshQueue('preRender'))
             this.addEventListener('postRender', () => this.refreshQueue('postRender'))
-            const fn = () => {
-                this.dispatchEvent({type: 'preFrame'})
-                this.dispatchEvent({type: 'preRender'})
-                this.dispatchEvent({type: 'postRender'})
-                this.dispatchEvent({type: 'postFrame'})
-                requestAnimationFrame(fn)
-            }
-            requestAnimationFrame(fn)
+        }
+    }
+
+    private _rafId: number | null = null
+
+    raf = () => {
+        if (!this._autoFrameEvents) return
+        this.dispatchEvent({type: 'preFrame'})
+        this.dispatchEvent({type: 'preRender'})
+        this.dispatchEvent({type: 'postRender'})
+        this.dispatchEvent({type: 'postFrame'})
+        this._rafId = requestAnimationFrame(this.raf)
+    }
+
+    // call from render or onMount
+    start() {
+        if (this._rafId === null) {
+            this._rafId = requestAnimationFrame(this.raf)
+        }
+    }
+    // call from unmount or onDispose etc
+    stop() {
+        if (this._rafId !== null) {
+            cancelAnimationFrame(this._rafId)
+            this._rafId = null
         }
     }
 
@@ -78,37 +98,6 @@ export abstract class UiConfigRendererBase<TUiNode = any> extends SimpleEventDis
         this._refreshQueue[mode] = l
     }
 
-    dispose() {
-        // todo
-    }
-
-    // appendUiConfig(uiConfig: UiObjectConfig): void {
-    //     if (!uiConfig) return
-    //     this._renderUiConfig(uiConfig)
-    // }
-
-    appendChild(config?: UiObjectConfig, params?: UiObjectConfig) {
-        if (!config) return
-        Object.assign(config, params)
-        this.config.children!.push(config)
-        this.refreshRoot()
-    }
-    removeChild(config: UiObjectConfig) {
-        const index = this.config.children!.indexOf(config)
-        if (index === -1) return
-        this.config.children!.splice(index, 1)
-        this.disposeUiConfig(config)
-        this.refreshRoot()
-    }
-
-    refreshRoot(deep = true, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) {
-        this.config.uiRefresh?.(deep, mode, delay)
-    }
-
-    abstract renderUiConfig(uiConfig: UiObjectConfig): void
-
-    protected _root?: TUiNode
-
     /**
      * Disposes the UI associated with a config, doesn't makes change to the object or its parent.
      * @param config
@@ -133,10 +122,6 @@ export abstract class UiConfigRendererBase<TUiNode = any> extends SimpleEventDis
     }
     protected abstract _refreshUiConfigObject(config: UiObjectConfig): void
 
-    protected _createUiContainer(): HTMLDivElement {
-        return createDiv({id: 'uiConfigContainer', addToBody: false})
-    }
-
     private _flattenUiConfig(uiC: UiObjectConfig, list?: UiObjectConfig[]) {
         list = list ?? []
         if (!uiC || !uiC.uiRef) return list
@@ -153,7 +138,7 @@ export abstract class UiConfigRendererBase<TUiNode = any> extends SimpleEventDis
             else list = this._flattenUiConfig(value, list)
         })
         return list
-
     }
 
 }
+

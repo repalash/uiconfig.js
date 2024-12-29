@@ -2,6 +2,7 @@ module.exports = {
     'root': true,
     'extends': [
         'eslint:recommended',
+        "plugin:@typescript-eslint/recommended"
     ],
     'parserOptions': {
         'ecmaVersion': 2018,
@@ -9,6 +10,7 @@ module.exports = {
     },
     'plugins': [
         'html',
+        "@typescript-eslint"
     ],
     'settings': {
         'html/indent': 4,

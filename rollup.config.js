@@ -4,11 +4,19 @@ import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import license from 'rollup-plugin-license'
-import packageJson from './package.json' assert {type: 'json'};
 import del from 'rollup-plugin-delete';
+import fs from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const configPath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    './package.json'
+);
+const packageJson = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 const { name, version, author } = packageJson
-const { main, module } = packageJson["clean-package"].replace
+const { main, module } = packageJson
 const isProduction = process.env.NODE_ENV === 'production'
 
 const settings = {
@@ -36,8 +44,8 @@ export default {
     }),
     typescript({
       compilerOptions: {
-        "sourceRoot": "../src",
-        "declarationDir": "../dist",
+        "sourceRoot": "./src",
+        "declarationDir": "./dist",
         "declarationMap": true,
       }
     }),
