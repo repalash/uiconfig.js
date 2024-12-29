@@ -6,7 +6,7 @@
 
 Examples: https://repalash.com/uiconfig.js/examples/index.html
 
-A super small UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators. 
+A super-small UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators or zod schemas etc. It includes the types for the configuration, utilities for parsers and renderers and renderers for different UI frameworks.
 
 It includes several themes with components for editor-like user interfaces like panels, sliders, pickers, inputs for string, number, file, vector, colors, etc. 
 
@@ -612,3 +612,7 @@ Vector3, Vector4 types.
 See [uiconfig-tweakpane](https://github.com/repalash/uiconfig-tweakpane)
 
 For viewing textures and images check the implementation in [threepipe](https://threepipe.org) under[@threepipe/plugin-tweakpane](https://github.com/repalash/threepipe/tree/main/plugins/tweakpane/src/TweakpaneUiPlugin.ts)
+
+## Changelog
+
+See - [CHANGELOG.md](./CHANGELOG.md)

@@ -11,12 +11,13 @@ export interface ChangeEvent {
     value?: any, // the new value
     lastValue?: any, // the old value
 }
-export type ChangeArgs = [ChangeEvent, ...any[]] | never[]
+export type ChangeArgs = [ChangeEvent, ...any[]]
 
 export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectType, TTarget = any> {
     /**
      * An optional uuid to identify this object. If not provided, one will be generated during first render.
      * This must be provided if a new UiObjectConfig object is generated each time the config is rendered.
+     * This is similar to `key` in react.
      */
     uuid?: string,
     /**
@@ -64,7 +65,13 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * @param value - The value to set
      * @param args - other arguments like the config, renderer, etc. See source code for details.
      */
-    setValue?: (value: T, ...args: ChangeArgs) => void,
+    setValue?: ((value: T, ...args: ChangeArgs|never[]) => void) | ((value: T) => void),
+
+    // /**
+    //  * React-like state object. This is used for inputs, if property/value is not specified.
+    //  */
+    // state?: [T, ((value: T) => void)| ((value: T) => Promise<void>)],
+
     /**
      * Path of the binding inside the value. (dot separated json path)
      * In case of property it is appended to the property path.
@@ -98,14 +105,16 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * This can be a function or an array of functions.
      * When it's specified with a container(with children) object, it will be called when any of the children change, and the config of the child that's changed will be available in the arguments
      */
-    onChange?: ValOrArrOp<((...args: ChangeArgs) => void)>;
+    onChange?: ValOrArrOp<((...args: ChangeArgs) => void)> | ValOrArrOp<(() => void)>;
 
     /**
      * A function to be called when the Ui element is clicked.
      * Only for buttons. This is an alias of config.value or config.property for buttons.
+     *
+     * Return a function for undo, or (undo, redo) or (action, undo) for undo/redo support. action will be exec immediately and on undo
      * @param args
      */
-    onClick?: (...args: any[]) => void; // for button-like types
+    onClick?: (...args: any[]) => (void|(()=>any)|{action?: (()=>any), undo?: (()=>any), redo?: (()=>any)}); // for button-like types
 
     /**
      * bounds for the value of the object. This is used for numeric inputs like number and sliders.
@@ -180,6 +189,17 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * Can be set by the parent, if this is a child object.
      */
     parentOnChange?: (...args: ChangeArgs) => void;
+    /**
+     * @internal
+     * Can be set by the parent, if this is a child object.
+     */
+    parentProperty?: ValOrFunc<[any, string|number]|undefined>,
+    // /**
+    //  * Path of the binding inside the value. (dot separated json path)
+    //  * In case of property it is appended to the property path.
+    //  */
+    // parentPath?: ValOrFunc<string|undefined>,
+
 
     /**
      * Individual components can support custom options. These can be added to the config object.
@@ -193,4 +213,8 @@ export interface IUiConfigContainer<TValue = any, TType extends string = string>
 
 export interface UiConfigContainer<TValue = any, TType extends string = string> extends IUiConfigContainer<TValue, TType> {
     [id: string]: any
+}
+
+export function createValueUiConfig<T = any, TType extends UiObjectType = UiObjectType, TTarget = any>(config: UiObjectConfig<T, TType, TTarget>): Omit<UiObjectConfig<T, TType, TTarget>, 'value'>&{value: T} {
+    return config as any
 }
