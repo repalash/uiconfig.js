@@ -38,12 +38,13 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
         types.push(type)
         type = Object.getPrototypeOf(type)
     }
-    if (!types.length) {
+    if (!types.length || Array.isArray(obj)) {
         const keys = typeof obj === 'object' ? Object.keys(obj) : Array.isArray(obj) ? obj.map((_, i)=>i) : []
         for (const key of keys) {
             const val = obj[key]
             if (val === undefined || val === null) continue
             // if (Array.isArray(obj)) debugger
+            // todo: make only the children of folder inside the value config dynamic instead of the whole thing? as in webgi
             const c = ()=>generateValueConfig(obj, key, key + '', val)
             if (c) result.push(c)
         }
