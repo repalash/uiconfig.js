@@ -2,6 +2,7 @@ import {FolderApi} from 'tweakpane'
 import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import type * as THREE_1 from 'three'
 import {tpInputGenerator} from './tpGenerators'
 
@@ -14,7 +15,7 @@ export const tpColorInputGenerator = (parent: FolderApi, config: UiObjectConfig,
     }
     if (!config.__proxy) {
         config.__proxy = {
-            forceOnChange: true,
+            forceOnChange: false,
         }
         const uiColorSpace = 'srgb'
         const tempColor = new renderer.THREE.Color()
@@ -27,7 +28,7 @@ export const tpColorInputGenerator = (parent: FolderApi, config: UiObjectConfig,
                 return 0
             },
             set: (v: number) => {
-                config.__proxy.value_ = renderer.methods.getValue(config)
+                config.__proxy.value_ = renderer.methods.getValue(config, config.__proxy.value_ || undefined)
                 const cc: any = config.__proxy.value_
                 const tempC = tempColor.setHex(v, uiColorSpace)
                 if (cc?.isColor) {
@@ -37,7 +38,8 @@ export const tpColorInputGenerator = (parent: FolderApi, config: UiObjectConfig,
             },
         })
     }
-    config.__proxy.value_ = renderer.methods.getValue(config)
+    config.__proxy.value_ = renderer.methods.getValue(config, config.__proxy.value_ || undefined)
+    // console.log(config.__proxy.value_)
     params = params ?? {}
     params.view = 'color'
     if (getOrCall(config.inlinePicker))

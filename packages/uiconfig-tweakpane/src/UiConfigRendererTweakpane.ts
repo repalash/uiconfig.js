@@ -1,6 +1,6 @@
-import {AnyOptions, createDiv, createStyles, css, getOrCall} from 'ts-browser-helpers'
+import {AnyOptions, createDiv, createStyles, css, getOrCall, JSUndoManager} from 'ts-browser-helpers'
 import {BladeApi, FolderApi, Pane} from 'tweakpane'
-import {TUiRefreshModes, UiConfigRendererBase, UiObjectConfig} from 'uiconfig.js'
+import {TUiRefreshModes, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
 import {
     tpButtonInputGenerator,
@@ -12,10 +12,17 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 
-export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
+export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
-    constructor(container: HTMLElement = document.body, {expanded = true, autoPostFrame = true} = {}) {
-        super(container, autoPostFrame)
+    protected _root?: Pane
+
+    unmount() {
+        this._root?.dispose()
+        super.unmount()
+    }
+
+    constructor(container: HTMLElement = document.body, {expanded = true, autoPostFrame = true} = {}, undoManager?: JSUndoManager|false) {
+        super(container, autoPostFrame, undefined, undoManager)
         if (this._root) this._root.expanded = expanded
     }
 
@@ -92,7 +99,6 @@ export class UiConfigRendererTweakpane extends UiConfigRendererBase<Pane> {
             uiConfig.uiRefType = undefined
             uiConfig.uiRefresh = undefined
         })
-
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {

@@ -19,7 +19,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
             safeSetProperty(config, 'expanded', expanded, true)
             expanded = getOrCall(config.expanded) ?? expanded
             if (expanded !== folder1.expanded) folder1.expanded = expanded
-            config.uiRefresh?.(true, 'postFrame')
+            config.uiRefresh?.(expanded, 'postFrame')
             if (expanded) {
                 config.onExpand?.(config)
             }
@@ -165,7 +165,10 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
 
     let proxy = config.__proxy
     if (!proxy) proxy = config.__proxy = {} // see tpColorInputGenerator
-    if (!objectHasOwn(proxy, 'value_')) proxy.value = renderer.methods.getValue(config)
+    if (!objectHasOwn(proxy, 'value_')) {
+        const n = renderer.methods.getValue(config, proxy.value || undefined)
+        proxy.value = n
+    }
     if (!input) {
         // Create input in parent and bind to property
         try {
@@ -174,7 +177,9 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
                 input = tar ? parent.addMonitor(tar, key, inputParams) : undefined
             } else {
                 input = parent.addInput(proxy, 'value', inputParams).on('change', ev => {
-                    if (proxy.listedOnChange === false) return
+                    if (proxy.listedOnChange === false) return // used in tpImageInputGenerator
+                    // console.log(ev.last ?? true)
+                    config.dispatchMode = "immediate" // this is required so that the value is set before the next uiRefresh.
                     renderer.methods.setValue(config, proxy.value_ ?? proxy.value, {last: ev.last ?? true}, proxy.forceOnChange || false)
                 })
             }
@@ -224,7 +229,7 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
 
 export const tpVecInputGenerator = (parent: FolderApi, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, params?: any) => {
     if (!config.__proxy) config.__proxy = {}
-    config.__proxy.forceOnChange = true
+    config.__proxy.forceOnChange = false
 
     // todo handle array type of values instead of {x,y,z,w}
 
