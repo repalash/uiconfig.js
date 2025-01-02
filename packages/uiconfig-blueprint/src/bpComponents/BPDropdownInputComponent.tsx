@@ -60,7 +60,12 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
                 key={this.props.config.uuid}
                 disabled={this.state.disabled}
                 popoverProps={{
-                    minimal: true
+                    minimal: true,
+                }}
+                popoverTargetProps={{
+                    style: {
+                        height: "100%"
+                    }
                 }}
                 noResults={<MenuItem disabled={true} text="No results."  roleStructure="listoption" />}
                 items={this.state.options}
@@ -72,7 +77,7 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
             >
                 {/* children become the popover target; render value here */}
                 <Button rightIcon="double-caret-vertical" small={true}
-                        style={{whiteSpace: 'nowrap', textOverflow: "ellipsis"}}>{item.label}</Button>
+                        style={{whiteSpace: 'nowrap', textOverflow: "ellipsis", height: "100%"}}>{item.label}</Button>
             </Select>
         )
     }

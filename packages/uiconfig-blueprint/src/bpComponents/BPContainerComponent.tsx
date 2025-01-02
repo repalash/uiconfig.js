@@ -16,6 +16,7 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
     }
 
     protected _registerChild(child: UiObjectConfig) {
+        // if(Object.keys(child).length)
         child.parentOnChange = this._childParentOnChange
         if(child.property === undefined &&
             child.value === undefined &&
@@ -28,7 +29,7 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
 
     protected _unregisterChild(child: UiObjectConfig) {
         if (child.parentOnChange !== this._childParentOnChange)
-            child.parentOnChange = undefined
+            delete child.parentOnChange
         if(Array.isArray(child.property) &&
             (child.property === this.props.config.property ||
                 (child.property[0] === this.props.config &&

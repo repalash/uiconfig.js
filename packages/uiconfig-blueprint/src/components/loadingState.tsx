@@ -9,3 +9,12 @@ export function useLoadingState(){
     }, [loadingState])
     return {loadingState, updateLoading}
 }
+export function useLoadingStateKey(){
+    const [loadingState, setLoadingState] = useState<boolean>(false)
+    const updateLoading = useCallback(async (promise?: Promise<any>|void) => {
+        if(!promise || promise.then === undefined) return setLoadingState(false)
+        setLoadingState(true)
+        await promise.then(() => setLoadingState(false))
+    }, [loadingState])
+    return {loadingState, updateLoading}
+}

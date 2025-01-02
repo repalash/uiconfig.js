@@ -89,7 +89,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: calc($pt-grid-size / 2);
-  height: $pt-input-height;
+  //height: $pt-input-height; // todo: this will break the texture/image input
   flex-grow: 1;
 }
 
@@ -195,4 +195,14 @@
 .bp5-button{
   user-select: none; // todo: why is this needed?
   transition: var(--background-color-transition);
+}
+
+.file-component-select{
+  > select {
+    padding-right: 18px;
+    padding-left: 8px;
+  }
+  > .bp5-icon{
+    right: 0px;
+  }
 }

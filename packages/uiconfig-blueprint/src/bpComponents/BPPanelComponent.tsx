@@ -42,7 +42,7 @@ export class BPPanelComponent extends BPContainerComponent<BPPanelComponentState
             <div
                 key={this.props.config.uuid}
                 className="folder-children" style={{listStyleType: "none", paddingLeft: "0"}}>
-                {this.state.children.map((c, i) => <ConfigObject key={'c' + i} {...this.props} config={c}/>)}
+                {this.state.children.map((c, i) => c ? <ConfigObject key={'c' + i} {...this.props} config={c}/> : null)}
             </div>
         ) : null
     }

@@ -29,6 +29,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                 key={this.props.config.uuid}
                 open={this.state.expanded}
                 disabled={this.state.disabled}
+                level={this.props.level ?? 0}
                 minimal={(this.props.level ?? 0) > 0}
                 onClick={() => {
                     if(this.state.readOnly) return
@@ -39,7 +40,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                 onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
             >
                 <Collapse isOpen={this.state.expanded} keepChildrenMounted={false}>
-                    <div className="folder-children" style={{listStyleType: "none", paddingLeft: "0"}}>
+                    <div className="folder-children" style={{listStyleType: "none", paddingLeft: this.props.level??0 > 2 ? "6px" : 0}}> {/*todo use parameter instead of const 6*/}
                         {this.state.children.map((c, i) => <ConfigObject key={'c' + i} {...this.props} config={c}
                                                                          level={(this.props.level ?? 0) + 1}/>)}
                     </div>
@@ -49,7 +50,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
     }
 }
 
-export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, disabled?: boolean, enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
+export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, level: number, disabled?: boolean, enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
     return (
         <div
             // interactive={!props.open}
@@ -75,11 +76,14 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                 {/*</Button>*/}
 
                 <Button
-                    className="folder-trigger-button" fill={!props.minimal} onClick={props.onClick}
+                    className="folder-trigger-button"
+                    // fill={!props.minimal}
+                    fill={true}
+                    onClick={props.onClick}
                     minimal={true}
                     disabled={props.disabled}
                     small={props.minimal}
-                    style={props.minimal ? {} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
+                    style={props.level ? {marginLeft: "6px"} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
                     intent={props.open ? Intent.PRIMARY : Intent.NONE}
                     icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
                     rightIcon={(

@@ -135,7 +135,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
         return res
     }
 
-    handleKeyDown(e: React.KeyboardEvent) {
+    protected _handleKeyDown(e: React.KeyboardEvent) {
         const nodes = this.getFlatNodes(true)
         let current, next, previous;
         for (let i = 0; i < nodes.length; i++) {
@@ -166,7 +166,11 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
             case "Enter":
                 if (current) this._onNodeDoubleClick(current.id)
                 break
+            default:
+                return
         }
+        e.preventDefault()
+        e.stopPropagation()
     }
 
     render() {
@@ -174,7 +178,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPCompo
         return !this.state.hidden ? (
             <div
                 style={{width: "100%", height: "100%"}}
-                 onKeyDown={e => this.handleKeyDown(e)}
+                 onKeyDown={e => this._handleKeyDown(e)}
                 tabIndex={0}
             >
             <TreeT

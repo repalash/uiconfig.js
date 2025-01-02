@@ -58,8 +58,8 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
     state = {}
 
     render() {
+        if (!this.props.config || !this.props.config.type) return (<div key={this.props.config.uuid}></div>)
         this.context.methods.initUiConfig(this.props.config)
-        if (!this.props.config.type) return (<div key={this.props.config.uuid}></div>)
         let type = this.props.config.type as any as UiConfigTypes
         const val = this.context.methods.getValue(this.props.config)
 
@@ -83,7 +83,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
                     <FolderHeadCard
                         enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
                         onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
-                        label={label} minimal={false} open={false} onClick={() => {
+                        level={0} label={label} minimal={false} open={false} onClick={() => {
                         this.props.openPanel<{ config: UiObjectConfig<any> }>({
                             props: {config: this.props.config},
                             title: label,
