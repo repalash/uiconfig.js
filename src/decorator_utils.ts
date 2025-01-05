@@ -93,7 +93,7 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
 export function generateUiFolder(label: string, obj: any, params: any = {}, type = 'folder', dynamic = false): UiObjectConfig {
     return {
         type, label,
-        children: !dynamic ? generateUiConfig(obj) : [()=> generateUiConfig(obj)],
+        children: !dynamic ? generateUiConfig(obj) : ()=> generateUiConfig(obj),
         uuid: uuidV4(),
         ...params,
     }

@@ -1,8 +1,8 @@
 
 export interface PrimitiveValObject {
-    clone(): PrimitiveValObject
-    equals(other: PrimitiveValObject|PrimitiveVal): boolean
-    copy(other: PrimitiveValObject): void
+    clone(): this
+    equals(other: this|any): boolean
+    copy(other: this|any): void|this|any
 }
 // note that arbitrary objects are not allowed
 export type PrimitiveVal = string | number | boolean | null | PrimitiveValObject | PrimitiveVal[]
