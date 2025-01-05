@@ -1,5 +1,6 @@
 import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
 import {Tree, TreeNodeInfo} from "@blueprintjs/core";
+import {PrimitiveVal} from "uiconfig.js";
 
 export type BPTreeComponentState<T = {}> = BPComponentState & {
     nodes: TreeNodeInfo<T>[]
@@ -8,7 +9,7 @@ export type BPTreeComponentState<T = {}> = BPComponentState & {
 // https://github.com/palantir/blueprint/blob/develop/packages/docs-app/src/examples/core-examples/treeExample.tsx
 type NodePath = number[];
 
-export abstract class BPTreeComponent<T = {}, TConfigVal = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
+export abstract class BPTreeComponent<T = {}, TConfigVal extends PrimitiveVal|void = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
     constructor(props: BPComponentProps<TConfigVal>, context: UiConfigRendererContextType) {
         super(props, context, {nodes: []});
     }

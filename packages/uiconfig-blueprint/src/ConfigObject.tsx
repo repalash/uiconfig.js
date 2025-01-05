@@ -13,7 +13,6 @@ import {BPPanelComponent} from "./bpComponents/BPPanelComponent";
 import {BPTreeFolderComponent} from "./bpComponents/BPTreeFolderComponent";
 import {UiObjectConfig} from 'uiconfig.js'
 import {BPColorInputComponent} from './bpComponents/BPColorInputComponent'
-import {BPFileComponent} from "./bpComponents/BPFileComponent";
 import {BPVectorInputComponent} from './bpComponents/BPVectorInputComponent'
 // import {BPVectorInputComponent} from "./bpComponents/BPVectorInputComponent";
 // import {BPFileComponent} from "./bpComponents/BPFileComponent";
@@ -44,7 +43,7 @@ export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Co
     slider: BPSliderInputComponent,
     tree: BPTreeFolderComponent,
     color: BPColorInputComponent,
-    image: BPFileComponent,
+    // image: BPFileComponent,
     vec: BPVectorInputComponent,
     vec2: BPVectorInputComponent,
     vec3: BPVectorInputComponent,
@@ -61,7 +60,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
         if (!this.props.config || !this.props.config.type) return (<div key={this.props.config.uuid}></div>)
         this.context.methods.initUiConfig(this.props.config)
         let type = this.props.config.type as any as UiConfigTypes
-        const val = this.context.methods.getValue(this.props.config)
+        const val = this.context.methods.getRawValue(this.props.config)
 
         // hacks
         if (type === 'input' && typeof val === 'number') this.props.config.type = type = 'number'
@@ -81,7 +80,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
             return (
                 <div key={this.props.config.uuid}>
                     <FolderHeadCard
-                        enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
+                        enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                         onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
                         level={0} label={label} minimal={false} open={false} onClick={() => {
                         this.props.openPanel<{ config: UiObjectConfig<any> }>({

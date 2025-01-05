@@ -3,6 +3,7 @@ import React from "react";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
 import {Button} from "@blueprintjs/core";
 
+// @ts-ignore
 export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledComponentState> {
     constructor(props: BPComponentProps<()=>void>, context: UiConfigRendererContextType) {
         super(props, context, {label: 'Button'});

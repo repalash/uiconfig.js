@@ -20,7 +20,7 @@ export interface UiConfigRendererBaseBp extends UiConfigRendererBase{
 
 export const UiConfigRendererContext = createContext<UiConfigRendererBaseBp>(null as any)
 export type UiConfigRendererContextType = React.ContextType<typeof UiConfigRendererContext>
-export abstract class BPComponent<TValue, TState, TProps extends BPComponentProps<TValue> = BPComponentProps<TValue>> extends React.Component<TProps, TState> {
+export abstract class BPComponent<TValue, TState extends BPComponentState, TProps extends BPComponentProps<TValue> = BPComponentProps<TValue>> extends React.Component<TProps, TState> {
     static contextType = UiConfigRendererContext
     declare context: UiConfigRendererContextType
 
@@ -28,6 +28,7 @@ export abstract class BPComponent<TValue, TState, TProps extends BPComponentProp
         super(props, context);
         this.state = this.getUpdatedState(state)
         // this.state = state
+        this.setState = this.setState.bind(this)
     }
 
     /**
@@ -38,16 +39,25 @@ export abstract class BPComponent<TValue, TState, TProps extends BPComponentProp
         return new Promise<void>(resolve => this.setState(state, resolve))
     }
 
+    keyVersion = 0
+
     /**
      * This is called to get the updated state from the config, copy any values/properties from the config to the state here
      * @param state - the current state
      */
     getUpdatedState(state: TState): TState{
+        const hidden = getOrCall(this.props.config.hidden) ?? false
+        const disabled = getOrCall(this.props.config.disabled) ?? false
+        const readOnly = getOrCall(this.props.config.readOnly) ?? false
+        if(hidden !== state.hidden
+            || disabled !== state.disabled
+            || readOnly !== state.readOnly
+        ) this.keyVersion++
         return {
             ...state,
-            hidden: getOrCall(this.props.config.hidden) ?? false,
-            disabled: getOrCall(this.props.config.disabled) ?? false,
-            readOnly: getOrCall(this.props.config.readOnly) ?? false,
+            hidden,
+            disabled,
+            readOnly,
         }
     }
 

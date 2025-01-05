@@ -36,7 +36,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                     setExpanded(!this.state.expanded)
                 }}
                 label={this.state.label}
-                enabled={enabledToggle ? this.context.methods.getValue(enabledToggle) : undefined}
+                enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                 onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
             >
                 <Collapse isOpen={this.state.expanded} keepChildrenMounted={false}>

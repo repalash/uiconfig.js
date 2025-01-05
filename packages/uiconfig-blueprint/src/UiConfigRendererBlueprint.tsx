@@ -1,5 +1,5 @@
-import {createDiv, createStyles, css} from "ts-browser-helpers";
-import {UiConfigRendererBase, UiObjectConfig} from "uiconfig.js";
+import {createDiv, createStyles, css, JSUndoManager} from "ts-browser-helpers";
+import {UiConfigRenderer, UiObjectConfig} from "uiconfig.js";
 import React from 'react'
 import {createRoot, Root} from 'react-dom/client'
 import {ConfigurationPanelComponent} from './components/ConfigurationPanelComponent'
@@ -9,12 +9,13 @@ import rendererCss from './renderer.scss?inline' // for rollup build remove ?inl
 import {FocusStyleManager} from '@blueprintjs/core'
 import {THREE} from "./threejs";
 
-export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
-    constructor(container: HTMLElement = document.body, {autoPostFrame = true} = {}) {
-        super(container, autoPostFrame);
+export class UiConfigRendererBlueprint extends UiConfigRenderer {
+    constructor(container: HTMLElement = document.body, {autoPostFrame = true} = {}, undoManager?: JSUndoManager|false) {
+        super(container, autoPostFrame, undefined, undoManager);
         // this._root.expanded = expanded
-
     }
+
+    protected _root: Root
 
     protected _createUiContainer(): HTMLDivElement {
         FocusStyleManager.onlyShowFocusOnTabs();
@@ -64,8 +65,8 @@ export class UiConfigRendererBlueprint extends UiConfigRendererBase<Root> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     THREE: THREE|undefined = (window as any).THREE
 
-    dispose() {
-        // todo
+    unmount() {
+        this._root?.unmount()
     }
 
 }

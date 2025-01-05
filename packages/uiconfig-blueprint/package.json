@@ -18,7 +18,7 @@
     "dist:css": "css-dist lib/css",
 
     "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-    "new:publish": "npm run prepare && clean-package && npm publish; clean-package restore",
+    "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version",
     "dev": "vite",
     "build": "vite build && npm run compile",
     "build-examples": "vite build -c vite.examples.config.js",
@@ -102,13 +102,12 @@
     "@types/react-dom": "^18.0.11",
     "@blueprintjs/core": "^5.11.0",
     "@types/three": "^0.152.1",
-    "ts-browser-helpers": "^0.11.0",
     "@types/webxr": "^0.5.10",
     "blueprint-styler": "^5.0.2"
   },
   "dependencies": {
-    "ts-browser-helpers": "^0.11.0",
-    "uiconfig.js": "^0.0.12",
+    "ts-browser-helpers": "^0.16.1",
+    "uiconfig.js": "^0.1.2",
     "@blueprintjs/icons": "^5.11.0",
     "@blueprintjs/select": "^5.2.2",
     "blueprint-styler": "^5.0.2"

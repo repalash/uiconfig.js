@@ -13,6 +13,7 @@ export type BPFileComponentState = BPValueComponentState<StateValue> & {
 type BPFileComponentExtras = {fileLoader?: {load: (v: string|File|{path: string, file: File|Blob})=>Promise<FileImportType>}}
 type BPFileComponentContextType = UiConfigRendererContextType & BPFileComponentExtras
 
+// @ts-ignore
 export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> extends BPValueComponent<T | null, BPFileComponentState, StateValue> {
     declare context: BPFileComponentContextType
     declare props: BPComponentProps<T | null> & BPFileComponentExtras & TP
@@ -47,8 +48,8 @@ export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> e
     async convertStateToValue(state: BPFileComponentState): Promise<T|null> {
         const value = state.value
         let val: any
-        const last = this.context.methods.getValue(this.props.config) ?? null
-        const lastState = this.convertValueToState(last, {...this.state, value: null})
+        const last = this.context.methods.getRawValue(this.props.config as any) ?? null
+        const lastState = this.convertValueToState(last as any, {...this.state, value: null})
         if (value === null) {
             val = null
         } else if (typeof value === 'string') {

@@ -2,9 +2,10 @@ import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {ReactNode} from "react";
 import {FormGroupComponent} from "../components/FormGroupComponent";
+import {PrimitiveVal} from "uiconfig.js";
 
 export abstract class BPInputComponent<
-    TStateValue, TState extends BPValueComponentState<TStateValue> = BPValueComponentState<TStateValue>>
+    TStateValue extends PrimitiveVal, TState extends BPValueComponentState<TStateValue> = BPValueComponentState<TStateValue>>
     extends BPValueComponent<TStateValue, TState, TStateValue> {
 
     protected constructor(props: BPComponentProps<TStateValue>, context: UiConfigRendererContextType, state: TState) {

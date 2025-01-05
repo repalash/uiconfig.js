@@ -46,7 +46,11 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
                 // labelValues={[]}
                 onChange={(v) => {
                     if(this.state.readOnly) return
-                    this.setValue(v)
+                    this.setValue(v, false)
+                }}
+                onRelease={(v) => {
+                    if(this.state.readOnly) return
+                    this.setValue(v, true)
                 }}
             />
         ),(
@@ -63,7 +67,14 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
                 buttonPosition="none"
                 onValueChange={(v) => {
                     if(this.state.readOnly) return
-                    this.setValue(v)
+                    this.setValue(v, false)
+                }}
+                onBlur={(e) => {
+                    if(this.state.readOnly) return
+                    this.setValue(parseFloat(e.currentTarget.value), true)
+                }}
+                onKeyDown={(e) => {
+                    if (e.code === 'Enter') this.setValue(parseFloat(e.currentTarget.value), true)
                 }}
             />)
     ]
