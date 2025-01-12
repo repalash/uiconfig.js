@@ -1,15 +1,14 @@
 import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
 import {Tree, TreeNodeInfo} from "@blueprintjs/core";
-import {PrimitiveVal} from "uiconfig.js";
 
 export type BPTreeComponentState<T = {}> = BPComponentState & {
     nodes: TreeNodeInfo<T>[]
 }
 
 // https://github.com/palantir/blueprint/blob/develop/packages/docs-app/src/examples/core-examples/treeExample.tsx
-type NodePath = number[];
+type NodePath = (string|number)[];
 
-export abstract class BPTreeComponent<T = {}, TConfigVal extends PrimitiveVal|void = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
+export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|PrimitiveVal|void*/ = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
     constructor(props: BPComponentProps<TConfigVal>, context: UiConfigRendererContextType) {
         super(props, context, {nodes: []});
     }
@@ -51,19 +50,29 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends PrimitiveVal|vo
         })
     }
 
+    protected _getNodePath(id: string, nodes?: TreeNodeInfo<T>[]): NodePath {
+        let path1: NodePath|null = null
+        this._forEachNode(nodes ?? this.state.nodes, (node, path) => {
+            if(!path1) return
+            if (node.id === id) path1 = path
+        })
+        return path1 ?? []
+    }
+
     protected _forEachNode<T>(nodes: TreeNodeInfo<T>[] | undefined, callback: (node: TreeNodeInfo<T>, path: NodePath) => void, path: NodePath = []) {
         if (nodes === undefined) {
             return nodes;
         }
         for (const node of nodes) {
             callback(node, path);
-            this._forEachNode(node.childNodes, callback, [...path, node.id] as NodePath);
+            this._forEachNode(node.childNodes, callback, [...path, node.id]);
         }
         return nodes
     }
-    protected _forNodeAtPath<T>(nodes: TreeNodeInfo<T>[], path: NodePath, callback: (node: TreeNodeInfo<T>) => void) {
-        callback(Tree.nodeFromPath(path, nodes));
-    }
+
+    // protected _forNodeAtPath<T>(nodes: TreeNodeInfo<T>[], path: NodePath, callback: (node: TreeNodeInfo<T>) => void) {
+    //     callback(Tree.nodeFromPath(path, nodes));
+    // }
 
     protected async _onNodeExpandCollapse(_id: string | number, expanded?: boolean) {
         const nodes = this._cloneNodes()
@@ -104,8 +113,15 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends PrimitiveVal|vo
         return this.setStatePromise({...this.state, nodes})
     }
 
-    async setSelected(id?: string) {
+    async setSelected(id?: string, expand = false) {
         const nodes = this._cloneNodes(n => n.isSelected = n.id === id)
+        if(expand && id!==undefined){
+            const parents = this._getNodePath(id)
+            for (let i = 0; i < parents.length; i++) {
+                const node = this._infoMap.get(parents[i])
+                if(node) node.isExpanded = true
+            }
+        }
         return this.setStatePromise({...this.state, nodes})
     }
 
