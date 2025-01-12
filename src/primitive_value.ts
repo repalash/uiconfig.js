@@ -3,6 +3,15 @@ export interface PrimitiveValObject {
     clone(): this
     equals(other: this|any): boolean
     copy(other: this|any): void|this|any
+
+    // these can be set if the object does not want to use the default implementation (like Texture, Object3D)
+    _ui_isPrimitive?: boolean
+    // disable clone.
+    _ui_primitiveClone?: false
+    // disable copy
+    _ui_primitiveCopy?: false
+    // disable equals
+    _ui_primitiveEquals?: false
 }
 // note that arbitrary objects are not allowed
 export type PrimitiveVal = string | number | boolean | null | PrimitiveValObject | PrimitiveVal[]
@@ -10,14 +19,14 @@ export type PrimitiveVal = string | number | boolean | null | PrimitiveValObject
 export function clonePrimitive<T extends PrimitiveVal>(a: T): T {
     if (a === null || typeof a !== 'object') return a
     if (Array.isArray(a)) return a.map(clonePrimitive) as T
-    if (typeof a.clone === 'function') return a.clone() as T
+    if (!a._ui_isPrimitive && typeof a.clone === 'function' && a._ui_primitiveClone !== false) return a.clone() as T
     return a
 }
 
 export function equalsPrimitive<T extends PrimitiveVal>(a: T, b: T): boolean {
     if (a === null || typeof a !== 'object') return a === b
     if (Array.isArray(a)) return Array.isArray(b) && a.length === b.length && a.every((v, i)=>equalsPrimitive(v, b[i]))
-    if (typeof a.equals === 'function') return !!a.equals(b)
+    if (!a._ui_isPrimitive && typeof a.equals === 'function' && a._ui_primitiveEquals !== false) return !!a.equals(b)
     // direct equality check in case of objects
     return a === b
 }
@@ -36,9 +45,9 @@ export function copyPrimitive<T extends PrimitiveVal>(a: T, b: T) {
             }
             return a
         } else return clonePrimitive(b)
-    } else if (typeof b.copy === 'function') {
+    } else if (!b._ui_isPrimitive && typeof b.copy === 'function' && b._ui_primitiveCopy !== false) {
         // const a = target[key]
-        if (a && typeof a === 'object' && !Array.isArray(a) && typeof a.copy === 'function') {
+        if (a && typeof a === 'object' && !Array.isArray(a) && !a._ui_isPrimitive && typeof a.copy === 'function' && a._ui_primitiveCopy !== false) {
             a.copy(b)
             return a
         } else return clonePrimitive(b)
