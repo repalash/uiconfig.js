@@ -40,20 +40,27 @@ export class UiConfigMethods {
         return prop
     }
 
-    getRawValue<T extends PrimitiveVal>(config: UiObjectConfig<T>): T | undefined {
+    getRawValue<T extends any /*PrimitiveVal*/>(config: UiObjectConfig<T>): T | undefined {
         const [tar, key] = this.getBinding(config)
         if (!tar) return undefined
         const res = tar[key]
         return res as T | undefined
     }
 
+    /**
+     * Get the value from config
+     * @param config
+     * @param val - existing value, new value can be copied to this if not equal.
+     * @param copyOnEqual - whether the value should be copied to val if equal. Default is true.
+     * @returns The value from the binding, cloned or copied if possible. If the value is equal and copyOnEqual is false, then undefined is returned. this can be used to check if the value is changed
+     */
     getValue<T extends PrimitiveVal>(config: UiObjectConfig<T>, val: T | undefined, copyOnEqual = true): T | undefined {
         const [tar, key] = this.getBinding(config)
         if (!tar) return undefined
         const res = tar[key]
         // console.log('get', config, res)
         if (val !== undefined && res !== undefined) {
-            if (equalsPrimitive(val, res) && !copyOnEqual) return undefined
+            if (equalsPrimitive(val, res) && !copyOnEqual) return undefined // returns undefined if equal
             return copyPrimitive(val, res)
         }
         return clonePrimitive(res)
@@ -201,7 +208,7 @@ export class UiConfigMethods {
                 const resAction = typeof res !== 'function' ? res?.action?.bind(res) : null
                 const redo = typeof res === 'function' ? action : res?.redo?.bind(res) ?? resAction
                 if (typeof resAction === 'function') {
-                    res = resAction() // execute the action now.
+                    res = await resAction() // execute the action now. adding await just in case
                 }
                 if (typeof undo === 'function') {
                     this.recordUndo({

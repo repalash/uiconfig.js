@@ -12,6 +12,7 @@ export interface ChangeEvent {
     lastValue?: any, // the old value
 }
 export type ChangeArgs = [ChangeEvent, ...any[]]
+export type OnClickReturnType = (void|(()=>any)|{action?: (()=>any), undo?: (()=>any), redo?: (()=>any)})
 
 export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectType, TTarget = any> {
     /**
@@ -114,7 +115,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * Return a function for undo, or (undo, redo) or (action, undo) for undo/redo support. action will be exec immediately and on undo
      * @param args
      */
-    onClick?: (...args: any[]) => (void|(()=>any)|{action?: (()=>any), undo?: (()=>any), redo?: (()=>any)}); // for button-like types
+    onClick?: ((...args: any[]) => OnClickReturnType) | ((...args: any[]) => Promise<OnClickReturnType>); // for button-like types
 
     /**
      * bounds for the value of the object. This is used for numeric inputs like number and sliders.

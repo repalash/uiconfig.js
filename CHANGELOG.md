@@ -2,8 +2,26 @@
 
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
-## Upgrade to v0.1.0
+## v0.1.3
+Minor update
+- Add options to disable primitive logic (for textures, objects etc)
+- Add `OnClickReturnType`, Support promise return in onClick
+- Fix `getRawValue` type to allow `any`
+- Allow promise return in undo action function.
 
+## v0.1.2
+Minor update
+- Fix dynamic `generateUiFolder`
+- Fix types of `PrimitiveValObject`
+
+## v0.1.1
+Minor update
+- Fix initial setting of `undoManager`
+
+## v0.1.0
+Major updates
+
+### Migration Guide
 - `UiConfigRendererBase` split into 2 classes.
   - Use class `UiConfigRenderer` in place of `UiConfigRendererBase<T>`
   - Removed `protected _root: T`. It can be defined in the subclass if used.
