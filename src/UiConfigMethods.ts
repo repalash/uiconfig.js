@@ -99,7 +99,7 @@ export class UiConfigMethods {
         let sameType = !!lastCommand && (lastCommand as SetValueCommand).type === 'UiConfigMethods_set' && (lastCommand as SetValueCommand).config === c.config
         if (sameType) {
             const cLast = lastCommand as SetValueCommand
-            if (!cLast.final && (c.time - cLast.time) < 2000) {
+            if (!cLast.final && (c.time - cLast.time) < this.undoEditingWaitTime) {
                 // replace cLast with c using lastVal from cLast
                 c.lastVal = cLast.lastVal
                 c.val = clonePrimitive(c.val)
