@@ -2,6 +2,9 @@
 
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
+## v0.1.4
+- Add property `undoEditingWaitTime` to `UiConfigMethods`
+
 ## v0.1.3
 Minor update
 - Add options to disable primitive logic (for textures, objects etc)
