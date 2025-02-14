@@ -1,22 +1,22 @@
-import {BPValueComponentState} from "./BPValueComponent.tsx";
-import {BPComponentProps2, UiConfigRendererContextType} from "./BPComponent.tsx";
-import {BPInputComponent} from "./BPInputComponent.tsx";
+import {UiConfigValueBaseState} from "./UiConfigValueBase.tsx";
+import {UiConfigBaseProps2, UiConfigRendererContextType} from "./UiConfigBase.tsx";
+import {UiConfigInput} from "./UiConfigInput.tsx";
 
 export interface DropdownItem<T extends string|number=string|number>{
     label: string,
     value: T,
 }
 
-export type BPDropdownComponentState<T extends string|number=string|number> = BPValueComponentState<T> & {
+export type UiConfigDropdownState<T extends string|number=string|number> = UiConfigValueBaseState<T> & {
     options: DropdownItem<T>[]
 }
 
-export class BPDropdownInputComponent<T extends string|number=string|number> extends BPInputComponent<T, BPDropdownComponentState<T>> {
-    constructor(props: BPComponentProps2<T, BPDropdownComponentState<T>>, context: UiConfigRendererContextType) {
+export class UiConfigDropdownInput<T extends string|number=string|number> extends UiConfigInput<T, UiConfigDropdownState<T>> {
+    constructor(props: UiConfigBaseProps2<T, UiConfigDropdownState<T>>, context: UiConfigRendererContextType) {
         super(props, context);
     }
 
-    getUpdatedState(state: BPDropdownComponentState<T>): BPDropdownComponentState<T> {
+    getUpdatedState(state: UiConfigDropdownState<T>): UiConfigDropdownState<T> {
         const children = this.context.methods.getChildren(this.props.config)
         let changed = state.options?.length !== children.length
         const options: DropdownItem<T>[] = children.map((value, i) => {

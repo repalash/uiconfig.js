@@ -3,11 +3,11 @@ import {PrimitiveVal, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
 import {UiConfigRendererReact} from "../lib/UiConfigRendererReact.tsx";
 
-export type BPComponentProps<T> = {
+export type UiConfigBaseProps<T> = {
     config: UiObjectConfig<T>,
     level?: number
 }
-export type BPComponentProps2<T extends PrimitiveVal|void, TState extends BPComponentState, C extends BPComponent<T, TState> = BPComponent<T, TState>> = {
+export type UiConfigBaseProps2<T extends PrimitiveVal|void, TState extends UiConfigBaseState, C extends UiConfigBase<T, TState> = UiConfigBase<T, TState>> = {
     config: UiObjectConfig<T>,
     level?: number
 
@@ -17,7 +17,7 @@ export type BPComponentProps2<T extends PrimitiveVal|void, TState extends BPComp
 
     // children?: ReactNode
 }
-export type BPComponentState = {
+export type UiConfigBaseState = {
     hidden?: boolean
     disabled?: boolean
     readOnly?: boolean // same as disabled(for most inputs)
@@ -26,12 +26,11 @@ export type BPComponentState = {
 export const UiConfigRendererContext = createContext<UiConfigRendererReact>(null as any)
 export type UiConfigRendererContextType = React.ContextType<typeof UiConfigRendererContext>
 
-// todo rename to UiConfigComponent?
-export class BPComponent<TValue extends PrimitiveVal|void, TState extends BPComponentState=BPComponentState> extends React.Component<BPComponentProps2<TValue, TState, BPComponent<TValue, TState>>, TState> {
+export class UiConfigBase<TValue extends PrimitiveVal|void, TState extends UiConfigBaseState=UiConfigBaseState> extends React.Component<UiConfigBaseProps2<TValue, TState, UiConfigBase<TValue, TState>>, TState> {
     static contextType = UiConfigRendererContext
     declare context: UiConfigRendererContextType
 
-    constructor(props: BPComponentProps2<TValue, TState, BPComponent<TValue, TState>>, context: UiConfigRendererContextType) {
+    constructor(props: UiConfigBaseProps2<TValue, TState, UiConfigBase<TValue, TState>>, context: UiConfigRendererContextType) {
         super(props, context);
         this.state = this.getUpdatedState(props.initialState)
         // this.state = state
@@ -117,13 +116,13 @@ export class BPComponent<TValue extends PrimitiveVal|void, TState extends BPComp
         return this.props.render && !this.state.hidden ? this.props.render(this) : null
         // return this.state.hidden ? null : this.props.children
         // const Child = this.props.slt!
-        // return this.state.hidden ? null : this.props.render ? this.props.render(this) : (<BPParentContext.Provider value={this}>
+        // return this.state.hidden ? null : this.props.render ? this.props.render(this) : (<UiConfigParentContext.Provider value={this}>
         //     {Child ? <Child/> : null}
-        // </BPParentContext.Provider>)
+        // </UiConfigParentContext.Provider>)
     }
 }
 
-const BPParentContext = createContext<BPComponent<any, any>|null>(null)
-// export type BPParentContextType = React.ContextType<typeof BPParentContext>
-// export const BPParentProvider = BPParentContext.Provider
-export const useBPParent = () => React.useContext(BPParentContext)
+const UiConfigParentContext = createContext<UiConfigBase<any, any>|null>(null)
+// export type UiConfigParentContextType = React.ContextType<typeof UiConfigParentContext>
+// export const UiConfigParentProvider = UiConfigParentContext.Provider
+export const useUiConfigParent = () => React.useContext(UiConfigParentContext)

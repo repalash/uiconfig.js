@@ -1,15 +1,16 @@
-import {BPComponentProps2, UiConfigRendererContextType} from "./BPComponent.tsx";
-import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent.tsx";
+import {UiConfigBaseProps2, UiConfigRendererContextType} from "./UiConfigBase.tsx";
+import {UiConfigLabelled, UiConfigLabelledState} from "./UiConfigLabelled.tsx";
 import {equalsPrimitive, PrimitiveVal} from "uiconfig.js";
 import React from "react";
 
-export type BPValueComponentState<TStateValue> = BPLabelledComponentState & {
+export type UiConfigValueBaseState<TStateValue> = UiConfigLabelledState & {
     value: TStateValue
 }
 
-export abstract class BPValueComponent<TValue extends PrimitiveVal, TState extends BPValueComponentState<TStateValue>, TStateValue> extends BPLabelledComponent<TValue, TState> {
-    protected constructor(props: BPComponentProps2<TValue, TState, any>, context: UiConfigRendererContextType) {
+export abstract class UiConfigValueBase<TValue extends PrimitiveVal, TState extends UiConfigValueBaseState<TStateValue>, TStateValue> extends UiConfigLabelled<TValue, TState> {
+    protected constructor(props: UiConfigBaseProps2<TValue, TState, any>, context: UiConfigRendererContextType) {
         super(props, context);
+        this.setValue = this.setValue.bind(this)
     }
 
     abstract convertValueToState(value: TValue, state: TState): TState;
@@ -95,7 +96,9 @@ export function useNumberInputState(initialValue: number, min: number, max: numb
     return [val, setValueCallback];
 }
 
-export type TVectorInputVal = number[]|{x: number, y?: number, z?: number, w?: number, clone(): TVectorInputVal, toArray(): number[], fromArray(a: number[]): TVectorInputVal, equals(other: TVectorInputVal): boolean; copy(other: TVectorInputVal): void;}
+export type TVectorInputVal1 = {x: number, y?: number, z?: number, w?: number, clone(): TVectorInputVal1, toArray(): number[], fromArray(a: number[]): TVectorInputVal1, equals(other: TVectorInputVal1): boolean; copy(other: TVectorInputVal1): void;}
+export type TVectorInputVal = number[]|TVectorInputVal1
+
 export function useVectorInputState(initialValue: TVectorInputVal, min: number, max: number, step: number, setValue: (v: TVectorInputVal, last: boolean) => void): [TEmptyNumber[], (v: string, key: number, last: boolean) => void, (v: number[], last: boolean) => void] {
     const [val, setVal] = React.useState<TEmptyNumber[]>(Array.isArray(initialValue) ? [...initialValue] : initialValue.toArray()); // todo should we clamp initial? or show the correct val
 

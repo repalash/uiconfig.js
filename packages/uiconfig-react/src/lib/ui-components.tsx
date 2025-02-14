@@ -1,19 +1,19 @@
-import {BPComponentProps} from "../components/BPComponent.tsx";
-import {BPLabelledComponent} from "../components/BPLabelledComponent.tsx";
-import {BPContainerComponent} from "../components/BPContainerComponent.tsx";
+import {UiConfigBaseProps} from "../components/UiConfigBase.tsx";
+import {UiConfigLabelled} from "../components/UiConfigLabelled.tsx";
+import {UiConfigContainer} from "../components/UiConfigContainer.tsx";
 import {Class} from "ts-browser-helpers";
 import {ConfigObject} from "../components/ConfigObject.tsx";
-import {BPInputComponent} from "../components/BPInputComponent.tsx";
-import {BPDropdownInputComponent} from "../components/BPDropdownInputComponent.tsx";
+import {UiConfigInput} from "../components/UiConfigInput.tsx";
+import {UiConfigDropdownInput} from "../components/UiConfigDropdownInput.tsx";
 import React from "react";
 import {UiConfigRendererReact} from "./UiConfigRendererReact.tsx";
 import {
-    BPValueComponentState, TColorInputVal,
+    UiConfigValueBaseState, TColorInputVal,
     TVectorInputVal,
     useColorInputState,
     useNumberInputState,
     useVectorInputState
-} from "../components/BPValueComponent.tsx";
+} from "../components/UiConfigValueBase.tsx";
 import {UiObjectConfig} from "uiconfig.js";
 
 export function TextInputComponent<T extends string | number = string>({
@@ -22,13 +22,13 @@ export function TextInputComponent<T extends string | number = string>({
                                                                       strToValue,
                                                                       valToStr,
                                                                       ...props
-                                                                  }: BPComponentProps<T> & {
+                                                                  }: UiConfigBaseProps<T> & {
     initialValue?: T
     inputProps?: React.InputHTMLAttributes<HTMLInputElement>
     strToValue?: (value: string) => T
     valToStr?: (value: T) => string
 }) {
-    return <BPInputComponent<T>
+    return <UiConfigInput<T>
         config={props.config}
         level={props.level}
         initialState={{
@@ -36,7 +36,7 @@ export function TextInputComponent<T extends string | number = string>({
             label: 'Input'
         }}
         // @ts-ignore
-        render={({setValue, state, props}: BPInputComponent<T>)=>{
+        render={({setValue, state, props}: UiConfigInput<T>)=>{
             return (
                 <div
                     style={{
@@ -74,12 +74,12 @@ export function TextInputComponent<T extends string | number = string>({
     />
 }
 
-export function CheckboxComponent(props: BPComponentProps<boolean>) {
-    return <BPInputComponent<boolean>
+export function CheckboxComponent(props: UiConfigBaseProps<boolean>) {
+    return <UiConfigInput<boolean>
         {...props}
         initialState={{value: false, label: 'Toggle'}}
         // @ts-ignore
-        render={({setValue, state, props}: BPInputComponent<boolean>) =>
+        render={({setValue, state, props}: UiConfigInput<boolean>) =>
             (<div
                 style={{
                     display: 'flex',
@@ -106,7 +106,7 @@ export function CheckboxComponent(props: BPComponentProps<boolean>) {
     />
 }
 
-export function NumberComponent(props: BPComponentProps<number>) {
+export function NumberComponent(props: UiConfigBaseProps<number>) {
     return <TextInputComponent<number>
         {...props}
         strToValue={parseFloat}
@@ -115,7 +115,7 @@ export function NumberComponent(props: BPComponentProps<number>) {
     />
 }
 
-function NumberInputFC({setValue, state, config, min, max, step}: {setValue: (v: number, last: boolean) => void, state: BPValueComponentState<number>, config: UiObjectConfig, min: number, max: number, step: number}) {
+function NumberInputFC({setValue, state, config, min, max, step}: {setValue: (v: number, last: boolean) => void, state: UiConfigValueBaseState<number>, config: UiObjectConfig, min: number, max: number, step: number}) {
     const [val, setVal] = useNumberInputState(state.value, min, max, step, setValue);
     return (
         <div
@@ -144,7 +144,7 @@ function NumberInputFC({setValue, state, config, min, max, step}: {setValue: (v:
     );
 }
 
-function ColorInputFC({setValue, state, config}: {setValue: (v: TColorInputVal, last: boolean) => void, state: BPValueComponentState<TColorInputVal>, config: UiObjectConfig}) {
+function ColorInputFC({setValue, state, config}: {setValue: (v: TColorInputVal, last: boolean) => void, state: UiConfigValueBaseState<TColorInputVal>, config: UiObjectConfig}) {
     const [val, setVal] = useColorInputState(state.value, setValue);
     return (
         <div
@@ -180,7 +180,7 @@ function ColorInputFC({setValue, state, config}: {setValue: (v: TColorInputVal, 
     );
 }
 
-function SliderFC({setValue, state, config, min, max, step}: {setValue: (v: number, last: boolean) => void, state: BPValueComponentState<number>, config: UiObjectConfig, min: number, max: number, step: number}) {
+function SliderFC({setValue, state, config, min, max, step}: {setValue: (v: number, last: boolean) => void, state: UiConfigValueBaseState<number>, config: UiObjectConfig, min: number, max: number, step: number}) {
     const [val, setVal] = useNumberInputState(state.value, min, max, step, setValue);
     return (
         <div
@@ -219,7 +219,7 @@ function SliderFC({setValue, state, config, min, max, step}: {setValue: (v: numb
     );
 }
 
-function VectorInputFC({setValue, state, config, min, max, step}: {setValue: (v: TVectorInputVal, last: boolean) => void, state: BPValueComponentState<TVectorInputVal>, config: UiObjectConfig, min: number, max: number, step: number}) {
+function VectorInputFC({setValue, state, config, min, max, step}: {setValue: (v: TVectorInputVal, last: boolean) => void, state: UiConfigValueBaseState<TVectorInputVal>, config: UiObjectConfig, min: number, max: number, step: number}) {
     const [val, setOne, _setAll] = useVectorInputState(state.value, min, max, step, setValue);
     return (
         <div
@@ -248,59 +248,59 @@ function VectorInputFC({setValue, state, config, min, max, step}: {setValue: (v:
     );
 }
 
-export function NumberInputComponent(props: BPComponentProps<number>) {
+export function NumberInputComponent(props: UiConfigBaseProps<number>) {
     // console.log('render slider')
-    return <BPInputComponent<number>
+    return <UiConfigInput<number>
         {...props}
         initialState={{value: 0, label: 'Number'}}
         // @ts-ignore
-        render={({setValue, state, context, props, keyVersion}: BPInputComponent<number>) => {
+        render={({setValue, state, context, props, keyVersion}: UiConfigInput<number>) => {
             const {min, max, step} = context.methods.getBounds(props.config, true)
             return <NumberInputFC key={keyVersion.toString()} setValue={setValue} state={state} config={props.config} min={min} max={max} step={step}/>
         }}
     />
 }
 
-export function ColorInputComponent(props: BPComponentProps<TColorInputVal>) {
+export function ColorInputComponent(props: UiConfigBaseProps<TColorInputVal>) {
     // console.log('render slider')
-    return <BPInputComponent<TColorInputVal>
+    return <UiConfigInput<TColorInputVal>
         {...props}
         initialState={{value: '#ffffff', label: 'Color'}}
         // @ts-ignore
-        render={({setValue, state, props, keyVersion}: BPInputComponent<TColorInputVal>) => {
+        render={({setValue, state, props, keyVersion}: UiConfigInput<TColorInputVal>) => {
             return <ColorInputFC key={keyVersion.toString()} setValue={setValue} state={state} config={props.config}/>
         }}
     />
 }
 
-export function SliderComponent(props: BPComponentProps<number>) {
+export function SliderComponent(props: UiConfigBaseProps<number>) {
     // console.log('render slider')
-    return <BPInputComponent<number>
+    return <UiConfigInput<number>
         {...props}
         initialState={{value: 0, label: 'Slider'}}
         // @ts-ignore
-        render={({setValue, state, context, props, keyVersion}: BPInputComponent<number>) => {
+        render={({setValue, state, context, props, keyVersion}: UiConfigInput<number>) => {
             const {min, max, step} = context.methods.getBounds(props.config)
             return <SliderFC key={keyVersion.toString()} setValue={setValue} state={state} config={props.config} min={min} max={max} step={step}/>
         }}
     />
 }
 
-export function VectorComponent(props: BPComponentProps<TVectorInputVal>) {
+export function VectorComponent(props: UiConfigBaseProps<TVectorInputVal>) {
     // console.log('render slider')
-    return <BPInputComponent<TVectorInputVal>
+    return <UiConfigInput<TVectorInputVal>
         {...props}
         initialState={{value: [0,0,0], label: 'Vector'}}
         // @ts-ignore
-        render={({setValue, state, context, props, keyVersion}: BPInputComponent<TVectorInputVal>) => {
+        render={({setValue, state, context, props, keyVersion}: UiConfigInput<TVectorInputVal>) => {
             const {min, max, step} = context.methods.getBounds(props.config, true)
             return <VectorInputFC key={keyVersion.toString()} setValue={setValue} state={state} config={props.config} min={min} max={max} step={step}/>
         }}
     />
 }
 
-export function ButtonComponent(props: BPComponentProps<void>) {
-    return <BPLabelledComponent<void>
+export function ButtonComponent(props: UiConfigBaseProps<void>) {
+    return <UiConfigLabelled<void>
         {...props}
         initialState={{label: 'Button'}}
         render={({state, context}) =>
@@ -319,12 +319,12 @@ export function ButtonComponent(props: BPComponentProps<void>) {
     />
 }
 
-export function FolderComponent(props: BPComponentProps<void>) {
-    return <BPContainerComponent
+export function FolderComponent(props: UiConfigBaseProps<void>) {
+    return <UiConfigContainer
         {...props}
         initialState={{children: [], expanded: false, label: 'Folder'}}
         // @ts-ignore
-        render={({state, toggleExpanded, props}: BPContainerComponent)=>{
+        render={({state, toggleExpanded, props}: UiConfigContainer)=>{
             return (
                 <div
                     style={{
@@ -377,8 +377,8 @@ export function FolderComponent(props: BPComponentProps<void>) {
     />
 }
 
-export function DropdownComponent(props: BPComponentProps<string | number>) {
-    return <BPDropdownInputComponent<string | number>
+export function DropdownComponent(props: UiConfigBaseProps<string | number>) {
+    return <UiConfigDropdownInput<string | number>
         {...props}
         initialState={{
             value: '0',
@@ -386,7 +386,7 @@ export function DropdownComponent(props: BPComponentProps<string | number>) {
             options: [{label: 'none', value: ''}]
         }}
         // @ts-ignore
-        render={({setValue, state}: BPDropdownInputComponent<string | number>) => {
+        render={({setValue, state}: UiConfigDropdownInput<string | number>) => {
             const item = state.options.find(o => o.value === state.value) || state.options[0]
             return (
                 <div
@@ -422,10 +422,10 @@ export const ConfigObjectGeneratorsSample = {
     checkbox: CheckboxComponent,
     toggle: CheckboxComponent,
     panel: FolderComponent,
-    // folder: bpPopFolderGenerator,
-    // tree: BPTreeFolderComponent,
+    // folder: PopFolderGenerator,
+    // tree: TreeFolderComponent,
     color: ColorInputComponent,
-    // image: BPFileComponent,
+    // image: FileComponent,
     vector: VectorComponent,
     vec: VectorComponent,
 }

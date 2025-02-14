@@ -3,12 +3,12 @@ import {UiConfigRendererBase, UiObjectConfig} from "uiconfig.js";
 import React from 'react'
 import {createRoot, Root} from 'react-dom/client'
 import {ConfigObject, UiConfigTypes} from "../components/ConfigObject.tsx"; // for rollup build remove ?inline
-import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContext} from "../components/BPComponent.tsx";
+import {UiConfigBase, UiConfigBaseProps, UiConfigBaseState, UiConfigRendererContext} from "../components/UiConfigBase.tsx";
 // import {FocusStyleManager} from '@blueprintjs/core'
 // import {THREE} from "./threejs";
 
 export class UiConfigRendererReact extends UiConfigRendererBase {
-    ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponentProps<any>, BPComponentState>>|((props: BPComponentProps<any>) => React.JSX.Element)> = {}
+    ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Component<UiConfigBaseProps<any>, UiConfigBaseState>>|((props: UiConfigBaseProps<any>) => React.JSX.Element)> = {}
 
     constructor({autoPostFrame = true} = {}) {
         super(autoPostFrame);
@@ -16,7 +16,7 @@ export class UiConfigRendererReact extends UiConfigRendererBase {
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig): void {
-        (config.uiRef as BPComponent<any, any>)?.refreshConfigState()
+        (config.uiRef as UiConfigBase<any, any>)?.refreshConfigState()
     }
 
     static Provider = ({renderer, rClass, children}: {renderer?: UiConfigRendererReact, rClass?: Class<UiConfigRendererReact>, children: React.ReactNode})=>{

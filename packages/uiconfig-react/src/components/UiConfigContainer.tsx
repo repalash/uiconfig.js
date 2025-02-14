@@ -1,13 +1,13 @@
-import {BPLabelledComponent, BPLabelledComponentState} from './BPLabelledComponent.tsx'
-import {BPComponentProps2, UiConfigRendererContextType} from './BPComponent.tsx'
+import {UiConfigLabelled, UiConfigLabelledState} from './UiConfigLabelled.tsx'
+import {UiConfigBaseProps2, UiConfigRendererContextType} from './UiConfigBase.tsx'
 import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
 
-export type BPContainerComponentState = BPLabelledComponentState & {
+export type UiConfigContainerState = UiConfigLabelledState & {
     children: UiObjectConfig[]
     expanded: boolean
 }
-export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState> extends BPLabelledComponent<void, TState> {
+export class UiConfigContainer<TState extends UiConfigContainerState=UiConfigContainerState> extends UiConfigLabelled<void, TState> {
     toggleExpanded = () => {
         const e = !this.state.expanded
         this.setState({...this.state, expanded: e})
@@ -50,7 +50,7 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
         // ) delete child.property
     }
 
-    constructor(props: BPComponentProps2<void, TState&BPLabelledComponentState>, context: UiConfigRendererContextType) {
+    constructor(props: UiConfigBaseProps2<void, TState&UiConfigLabelledState>, context: UiConfigRendererContextType) {
         super(props, context);
     }
 
