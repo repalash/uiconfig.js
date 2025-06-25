@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.5",
+  "version": "0.1.0-dev.6",
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
