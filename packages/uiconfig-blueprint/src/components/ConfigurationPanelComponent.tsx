@@ -31,6 +31,7 @@ export function ConfigurationPanelComponent({config}: { config: UiObjectConfig<a
         } as Panel<{ config: UiObjectConfig }>
     }, [config])
     const [currentPanelStack, setCurrentPanelStack] = React.useState<Array<Panel<{ config: UiObjectConfig }>>>([stackItem()]);
+    const [isMinimized, setIsMinimized] = React.useState(false);
 
     React.useEffect(() => {
         setCurrentPanelStack([stackItem()])
@@ -40,7 +41,7 @@ export function ConfigurationPanelComponent({config}: { config: UiObjectConfig<a
 
     return (
         <VisualStyleContext.Provider value={{...defaultVisualStyle, ...style}}>
-        <Card className={`bpInspectorCard ${style.darkMode?Classes.DARK:""}`}>
+        <Card className={`bpInspectorCard ${style.darkMode?Classes.DARK:""}`} style={{display: isMinimized ? 'none' : 'block'}}>
             <PanelStack2 className="inspectorPanelStack"
                          showPanelHeader={true}
                          renderActivePanelOnly={true}
@@ -48,16 +49,26 @@ export function ConfigurationPanelComponent({config}: { config: UiObjectConfig<a
                          onClose={() => setCurrentPanelStack(currentPanelStack.slice(0, -1))}
                          stack={currentPanelStack}/>
             <div className={"bpPanelStackHeaderOverlay " + Classes.PANEL_STACK2_HEADER}>
-                <Popover targetProps={{style: {position: "absolute", right: "5px"}}}
+                <Popover targetProps={{style: {position: "absolute", right: "30px"}}}
                          minimal={true}
                          targetTagName={"div"}
                     content={
                     <ThemeSettingsMenuComponent/>
                 } placement="bottom">
-                    <Button icon="cog" small minimal text="" />
+                    <Button icon="more" small minimal text="" />
                 </Popover>
+                <Button icon="minus" small minimal text="" style={{position: "absolute", right: "5px"}}
+                        onClick={() => {
+                            setIsMinimized(!isMinimized);
+                        }}
+                />
             </div>
         </Card>
+        {isMinimized && <Button icon="cog" small text="Configuration" style={{position: "absolute", right: "5px"}}
+                onClick={() => {
+                    setIsMinimized(!isMinimized);
+                }}
+        />}
         </VisualStyleContext.Provider>
     )
 }

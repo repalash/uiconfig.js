@@ -13,6 +13,7 @@ export type BPFileComponentState = BPValueComponentState<StateValue> & {
 type BPFileComponentExtras = {fileLoader?: {load: (v: string|File|{path: string, file: File|Blob})=>Promise<FileImportType>}}
 type BPFileComponentContextType = UiConfigRendererContextType & BPFileComponentExtras
 
+// todo make this abstract?
 // @ts-ignore
 export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> extends BPValueComponent<T | null, BPFileComponentState, StateValue> {
     declare context: BPFileComponentContextType
@@ -67,7 +68,7 @@ export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> e
     // }
 
     renderPreviewSlot() {
-        return <img src={"https://playground.ijewel3d.com/logo_black.png"}
+        return <img src={"https://threepipe.org/logo.svg"}
                     style={{width: "100%", maxHeight: "80px", objectFit: "contain"}}/>
     }
 

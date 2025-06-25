@@ -53,7 +53,6 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
     protected _getNodePath(id: string, nodes?: TreeNodeInfo<T>[]): NodePath {
         let path1: NodePath|null = null
         this._forEachNode(nodes ?? this.state.nodes, (node, path) => {
-            if(!path1) return
             if (node.id === id) path1 = path
         })
         return path1 ?? []
@@ -116,7 +115,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
     async setSelected(id?: string, expand = false) {
         const nodes = this._cloneNodes(n => n.isSelected = n.id === id)
         if(expand && id!==undefined){
-            const parents = this._getNodePath(id)
+            const parents = this._getNodePath(id, nodes)
             for (let i = 0; i < parents.length; i++) {
                 const node = this._infoMap.get(parents[i])
                 if(node) node.isExpanded = true
