@@ -143,6 +143,14 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     onExpand?: (c: UiObjectConfig) => void,
 
     /**
+     * The order of the element in the UI when rendered as a child of folder or panel, ideally controlled using css order property.
+     * Lower numbers will be rendered first.
+     *
+     * Only supported in react based renderers for now.
+     */
+    order?: ValOrFunc<number>,
+
+    /**
      * Only for elements with inline picker support
      * This can be a boolean or a function that returns a boolean.
      */
