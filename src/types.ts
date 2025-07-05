@@ -151,6 +151,14 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     order?: ValOrFunc<number>,
 
     /**
+     * Base width of the element as css string when rendered as a child of folder or panel.
+     * It is used as `flex-basis` property in css.
+     *
+     * Only supported in react based renderers for now.
+     */
+    baseWidth?: ValOrFunc<string>,
+
+    /**
      * Only for elements with inline picker support
      * This can be a boolean or a function that returns a boolean.
      */
