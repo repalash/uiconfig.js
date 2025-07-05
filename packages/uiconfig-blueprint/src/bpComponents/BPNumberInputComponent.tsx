@@ -27,9 +27,10 @@ export class BPNumberInputComponent extends BPInputComponent<number> {
                 disabled={this.state.disabled}
                 readOnly={this.state.readOnly}
                 defaultValue={this.state.value}
+                fill={true}
                 ref={this._inputs[0]}
                 key={this.props.config.uuid}
-                onChange2={this._onChange} fill={false}/>
+                onChange2={this._onChange}/>
         )
     }
 }

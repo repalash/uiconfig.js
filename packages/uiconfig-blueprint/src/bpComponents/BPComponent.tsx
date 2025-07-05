@@ -12,6 +12,7 @@ export type BPComponentState = {
     hidden?: boolean
     disabled?: boolean
     readOnly?: boolean // same as disabled(for most inputs)
+    baseWidth?: string // for flexBasis, can be a number or a string like '50%' or '100px'
 }
 export interface UiConfigRendererBaseBp extends UiConfigRendererBase{
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -49,6 +50,7 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
         const hidden = getOrCall(this.props.config.hidden) ?? false
         const disabled = getOrCall(this.props.config.disabled) ?? false
         const readOnly = getOrCall(this.props.config.readOnly) ?? false
+        const baseWidth = getOrCall(this.props.config.baseWidth) ?? undefined
         if(hidden !== state.hidden
             || disabled !== state.disabled
             || readOnly !== state.readOnly
@@ -58,6 +60,7 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
             hidden,
             disabled,
             readOnly,
+            baseWidth
         }
     }
 

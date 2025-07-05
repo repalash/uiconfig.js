@@ -1,7 +1,7 @@
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import React from "react";
 import {BPLabelledComponent, BPLabelledComponentState} from "./BPLabelledComponent";
-import {Button} from "@blueprintjs/core";
+import {Button, Intent} from "@blueprintjs/core";
 
 // @ts-ignore
 export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledComponentState> {
@@ -14,12 +14,18 @@ export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledC
         this.context.methods.clickButton(this.props.config, {args: [event]})
     }
 
+    protected flexBasis = "50%"
+
     render() {
         return !this.state.hidden ? (
-            <div className="bpButtonComponent xPaddedContent">
+            <div className="bpButtonComponent xPaddedContent"
+                 style={{flexBasis: this.state.baseWidth ?? this.flexBasis}}
+            >
                 <Button className="bpButton"
                         disabled={this.state.disabled}
+                        intent={Intent.PRIMARY}
                         // small={true}
+                        fill={true}
                         text={this.state.label} style={{}} onClick={this.onClick}/>
             </div>
         ) : null

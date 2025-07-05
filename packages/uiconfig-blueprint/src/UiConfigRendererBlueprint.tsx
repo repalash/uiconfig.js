@@ -22,19 +22,30 @@ export class UiConfigRendererBlueprint extends UiConfigRenderer {
 
         const container = createDiv({id: 'blueprintUiContainer', addToBody: false})
         createStyles(css`
-          :root{
-            --blueprint-ui-container-width: 300px;
-          }
-          @media only screen and (min-width: 1500px) {
-            :root{
-              --blueprint-ui-container-width: 400px;
+            :root {
+                --blueprint-ui-container-width: 300px;
             }
-          }
-          @media only screen and (min-width: 2500px) {
-            :root{
-              --blueprint-ui-container-width: 500px;
+
+            @media only screen and (min-width: 1500px) {
+                :root {
+                    --blueprint-ui-container-width: 400px;
+                }
             }
-          }
+            @media only screen and (min-width: 2500px) {
+                :root {
+                    --blueprint-ui-container-width: 500px;
+                }
+            }
+
+            @media only screen and (min-width: 600px) {
+                #blueprintUiContainer {
+                    min-width: var(--blueprint-ui-container-width);
+                    min-height: 200px;
+                    max-height: 100%;
+                    max-width: 100%;
+                    resize: both;
+                }
+            }
         `)
         createStyles(rendererCss)
 

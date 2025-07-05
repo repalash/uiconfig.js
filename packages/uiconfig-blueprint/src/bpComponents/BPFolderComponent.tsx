@@ -5,6 +5,9 @@ import {ConfigObject} from "../ConfigObject";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {safeSetProperty} from 'ts-browser-helpers'
 import {BPContainerComponent, BPContainerComponentState} from './BPContainerComponent'
+import classNames from "classnames";
+import {Classes} from "@blueprintjs/core/src/common";
+import {AnimationStates} from "@blueprintjs/core/lib/esm/components/collapse/collapse";
 
 export type BPFolderComponentState = BPContainerComponentState & {
 }
@@ -39,18 +42,21 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                 enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                 onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
             >
-                <Collapse isOpen={this.state.expanded} keepChildrenMounted={false}>
+                <Collapse2 isOpen={this.state.expanded} keepChildrenMounted={true} transitionDuration={300}>
                     <div className="folder-children" style={{listStyleType: "none", paddingLeft: this.props.level??0 > 2 ? "6px" : 0}}> {/*todo use parameter instead of const 6*/}
-                        {this.state.children.map((c, i) => <ConfigObject key={'c' + i} {...this.props} config={c}
-                                                                         level={(this.props.level ?? 0) + 1}/>)}
+                        {this.state.children.map((c, i) =>
+                            <ConfigObject key={'c' + i} {...this.props} config={c}
+                                          level={(this.props.level ?? 0) + 1}/>
+                        )}
                     </div>
-                </Collapse>
+                </Collapse2>
             </FolderHeadCard>
         ) : null
     }
 }
 
 export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, level: number, disabled?: boolean, enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
+    const hasEnabled = (props.enabled !== undefined)
     return (
         <div
             // interactive={!props.open}
@@ -76,7 +82,7 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                 {/*</Button>*/}
 
                 <Button
-                    className="folder-trigger-button"
+                    className={"folder-trigger-button " + (props.open ? "folder-trigger-button-expanded" : "")}
                     // fill={!props.minimal}
                     fill={true}
                     onClick={props.onClick}
@@ -85,16 +91,18 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                     small={props.minimal}
                     style={props.level ? {marginLeft: "6px"} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
                     intent={props.open ? Intent.PRIMARY : Intent.NONE}
-                    icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
-                    rightIcon={(
-                        <Icon icon="chevron-right" style={{
-                            rotate: props.open ? "90deg" : "0deg",
-                            transition: "rotate 0.25s ease-in-out"
-                        }}/>
+                    // icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
+                    icon={(
+                        <>
+                            <Icon icon="caret-right" style={{
+                                rotate: props.open ? "90deg" : "0deg",
+                                transition: "rotate 0.25s ease-in-out"
+                            }}/>
+                        </>
                     )}>{props.label}
                 </Button>
-                {(props.enabled !== undefined) && <Checkbox
-                    style={{margin: 0, position: 'absolute', left: '5px'}}
+                {hasEnabled && <Checkbox
+                    style={{margin: 0, position: 'absolute', left: '10px'}}
                     large inline
                     defaultChecked={props.enabled}
                     onChange={props.onEnabledChange}
@@ -105,4 +113,68 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
             {props.children}
         </div>
     )
+}
+
+export class Collapse2 extends Collapse{
+    private contentsRefHandler2 = (el: HTMLElement | null) => {
+        // @ts-ignore
+        this.contents = el;
+        // @ts-ignore
+        if (this.contents != null) {
+            // @ts-ignore
+            const height = this.contents.clientHeight;
+            this.setState({
+                animationState: this.props.isOpen ? AnimationStates.OPEN : AnimationStates.CLOSED,
+                height: height === 0 ? undefined : `${height}px`,
+                heightWhenOpen: height === 0 ? undefined : height,
+            });
+        }
+    };
+
+    public render() {
+        const isContentVisible = this.state.animationState !== AnimationStates.CLOSED;
+        const shouldRenderChildren = isContentVisible || this.props.keepChildrenMounted;
+        // const displayWithTransform = isContentVisible && this.state.animationState !== AnimationStates.CLOSING;
+        const isAutoHeight = this.state.height === "auto";
+
+        const containerStyle = {
+            height: isContentVisible ? this.state.height : undefined,
+            overflowY: isAutoHeight ? "visible" : undefined,
+            // transitions don't work with height: auto
+            transition: isAutoHeight ? "none" : undefined,
+        };
+
+        const contentsStyle = {
+            // only use heightWhenOpen while closing
+            // transform: displayWithTransform ? "translateY(0)" : `translateY(-${this.state.heightWhenOpen}px)`,
+            // transitions don't work with height: auto
+            // transition: isAutoHeight ? "none" : undefined,
+            display: "block", // for opacity animation
+            visibility: isContentVisible ? "visible" : "hidden",
+            opacity: this.state.animationState === AnimationStates.CLOSING ||  this.state.animationState === AnimationStates.CLOSED ? 0.1 : 1,
+        } as React.CSSProperties;
+
+        // if(isContentVisible && !isAutoHeight && this.state.heightWhenOpen && this.state.height){
+        //     const h = parseInt(this.state.height)
+        //     contentsStyle.opacity = h / this.state.heightWhenOpen;
+        //     console.log(contentsStyle.opacity)
+        // }
+
+        return React.createElement(
+            this.props.component!,
+            {
+                className: classNames(Classes.COLLAPSE, this.props.className),
+                style: containerStyle,
+            },
+            <div
+                className={Classes.COLLAPSE_BODY}
+                ref={this.contentsRefHandler2}
+                style={contentsStyle}
+                aria-hidden={!isContentVisible}
+            >
+                {shouldRenderChildren ? this.props.children : null}
+            </div>,
+        );
+    }
+
 }

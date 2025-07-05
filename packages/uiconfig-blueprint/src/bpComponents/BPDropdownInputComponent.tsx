@@ -59,12 +59,13 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
                 activeItem={item}
                 key={this.props.config.uuid}
                 disabled={this.state.disabled}
+                fill={true}
                 popoverProps={{
                     minimal: true,
                 }}
                 popoverTargetProps={{
                     style: {
-                        height: "100%"
+                        height: "var(--pt-input-height)",
                     }
                 }}
                 noResults={<MenuItem disabled={true} text="No results."  roleStructure="listoption" />}

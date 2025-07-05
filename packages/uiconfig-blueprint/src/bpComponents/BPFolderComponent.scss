@@ -29,7 +29,7 @@
   background-color: $light-gray4 !important;
 }
 .bp5-dark .folder-card {
-  background-color: $dark-gray3 !important;
+  background-color: $dark-gray1 !important;
 }
 
 
@@ -68,11 +68,15 @@
   background-color: $dark-gray1 !important;
 
   &:hover {
-      background-color: $dark-gray3 !important;
+      background-color: $dark-gray2 !important;
   }
 
   &:active {
-      background-color: $dark-gray5 !important;
+      background-color: $dark-gray2 !important;
+  }
+
+  &.folder-trigger-button-expanded{
+    background-color: $dark-gray2 !important;
   }
 }
 
@@ -93,6 +97,7 @@
     //margin-left: $pt-grid-size;
     padding-top: 6px;
     padding-bottom: 6px;
+    min-height: 36px;
   }
 }
 

@@ -20,6 +20,7 @@ export class BPTextInputComponent extends BPInputComponent<string> {
                 disabled={this.state.disabled}
                 readOnly={this.state.readOnly}
                 key={this.props.config.uuid}
+                fill={true}
                 onChange={this._onChange}/>
         )
     }

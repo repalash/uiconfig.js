@@ -1,5 +1,5 @@
 import React from "react";
-import {Class, PartialRecord} from "ts-browser-helpers";
+import {Class, getOrCall, PartialRecord} from "ts-browser-helpers";
 import {BPComponentProps, BPComponentState, UiConfigRendererContext} from "./bpComponents/BPComponent";
 import {BPFolderComponent, FolderHeadCard} from "./bpComponents/BPFolderComponent";
 import {BPTextInputComponent} from "./bpComponents/BPTextInputComponent";
@@ -59,6 +59,10 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
     render() {
         if (!this.props.config || !this.props.config.type) return (<div key={this.props.config.uuid}></div>)
         this.context.methods.initUiConfig(this.props.config)
+
+        const order = this.props.config.order ? getOrCall(this.props.config.order, this.props.config) ?? undefined : undefined
+        const orderStyle = {order: order && typeof order === 'string' ? parseInt(order): order}
+
         let type = this.props.config.type as any as UiConfigTypes
         const val = this.context.methods.getRawValue(this.props.config)
 
@@ -78,7 +82,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
             const enabledToggle = children[0] && this.context.methods.getLabel(children[0]).toLowerCase() === 'enabled' ? children[0] : undefined
             enabledToggle && (enabledToggle.hidden = true)
             return (
-                <div key={this.props.config.uuid}>
+                <div key={this.props.config.uuid} style={orderStyle}>
                     <FolderHeadCard
                         enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                         onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
@@ -97,9 +101,12 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
             )
         }
         if (BPComp) {
-            return (<div key={this.props.config.uuid}><BPComp {...{...this.props, isPanel: undefined}} /></div>)
+            return (<div key={this.props.config.uuid} style={orderStyle}><BPComp {...{...this.props, isPanel: undefined}} /></div>)
         }
-        return (<div key={this.props.config.uuid}>Unknown type: {this.props.config.type}</div>)
+        return (<div key={this.props.config.uuid} style={orderStyle}>
+            {/*Unknown type: {this.props.config.type}*/}
+        </div>)
+        // return null
 
         // let uiRef: React.FC | BPUiRef<any> | null = this.props.uiConfig.uiRef
         // if (uiRef) {

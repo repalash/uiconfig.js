@@ -26,7 +26,10 @@ export abstract class BPInputComponent<
 
     render() {
         return !this.state.hidden ? (
-            <FormGroupComponent disabled={this.state.disabled} label={this.state.label} flexBasis={this.flexBasis}>
+            <FormGroupComponent disabled={this.state.disabled}
+                                label={this.state.label}
+                                flexBasis={this.state.baseWidth ?? this.flexBasis}
+            >
                 {this.renderInput()}
             </FormGroupComponent>
         ) : null

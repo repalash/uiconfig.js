@@ -95,11 +95,17 @@ export class BPColorInputComponent extends BPValueComponent<ColorRepresentation,
         document.addEventListener('mouseup', this._mouseUp)
     }
 
+    protected flexBasis = "100%"
+
     render() {
         return !this.state.hidden ? (
-            <FormGroupComponent label={this.state.label}>
+            <FormGroupComponent
+                label={this.state.label}
+                flexBasis={this.state.baseWidth ?? this.flexBasis}
+            >
                 <InputGroup inputRef={this._inputRef}
                             disabled={this.state.disabled} readOnly={this.state.readOnly}
+                            fill={true}
                             leftElement={(
                     <Popover
                         popoverClassName={'color-picker-popover'}

@@ -1,5 +1,7 @@
+import {Tree2} from "../components/Tree2";
 import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
-import {Tree, TreeNodeInfo} from "@blueprintjs/core";
+import {TreeNodeInfo} from "@blueprintjs/core";
+import React from "react";
 
 export type BPTreeComponentState<T = {}> = BPComponentState & {
     nodes: TreeNodeInfo<T>[]
@@ -8,8 +10,8 @@ export type BPTreeComponentState<T = {}> = BPComponentState & {
 // https://github.com/palantir/blueprint/blob/develop/packages/docs-app/src/examples/core-examples/treeExample.tsx
 type NodePath = (string|number)[];
 
-export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|PrimitiveVal|void*/ = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>> {
-    constructor(props: BPComponentProps<TConfigVal>, context: UiConfigRendererContextType) {
+export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|PrimitiveVal|void*/ = void> extends BPComponent<TConfigVal, BPTreeComponentState<T>, BPComponentProps<TConfigVal> & {className: string}> {
+    constructor(props: BPComponentProps<TConfigVal> & {className: string}, context: UiConfigRendererContextType) {
         super(props, context, {nodes: []});
     }
 
@@ -189,8 +191,15 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
         e.stopPropagation()
     }
 
+    protected _canDropNode(_sourceNode: TreeNodeInfo<T>, _sourcePath: NodePath, _targetNode: TreeNodeInfo<T>, _targetPath: NodePath, _index?: number) {
+        return true
+    }
+    protected _onDropNode(_sourceNode: TreeNodeInfo<T>, _sourcePath: NodePath, _targetNode: TreeNodeInfo<T>, _targetPath: NodePath, _e?: React.DragEvent, _index?: number) {
+        return
+    }
+
     render() {
-        const TreeT = Tree.ofType<T>()
+        const TreeT = Tree2.ofType<T>()
         return !this.state.hidden ? (
             <div
                 style={{width: "100%", height: "100%"}}
@@ -199,7 +208,14 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
             >
             <TreeT
                 contents={this.state.nodes}
-                className="folderContent"
+                className={"folderContent " + (this.props.className||'')}
+                canDropNode={(node, path, targetNode, targetPath, index) => {
+                    return this._canDropNode(node, path, targetNode, targetPath, index)
+                }}
+                onNodeDrop={(node, path, targetNode, targetPath, e, index) => {
+                    console.log(node, path, targetNode, targetPath, e);
+                    this._onDropNode(node, path, targetNode, targetPath, e, index)
+                }}
                 onNodeExpand={(node, _path, _e) => {
                     this._onNodeExpandCollapse(node.id)
                 }}

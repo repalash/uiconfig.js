@@ -77,9 +77,20 @@ export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> e
     //     return super.updateStateValue(state, last);
     // }
 
+    protected flexBasis = "100%"
+
     render() {
-        return !this.state.hidden ? (
-            <FormGroupComponent label={this.state.label} flexBasis={"100%"} disabled={this.state.disabled}>
+        let show = !this.state.hidden
+        // todo - document hideOnEmpty. it hides the whole component if there is no value and no preview. (used in SSReflectionPlugin)
+        if (show && this.props.config.hideOnEmpty && !this.state.preview && !this.state.value) {
+            show = false
+        }
+        return show ? (
+            <FormGroupComponent
+                label={this.state.label}
+                disabled={this.state.disabled}
+                flexBasis={this.state.baseWidth ?? this.flexBasis}
+            >
                 <FileComponent previewSlot={this.renderPreviewSlot()} state={this.state} onChange={(s) =>
                     this.updateStateValue({...this.state, preview: undefined, ...s}) // todo: set loading while this promise is happening.
                 } key={this.props.config.uuid}/>

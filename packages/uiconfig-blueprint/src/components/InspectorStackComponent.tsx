@@ -6,7 +6,7 @@ import {UiConfigRendererContext} from '../bpComponents/BPComponent'
 
 // import {ViewerAppContext} from "./ViewerAppComponent";
 
-export function InspectorStackComponent({config}: { config: UiObjectConfig<any, 'panel'> }) {
+export function InspectorStackComponent({config, className}: { config: UiObjectConfig<any, 'panel'>, className?: string }) {
     const renderer = React.useContext(UiConfigRendererContext)
     const stackItem = React.useCallback(() => {
         return {
@@ -30,7 +30,7 @@ export function InspectorStackComponent({config}: { config: UiObjectConfig<any, 
     }, [setCurrentPanelStack, stackItem])
 
     return (
-        <Card className="bpInspectorCard" style={{borderRadius: 0}}>
+        <Card className={"bpInspectorCard " + className||''} style={{borderRadius: 0}}>
             <PanelStack2 className="inspectorPanelStack"
                          showPanelHeader={true}
                          renderActivePanelOnly={true}

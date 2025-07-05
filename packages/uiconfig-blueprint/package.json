@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.6",
+  "version": "0.1.0-dev.7",
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -107,7 +107,7 @@
   },
   "dependencies": {
     "ts-browser-helpers": "^0.16.2",
-    "uiconfig.js": "^0.1.2",
+    "uiconfig.js": "^0.1.5",
     "@blueprintjs/icons": "^5.11.0",
     "@blueprintjs/select": "^5.2.2",
     "blueprint-styler": "^5.0.2",

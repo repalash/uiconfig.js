@@ -49,7 +49,7 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
 
     public render() {
         const {value} = this.state;
-        const props2: HTMLInputProps & NumericInputProps & { onChange2?: (v: number, last?: boolean) => void } = {...this.props}
+        const props2: HTMLInputProps & NumericInputProps & { onChange2?: (v: number, last?: boolean) => void } = {...this.props, leftIcon: undefined}
         if (props2.onChange2) delete props2.onChange2
 
         return (

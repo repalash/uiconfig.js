@@ -1,7 +1,10 @@
+@import './tree2.scss';
 
 .bpButton {
   display: flex;
   justify-content: space-between;
+  min-height: 24px;
+  //max-height: 40px;
 }
 
 .bpIconButton {

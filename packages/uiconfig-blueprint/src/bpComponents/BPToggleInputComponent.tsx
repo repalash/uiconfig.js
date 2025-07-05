@@ -16,14 +16,17 @@ export class BPToggleInputComponent extends BPInputComponent<boolean> {
         return (
             <Switch alignIndicator="right" defaultChecked={this.state.value}
                     disabled={this.state.disabled} readOnly={this.state.readOnly}
-                    label={this.state.label} onChange={this._onChange}
-                    className="switch" innerLabelChecked="on" innerLabel="off"/>
+                    labelElement={(<span className={"bp5-label"} title={this.state.label}>{this.state.label}</span>)} onChange={this._onChange}
+                    inline={false} large={false}
+                    className="switch"/>
         )
     }
 
     render() {
         return !this.state.hidden ? (
-            <div className="xPaddedContent folderContent" style={{flexBasis: "100%"}}>
+            <div className="xPaddedContent folderContent"
+                 style={{flexBasis: this.state.baseWidth ?? this.flexBasis}}
+            >
                 {this.renderInput()}
             </div>
         ) : null
