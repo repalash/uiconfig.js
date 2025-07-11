@@ -1,14 +1,18 @@
-# UiConfig
+# uiconfig.js - a 0kb UI framework
 
-[![https://nodei.co/npm/uiconfig.js.png?downloads=true&downloadRank=true&stars=true](https://nodei.co/npm/uiconfig.js.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/uiconfig.js)
+[![NPM Package](https://img.shields.io/npm/v/ts-browser-helpers.svg)](https://www.npmjs.com/package/ts-browser-helpers)
+
+[![License: Apache 2.0](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/license/mit/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 Examples: https://repalash.com/uiconfig.js/examples/index.html
 
-A super-small UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators or zod schemas etc. It includes the types for the configuration, utilities for parsers and renderers and renderers for different UI frameworks.
+Github: https://github.com/repalash/uiconfig.js
 
-It includes several themes with components for editor-like user interfaces like panels, sliders, pickers, inputs for string, number, file, vector, colors, etc. 
+`uiconfig.js` is a minimal UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators or zod schemas etc. It includes the types for the configuration, utilities for parsers and renderers and renderers for different UI frameworks.
+
+It includes several themes/renderers with components for editor-like user interfaces like panels, sliders, pickers, inputs for string, number, file, vector, colors, etc.
 
 Available Renderers: [uiconfig-tweakpane](https://github.com/repalash/uiconfig-tweakpane), [uiconfig-blueprint](https://github.com/repalash/uiconfig-blueprint)
 
@@ -52,16 +56,18 @@ const config = {
 The same sample with decorators in typescript:
 
 ```typescript
+import {uiContainer, uiSlider, uiInput, uiButton, IUiConfigContainer, UiObjectConfig} from 'uiconfig.js';
+
 @uiContainer('My Panel')
 class Sample implements IUiConfigContainer {
     uiConfig: UiObjectConfig;
-    
+
     @uiSlider('My Slider', [0, 10], 0.1)
     sliderValue = 0
-    
+
     @uiInput('My Input')
     myProperty = 0;
-    
+
     @uiButton('My Button')
     myFunction = ()=>{
         console.log("Button clicked");
@@ -70,10 +76,9 @@ class Sample implements IUiConfigContainer {
 }
 ```
 
-This UI can be added to any webpage using one of several renderers/themes like lilgui, dat.gui, tweakpane, blueprint, etc, which can be picked based on the project requirements.
+This UI can be added to any webpage using one of several renderers/themes like lilgui, dat.gui, tweakpane, blueprint, shadcn etc, which can be picked based on the project requirements.
 
-TODO: add screenshots
-
+[//]: # (TODO: add screenshots)
 
 ## Getting Started
 
@@ -87,7 +92,7 @@ uiconfig.js has a core package which contains types and decorators and separate 
 
 #### Core package
 
-For javascript/html files and js libraries there is no need to install the uiconfig.js package, just import the renderer package and use it.
+For javascript/html files and js libraries there is no need to install the uiconfig.js package, simply import the renderer package and use it.
 
 For typescript projects, the package `uiconfig.js` can be installed/imported to use the decorators and types.
 
@@ -101,10 +106,8 @@ For both javascript/typescript, renderer packages can be installed separately in
 
 ```bash
 npm install uiconfig-tweakpane
-# or 
+# or
 npm install uiconfig-blueprint
-# or 
-npm install uiconfig-lilgui
 ```
 
 It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdelivr](https://www.jsdelivr.com/).
@@ -123,7 +126,7 @@ It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdeli
             console.log("clicked");
         },
     }
-    
+
     const ui = new tpui.UI() // use bpui.UI() for blueprint
     ui.appendChild(config)
 </script>
@@ -342,13 +345,13 @@ class Person implements IUiConfigContainer{
 
     @uiInput('Name')
     name = "John"
-  
+
     @uiSlider('Age', [0, 150], 1)
     age = 30
 
-    @uiDropdown('City', ['New York', 'Paris', 'London'].map((v) => ({label: v})))  
+    @uiDropdown('City', ['New York', 'Paris', 'London'].map((v) => ({label: v})))
     city = "New York"
-    
+
     @uiButton('Reset')
     reset = ()=>{
         this.name = "John";
@@ -377,7 +380,7 @@ renderer.appendChild(data.uiConfig)
 
 This will create a panel with a folder called `Person` containing the input fields for the properties of the data object. This will create an input box is created for `name`, a slider for `age` and a dropdown for `city`, inside the person folder.
 
-Here `appendChild` function appends the UI generated from the config object to the main panel. Tweakpane Renderer only supports a single panel (the main panel), so all objects are appended to it. 
+Here `appendChild` function appends the UI generated from the config object to the main panel. Tweakpane Renderer only supports a single panel (the main panel), so all objects are appended to it.
 
 ### Structure of a UiConfig
 A config object define a single UI component. It can be a folder, a button, a slider, a dropdown, etc. The config object can also contain other UiConfig object  as a list of child configs in `children`, which will be rendered inside the parent component in the way it supports it. The Configs can in this way be nested to create complex interfaces.
@@ -524,7 +527,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * This can be an array of HTMLElement or a function that returns an array of HTMLElement.
      */
     domChildren?: HTMLElement[] | (() => HTMLElement[]),
-    
+
     /**
      * After initial rendering, config.uiRef will be set to the instance of the UI component that's created.
      * The type of this will depend on the type of the component and the base UI library used.
@@ -561,7 +564,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
 ```
 
 ### Property/Value binding in Ui Object
-For UiConfig which have an editable value (like input, slider, dropdown, etc), the value is bound to a property/field in an object. This is done using the `property` field in the config object. The value is an array of `[object, property]` which will be used to bind the value to the property of the object. 
+For UiConfig which have an editable value (like input, slider, dropdown, etc), the value is bound to a property/field in an object. This is done using the `property` field in the config object. The value is an array of `[object, property]` which will be used to bind the value to the property of the object.
 
 An Example:
 ```javascript
