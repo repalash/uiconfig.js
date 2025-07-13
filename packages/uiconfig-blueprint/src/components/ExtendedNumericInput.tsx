@@ -20,7 +20,7 @@
 import React from "react";
 
 import type {HTMLInputProps, NumericInputProps} from "@blueprintjs/core";
-import {NumericInput} from "@blueprintjs/core";
+import {NumericInput} from "./NumericInput";
 import {DraggableIcon} from "./DraggableIcon";
 
 export interface IExtendedNumericInputState {
@@ -36,7 +36,7 @@ const NumberAbbreviation = {
 const NUMBER_ABBREVIATION_REGEX = /((\.\d+)|(\d+(\.\d+)?))(k|m|b)\b/gi;
 const SCIENTIFIC_NOTATION_REGEX = /((\.\d+)|(\d+(\.\d+)?))(e\d+)\b/gi;
 // todo: bounds and stepsize
-export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & NumericInputProps & { onChange2: (v: number, last?: boolean) => void }, IExtendedNumericInputState> {
+export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & NumericInputProps & { onChange2: (v: number, last?: boolean) => void, draggableIcon?: boolean }, IExtendedNumericInputState> {
     public state: IExtendedNumericInputState = {
         value: (this.props.value ?? this.props.defaultValue ?? '').toString(),
     };
@@ -47,16 +47,23 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
         })
     }
 
+    componentDidUpdate(prevProps: HTMLInputProps & NumericInputProps & { onChange2: (v: number, last?: boolean) => void, draggableIcon?: boolean }) {
+        if (prevProps.value !== this.props.value && this.props.value !== undefined) {
+            this.setState({ value: this.props.value.toString() });
+        }
+    }
     public render() {
         const {value} = this.state;
-        const props2: HTMLInputProps & NumericInputProps & { onChange2?: (v: number, last?: boolean) => void } = {...this.props, leftIcon: undefined}
-        if (props2.onChange2) delete props2.onChange2
+        const props2: HTMLInputProps & NumericInputProps = {...this.props, leftIcon: undefined}
+        if ((props2 as any).onChange2 !== undefined) delete (props2 as any).onChange2
+        if ((props2 as any).draggableIcon !== undefined) delete (props2 as any).draggableIcon
 
         return (
             <NumericInput
                 {...props2}
-                leftElement={(
-                    <DraggableIcon icon={this.props.leftIcon ?? "variable"}
+                leftElement={(  // props2.leftElement could be null
+                    props2.leftElement !== undefined ? props2.leftElement :
+                        this.props.draggableIcon !== false ? <DraggableIcon icon={this.props.leftIcon ?? "variable"}
                                    size={16}
                                    disabled={this.props.readOnly}
                                    small={this.props.small}
@@ -64,7 +71,7 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
                                    stepSize={this.props.stepSize}
                                    onChange={(v, last) => {
                                        this.handleValueChange(v, v.toString(), null, last, true)
-                                   }}/>
+                                   }}/> : undefined
                 )}
                 // leftIcon={"variable"}
                 buttonPosition={this.props.buttonPosition ?? (this.props.disabled ? "none" : "right")}

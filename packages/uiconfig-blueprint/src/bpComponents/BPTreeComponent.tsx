@@ -114,13 +114,19 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
         return this.setStatePromise({...this.state, nodes})
     }
 
-    async setSelected(id?: string, expand = false) {
-        const nodes = this._cloneNodes(n => n.isSelected = n.id === id)
+    async setSelected(id?: string|string[], expand = false) {
+        const nodes =
+            Array.isArray(id) ?
+            this._cloneNodes(n => n.isSelected = id.includes(n.id as any)) :
+            this._cloneNodes(n => n.isSelected = n.id === id)
         if(expand && id!==undefined){
-            const parents = this._getNodePath(id, nodes)
-            for (let i = 0; i < parents.length; i++) {
-                const node = this._infoMap.get(parents[i])
-                if(node) node.isExpanded = true
+            const ids = Array.isArray(id) ? id : [id]
+            for (const id1 of ids) {
+                const parents = this._getNodePath(id1, nodes)
+                for (let i = 0; i < parents.length; i++) {
+                    const node = this._infoMap.get(parents[i])
+                    if(node) node.isExpanded = true
+                }
             }
         }
         return this.setStatePromise({...this.state, nodes})

@@ -1,8 +1,9 @@
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import {NumericInput, Slider} from "@blueprintjs/core";
+import {Slider} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";
 import {BPValueComponentState} from "./BPValueComponent";
 import {getOrCall} from "ts-browser-helpers";
+import {ExtendedNumericInput} from "../components/ExtendedNumericInput";
 
 export type BPSliderComponentState = BPValueComponentState<number> & {
     min: number,
@@ -35,7 +36,23 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
     flexBasis = "75%"
 
     renderInput() {
-        return [(
+        return [(<ExtendedNumericInput
+                style={{maxWidth: "4rem", minWidth: "3rem"}}
+                // defaultValue={state}
+                disabled={this.state.disabled} readOnly={this.state.readOnly}
+                value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
+                key={this.props.config.uuid + '_input'}
+                min={this.state.min} max={this.state.max}
+                stepSize={this.state.step}
+                minorStepSize={this.state.step/10}
+                majorStepSize={this.state.step*10}
+                buttonPosition="none"
+                draggableIcon={false}
+                onChange2={(v, last) => {
+                    if(this.state.readOnly) return
+                    this.setValue(v, last)
+                }}
+            />), (
             <Slider
                 value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
                 key={this.props.config.uuid + '_slider'}
@@ -53,30 +70,7 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
                     this.setValue(v, true)
                 }}
             />
-        ),(
-            <NumericInput
-                style={{maxWidth: "4rem", minWidth: "3rem"}}
-                // defaultValue={state}
-                disabled={this.state.disabled}
-                value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
-                key={this.props.config.uuid + '_input'}
-                min={this.state.min} max={this.state.max}
-                stepSize={this.state.step}
-                minorStepSize={this.state.step/10}
-                majorStepSize={this.state.step*10}
-                buttonPosition="none"
-                onValueChange={(v) => {
-                    if(this.state.readOnly) return
-                    this.setValue(v, false)
-                }}
-                onBlur={(e) => {
-                    if(this.state.readOnly) return
-                    this.setValue(parseFloat(e.currentTarget.value), true)
-                }}
-                onKeyDown={(e) => {
-                    if (e.code === 'Enter') this.setValue(parseFloat(e.currentTarget.value), true)
-                }}
-            />)
+        ),
     ]
     }
 }

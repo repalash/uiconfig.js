@@ -20,13 +20,14 @@ import {BPVectorInputComponent} from './bpComponents/BPVectorInputComponent'
 // import {BPHierarchyComponent} from "./bpComponents/BPHierarchyComponent";
 
 export type UiConfigTypes = 'input' | 'button' | 'folder' | 'checkbox' | 'toggle' |
-    'dropdown' | 'slider' | 'color' | 'image' | 'number' | 'panel' | 'tree' | 'hierarchy' |
-    'vec' | 'vec2' | 'vec3' | 'vec4' | 'monitor'
+    'dropdown' | 'slider' | 'color' | 'image' | 'number' | 'panel' | 'tree' | 'hierarchy' | 'materials' |
+    'vec' | 'vec2' | 'vec3' | 'vec4' | 'monitor' | 'vector'
 
 export interface ConfigProps extends PanelActions {
     config: UiObjectConfig;
     isPanel?: boolean,
     level?: number,
+    className?: string
 }
 
 export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponentProps<any>, BPComponentState>>> = {
@@ -48,6 +49,7 @@ export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Co
     vec2: BPVectorInputComponent,
     vec3: BPVectorInputComponent,
     vec4: BPVectorInputComponent,
+    vector: BPVectorInputComponent,
     // hierarchy: BPHierarchyComponent,
 }
 
@@ -57,7 +59,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
     state = {}
 
     render() {
-        if (!this.props.config || !this.props.config.type) return (<div key={this.props.config.uuid}></div>)
+        if (!this.props.config || !this.props.config.type) return (<div key={this.props.config.uuid} className={this.props.className}></div>)
         this.context.methods.initUiConfig(this.props.config)
 
         const order = this.props.config.order ? getOrCall(this.props.config.order, this.props.config) ?? undefined : undefined
@@ -82,7 +84,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
             const enabledToggle = children[0] && this.context.methods.getLabel(children[0]).toLowerCase() === 'enabled' ? children[0] : undefined
             enabledToggle && (enabledToggle.hidden = true)
             return (
-                <div key={this.props.config.uuid} style={orderStyle}>
+                <div key={this.props.config.uuid} style={orderStyle} className={this.props.className}>
                     <FolderHeadCard
                         enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                         onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
@@ -101,9 +103,9 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
             )
         }
         if (BPComp) {
-            return (<div key={this.props.config.uuid} style={orderStyle}><BPComp {...{...this.props, isPanel: undefined}} /></div>)
+            return (<div key={this.props.config.uuid} style={orderStyle} className={this.props.className}><BPComp {...{...this.props, isPanel: undefined}} /></div>)
         }
-        return (<div key={this.props.config.uuid} style={orderStyle}>
+        return (<div key={this.props.config.uuid} style={orderStyle} className={this.props.className}>
             {/*Unknown type: {this.props.config.type}*/}
         </div>)
         // return null
