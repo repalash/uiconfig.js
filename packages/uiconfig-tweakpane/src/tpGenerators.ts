@@ -221,6 +221,29 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
         (input?.controller_.valueController.view as TextView<any>).inputElement?.setAttribute('placeholder', getOrCall(config.placeholder) ?? '')
 
         input.refresh()
+
+        const domChildren = getOrCall(config.domChildren, [])
+        const container = input.controller_.view.element
+        if (domChildren?.length !== undefined) {
+            const x: any = []
+            // eslint-disable-next-line @typescript-eslint/prefer-for-of
+            for (let j = 0; j < container.children.length; j++) {
+                const child: any = container.children[j]
+                if (!child.dataset?.tpCustomDOM) continue
+                x.push(child)
+            }
+            for (const child of x) {
+                container.removeChild(child)
+            }
+            for (const domChild of domChildren) {
+                if (domChild.parentElement !== container) {
+                    container.appendChild(domChild)
+                    domChild.dataset.tpCustomDOM = 'true'
+                }
+                // check ordering maybe?
+            }
+        }
+
     }
     // console.log('refresh', input)
     // console.log(ev)
