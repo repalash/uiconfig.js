@@ -209,7 +209,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
         return !this.state.hidden ? (
             <div
                 style={{width: "100%", height: "100%"}}
-                 onKeyDown={e => this._handleKeyDown(e)}
+                onKeyDown={e => this._handleKeyDown(e)}
                 tabIndex={0}
             >
             <TreeT
@@ -219,7 +219,7 @@ export abstract class BPTreeComponent<T = {}, TConfigVal extends any /*|Primitiv
                     return this._canDropNode(node, path, targetNode, targetPath, index)
                 }}
                 onNodeDrop={(node, path, targetNode, targetPath, e, index) => {
-                    console.log(node, path, targetNode, targetPath, e);
+                    // console.log(node, path, targetNode, targetPath, e);
                     this._onDropNode(node, path, targetNode, targetPath, e, index)
                 }}
                 onNodeExpand={(node, _path, _e) => {

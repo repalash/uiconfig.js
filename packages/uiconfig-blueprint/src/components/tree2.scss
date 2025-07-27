@@ -44,3 +44,26 @@
 .bp5-tree-node-content{
   transition: background-color 0.2s ease-in-out;
 }
+
+@for $i from 1 through 10 {
+  .bp5-tree-node-content-#{$i} {
+    padding-left: calc(10px * $i);
+  }
+}
+
+.bp5-tree-node-caret{
+  padding: 7px 5px;
+}
+
+.bp5-tree-node-content:has(.bp5-icon) {
+  .bp5-tree-node-caret, .bp5-tree-node-caret-none {
+    min-width: 0px;
+  }
+
+  // because bp5-tree-node-icon is not applied on this icon
+  .bp5-icon:has(.bp5-tree-node-icon-svg), .bp5-tree-node-icon{
+    margin-right: 0px;
+    padding: 0 5px;
+    position: relative;
+  }
+}

@@ -24,7 +24,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
             safeSetProperty(this.props.config, "expanded", e, true)
             // if (e) this.state.children.forEach(c => Array.isArray(c) ? null : c.uiRefresh?.("postFrame", true, 1)) // todo: handle array and functions
         }
-        const children = this.context.methods.getChildren(this.props.config)
+        const children = this.state.children
         const enabledToggle = children[0] && this.context.methods.getBinding(children[0])[1] === 'enabled' ? children[0] : undefined
         enabledToggle && (enabledToggle.hidden = true)
         return !this.state.hidden ? (
@@ -44,7 +44,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
             >
                 <Collapse2 isOpen={this.state.expanded} keepChildrenMounted={true} transitionDuration={300}>
                     <div className="folder-children" style={{listStyleType: "none", paddingLeft: this.props.level??0 > 2 ? "6px" : 0}}> {/*todo use parameter instead of const 6*/}
-                        {this.state.children.map((c, i) =>
+                        {children.map((c, i) =>
                             <ConfigObject key={'c' + i} {...this.props} config={c}
                                           level={(this.props.level ?? 0) + 1}/>
                         )}

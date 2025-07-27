@@ -152,7 +152,7 @@ import {
 } from './shapesIcons'
 import {HTMLAttributes, ReactElement} from 'react'
 
-const monoIcon = (icon: (props: HTMLAttributes<SVGElement>)=>ReactElement)=>(props?: HTMLAttributes<SVGElement>)=>icon({...props, className: 'bpIconWrapperMonoFilter' + (props?.className||'')})
+const monoIcon = (icon: (props: HTMLAttributes<SVGElement>)=>ReactElement)=>(props?: HTMLAttributes<SVGElement>)=>icon({...props, className: 'bpIconWrapperMonoFilter ' + (props?.className||'')})
 
 export const bpUiConfigIcons = {
     'x-1': xIcon1,

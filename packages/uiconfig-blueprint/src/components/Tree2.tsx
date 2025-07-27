@@ -192,11 +192,11 @@ export class Tree2<T = {}> extends React.Component<TreeProps<T>> {
             const draggable = !!node.draggable;
             const droppable = !!node.droppable;
             const parentDroppable = !!(parentNode && parentNode.droppable);
-            return (<>
+            return (<React.Fragment key={'wr-'+node.id}>
                 {parentDroppable && i === 0 && this.renderNodeSpacer(parentNode, elementPath, i)}
                 <TreeNode2<T>
                         {...node}
-                        key={node.id}
+                        key={'node-'+node.id}
                         contentRef={this.handleContentRef}
                         depth={elementPath.length - 1}
                         onClick={this.handleNodeClick}
@@ -218,7 +218,7 @@ export class Tree2<T = {}> extends React.Component<TreeProps<T>> {
                     {this.renderNodes(node.childNodes, elementPath, undefined, node)}
                 </TreeNode2>
                 {parentDroppable && i >= 0 && this.renderNodeSpacer(parentNode, elementPath, i + 1)}
-            </>)
+            </React.Fragment>)
         });
 
         return <ul className={classNames(Classes.TREE_NODE_LIST, className)}>{nodeItems}</ul>;

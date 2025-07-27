@@ -243,3 +243,22 @@
 .bp5-collapse {
   transition: height 0.3s var(--pt-transition-ease);
 }
+
+// todo move somewhere
+.bp5-vars, :root {
+  --slider-progress-color: hsla(var(--gray1-hsl), 0.2);
+}
+
+.bp5-dark {
+  --slider-progress-color: hsla(var(--gray4-hsl),0.15);
+}
+
+.bp5-slider-progress, .bp5-slider-track{
+  height: 3px;
+  top: calc($pt-grid-size - 3px)
+}
+.bp5-slider-handle{
+  //background-color: hsla(var(--pt-intent-primary-hsl), 0.7) !important;
+  background-color: hsla(var(--pt-intent-primary-hsl), 1) !important;
+  //backdrop-filter: blur(4px);
+}

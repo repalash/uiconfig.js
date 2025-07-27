@@ -60,6 +60,10 @@ export function ThemeSettingsMenuComponent() {
             // intent={intent}
             // labelElement={"⌘,"}
             roleStructure="menuitem"
+            popoverProps={{
+                hoverOpenDelay: 150,
+                hoverCloseDelay: 300,
+            }}
             children={
                 <>
                     <MenuItem icon="flash" text="Light Mode"
@@ -83,6 +87,10 @@ export function ThemeSettingsMenuComponent() {
             // intent={intent}
             // labelElement={"⌘,"}
             roleStructure="menuitem"
+            popoverProps={{
+                hoverOpenDelay: 150,
+                hoverCloseDelay: 300,
+            }}
             children={
                 <>
                     {Object.entries(visualStyle.themes).map(([key, value]) => (

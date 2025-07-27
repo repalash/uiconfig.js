@@ -13,6 +13,7 @@ export * from './components/VisualStyleContext'
 export * from './components/DialogContext'
 export * from './components/loadingState'
 export * from './components/AppToaster'
+export * from "./components/treeTypes";
 export * from './bpComponents/BPButtonComponent'
 export * from './bpComponents/BPColorInputComponent'
 export * from './bpComponents/BPComponent'
@@ -31,3 +32,5 @@ export * from './bpComponents/BPTreeComponent'
 export * from './bpComponents/BPTreeFolderComponent'
 export * from './bpComponents/BPValueComponent'
 export * from './bpComponents/BPVectorInputComponent'
+export * from "./bpComponents/NumberUnits";
+export * from "./bpComponents/GetNumberTransformFunctions";

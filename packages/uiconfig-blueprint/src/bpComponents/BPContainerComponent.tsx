@@ -45,6 +45,17 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
     getUpdatedState(state: TState) {
         const oldChildren = state.children
         const newChildren = this.context.methods.getChildren(this.props.config)
+            .flatMap(c=>{
+                if(c.type === 'folder' &&
+                    c.unwrapContents === true
+                ){
+                    const children2 = this.context.methods.getChildren(c)
+                    const enabledToggle = children2[0] && this.context.methods.getBinding(children2[0])[1] === 'enabled' ? children2[0] : undefined
+                    enabledToggle && (enabledToggle.hidden = true)
+                    return children2
+                }
+                return c
+            })
         const removed = oldChildren.filter(c => !newChildren.includes(c))
         const added = newChildren.filter(c => !oldChildren.includes(c))
         // console.warn(this, this._registerChild, this._childParentOnChange, added, removed)
