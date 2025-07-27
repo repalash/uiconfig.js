@@ -20,7 +20,7 @@ import {BPVectorInputComponent} from './bpComponents/BPVectorInputComponent'
 // import {BPHierarchyComponent} from "./bpComponents/BPHierarchyComponent";
 
 export type UiConfigTypes = 'input' | 'button' | 'folder' | 'checkbox' | 'toggle' |
-    'dropdown' | 'slider' | 'color' | 'image' | 'number' | 'panel' | 'tree' | 'hierarchy' | 'materials' |
+    'dropdown' | 'slider' | 'color' | 'image' | 'number' | 'panel' | 'tree' | 'hierarchy' | 'materials' | 'textures' |
     'vec' | 'vec2' | 'vec3' | 'vec4' | 'monitor' | 'vector'
 
 export interface ConfigProps extends PanelActions {

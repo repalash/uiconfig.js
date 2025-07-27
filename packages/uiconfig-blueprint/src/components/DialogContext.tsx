@@ -156,6 +156,7 @@ function DialogPromptButtons({
                 onClick={() => updateLoading('popup-close', doClose())}/>
         <Button text={submitButtonText}
                 intent="primary"
+                data-dialog-submit="true"
                 loading={loadingState['popup-submit']}
                 onClick={() => updateLoading('popup-submit', doSubmit())}/>
     </>
@@ -172,6 +173,18 @@ function DialogPromptContent({
     showInput?: boolean,
 }){
     const {state, setState} = useDialog() as {state: DialogPromptState, setState: Dispatch<SetStateAction<DialogPromptState>>}
+    const {loadingState} = useLoadingState()
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            // Get the submit button using the data attribute and simulate a click
+            const submitButton = document.querySelector('[data-dialog-submit="true"]') as HTMLButtonElement;
+            if (submitButton && !loadingState['popup-submit']) {
+                submitButton.click();
+            }
+        }
+    }
+
     return <FormGroup
         helperText={state.helperText||undefined}
         intent={state.intent}
@@ -184,13 +197,14 @@ function DialogPromptContent({
             placeholder={placeholder}
             defaultValue={state.value}
             style={{display: showInput ? 'block' : 'none'}}
+            autoFocus={true}
             onChange={(e: any) => {
                 state.value = e.target.value
                 state.helperText = ''
                 state.intent = Intent.NONE
                 setState({...state})
-            }} // todo: submit on enter
+            }}
+            onKeyDown={handleKeyDown}
         />
     </FormGroup>
-
 }
