@@ -3,8 +3,9 @@ import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {BPInputComponent} from "./BPInputComponent";
 import {ExtendedNumericInput} from "../components/ExtendedNumericInput";
 import {BPValueComponentState} from "./BPValueComponent";
+import {getNumberTransformFunctions} from "./GetNumberTransformFunctions";
 
-export class BPNumberInputComponent extends BPInputComponent<number> {
+export class BPNumberInputComponent extends BPInputComponent<number, BPValueComponentState<number>&{unit?: string}> {
     constructor(props: BPComponentProps<number>, context: UiConfigRendererContextType) {
         super(props, context, {value: 0, label: 'Number'});
     }
@@ -21,6 +22,12 @@ export class BPNumberInputComponent extends BPInputComponent<number> {
     }
 
     renderInput() {
+
+        const unit = this.props.config.unit as string|undefined; // todo add to uiconfig, getOrCall
+        const unitType = this.props.config.unitType as string|undefined; // todo add to uiconfig, getOrCall
+        const targetUnit = this.state.unit || unit
+        const {transformValue, invTransformValue} = getNumberTransformFunctions(unit, unitType, targetUnit);
+
         return (
             <ExtendedNumericInput
                 className="numericInput"
@@ -30,7 +37,11 @@ export class BPNumberInputComponent extends BPInputComponent<number> {
                 fill={true}
                 ref={this._inputs[0]}
                 key={this.props.config.uuid}
-                onChange2={this._onChange}/>
+                onChange2={this._onChange}
+                transformValue={transformValue}
+                invTransformValue={invTransformValue}
+            />
         )
     }
 }
+

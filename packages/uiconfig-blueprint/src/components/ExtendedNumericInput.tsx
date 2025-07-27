@@ -35,47 +35,87 @@ const NumberAbbreviation = {
 
 const NUMBER_ABBREVIATION_REGEX = /((\.\d+)|(\d+(\.\d+)?))(k|m|b)\b/gi;
 const SCIENTIFIC_NOTATION_REGEX = /((\.\d+)|(\d+(\.\d+)?))(e\d+)\b/gi;
+type Props = HTMLInputProps & NumericInputProps & {
+    onChange2?: (v: number, last?: boolean) => void,
+    transformValue?: (v: number) => number,
+    invTransformValue?: (v: number) => number,
+    draggableIcon?: boolean
+    value?: number | undefined
+    defaultValue?: number | undefined
+}
 // todo: bounds and stepsize
-export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & NumericInputProps & { onChange2: (v: number, last?: boolean) => void, draggableIcon?: boolean }, IExtendedNumericInputState> {
+export class ExtendedNumericInput extends React.PureComponent<Props, IExtendedNumericInputState> {
+    invTransformValue = (v: number|undefined) => {
+        v = v || 0
+        const v1 = this.props.invTransformValue ? this.props.invTransformValue(v) : v;
+        return v1
+    }
+    transformValue = (v: number|undefined) => {
+        v = v || 0
+        const v1 = this.props.transformValue ? this.props.transformValue(v) : v;
+        return v1
+    }
+
     public state: IExtendedNumericInputState = {
-        value: (this.props.value ?? this.props.defaultValue ?? '').toString(),
+        value: this.invTransformValue(this.props.value ?? this.props.defaultValue).toString(),
     };
 
     async setValue(val?: number) {
         return new Promise<void>((resolve) => {
-            this.setState({value: (val ?? this.props.value ?? this.props.defaultValue ?? '').toString()}, resolve)
+            this.setState({value: this.invTransformValue(val ?? this.props.value ?? this.props.defaultValue).toString()}, resolve)
         })
     }
 
-    componentDidUpdate(prevProps: HTMLInputProps & NumericInputProps & { onChange2: (v: number, last?: boolean) => void, draggableIcon?: boolean }) {
+    componentDidUpdate(prevProps: Props) {
         if (prevProps.value !== this.props.value && this.props.value !== undefined) {
-            this.setState({ value: this.props.value.toString() });
+            this.setState({ value: this.invTransformValue(this.props.value).toString() });
         }
     }
     public render() {
         const {value} = this.state;
-        const props2: HTMLInputProps & NumericInputProps = {...this.props, leftIcon: undefined}
-        if ((props2 as any).onChange2 !== undefined) delete (props2 as any).onChange2
-        if ((props2 as any).draggableIcon !== undefined) delete (props2 as any).draggableIcon
+       const {
+            invTransformValue,
+            transformValue,
+            draggableIcon,
+            onChange2,
+            value: _value,
+            leftIcon,
+            defaultValue,
+            ...props2
+        } = this.props;
+
+        if(transformValue && !invTransformValue ||
+              !transformValue && invTransformValue) {
+            console.error('ExtendedNumericInput: Both transformValue and invTransformValue must be provided or neither. This is to ensure that the value can be transformed back and forth correctly.');
+        }
+
+        if(transformValue){
+            if(props2.min !== undefined) props2.min = this.invTransformValue(props2.min);
+            if(props2.max !== undefined) props2.max = this.invTransformValue(props2.max);
+            if(props2.stepSize !== undefined) props2.stepSize = this.invTransformValue(props2.stepSize);
+            if(props2.minorStepSize /*!== undefined*/) props2.minorStepSize = this.invTransformValue(props2.minorStepSize);
+            if(props2.majorStepSize /*!== undefined*/) props2.majorStepSize = this.invTransformValue(props2.majorStepSize);
+        }
 
         return (
             <NumericInput
                 {...props2}
                 leftElement={(  // props2.leftElement could be null
                     props2.leftElement !== undefined ? props2.leftElement :
-                        this.props.draggableIcon !== false ? <DraggableIcon icon={this.props.leftIcon ?? "variable"}
+                        draggableIcon !== false ? <DraggableIcon icon={leftIcon ?? "variable"}
                                    size={16}
-                                   disabled={this.props.readOnly}
-                                   small={this.props.small}
+                                   disabled={props2.readOnly}
+                                   small={props2.small}
                                    value={parseFloat(value ?? '0')}
-                                   stepSize={this.props.stepSize}
+                                   stepSize={props2.stepSize}
                                    onChange={(v, last) => {
                                        this.handleValueChange(v, v.toString(), null, last, true)
                                    }}/> : undefined
                 )}
                 // leftIcon={"variable"}
-                buttonPosition={this.props.buttonPosition ?? (this.props.disabled ? "none" : "right")}
+                buttonPosition={props2.buttonPosition ?? (props2.disabled ? "none" : "right")}
                 allowNumericCharactersOnly={false}
+                clampValueOnBlur={true}
                 onBlur={this.handleBlur}
                 onKeyDown={this.handleKeyDown}
                 onButtonClick={this.handleButtonClick}
@@ -115,9 +155,11 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
     private handleValueChange = (_valueAsNumber: number, valueAsString: string, inputElement: HTMLInputElement | null, last?: boolean, dispatchOnChange2 = false) => {
         this._lastChangedValue = [_valueAsNumber, valueAsString]
         this.setState({value: valueAsString}, () => {
-            this.props.onValueChange?.(_valueAsNumber, valueAsString, inputElement)
-            if(dispatchOnChange2)
-                this.props.onChange2?.(_valueAsNumber, last)
+            const transformed = this.transformValue(_valueAsNumber)
+            this.props.onValueChange?.(transformed, valueAsString, inputElement)
+            if(dispatchOnChange2) {
+                this.props.onChange2?.(transformed, last)
+            }
         });
     };
 
@@ -132,8 +174,10 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
         result = this.evaluateSimpleMathExpression(result);
         result = this.nanStringToEmptyString(result);
         this.setState({value: result}, () => {
-            this.props.onValueChange?.(parseFloat(result) || 0, result, null)
-            this.props.onChange2?.(parseFloat(result) || 0)
+            const _valueAsNumber = parseFloat(result) || 0;
+            const transformed = this.transformValue(_valueAsNumber)
+            this.props.onValueChange?.(transformed, result, null)
+            this.props.onChange2?.(transformed, true)
         });
 
         // the user could have typed a different expression that evaluates to
@@ -159,7 +203,7 @@ export class ExtendedNumericInput extends React.PureComponent<HTMLInputProps & N
     };
 
     // Adapted from http://stackoverflow.com/questions/2276021/evaluating-a-string-as-a-mathematical-expression-in-javascript
-    // maybe try a better solution from above, right now it only works left to right
+    // todo - use a proper parser and evaluator, right now it only works left to right
     private evaluateSimpleMathExpression = (value: string) => {
         // leave empty strings empty
         if (!value) {

@@ -4,11 +4,13 @@ import {BPInputComponent} from "./BPInputComponent";
 import {BPValueComponentState} from "./BPValueComponent";
 import {getOrCall} from "ts-browser-helpers";
 import {ExtendedNumericInput} from "../components/ExtendedNumericInput";
+import {getNumberTransformFunctions} from "./GetNumberTransformFunctions";
 
 export type BPSliderComponentState = BPValueComponentState<number> & {
     min: number,
     max: number,
     step: number
+    unit?: string,
 }
 
 export class BPSliderInputComponent extends BPInputComponent<number, BPSliderComponentState> {
@@ -36,6 +38,14 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
     flexBasis = "75%"
 
     renderInput() {
+
+        const unit = this.props.config.unit as string|undefined; // todo add to uiconfig, getOrCall
+        const unitType = this.props.config.unitType as string|undefined; // todo add to uiconfig, getOrCall
+        const targetUnit = this.state.unit || unit
+        const {transformValue, invTransformValue} = getNumberTransformFunctions(unit, unitType, targetUnit);
+
+        const invTransformValue_ = invTransformValue || ((v: number) => v);
+        const transformValue_ = transformValue || ((v: number) => v);
         return [(<ExtendedNumericInput
                 style={{maxWidth: "4rem", minWidth: "3rem"}}
                 // defaultValue={state}
@@ -48,26 +58,30 @@ export class BPSliderInputComponent extends BPInputComponent<number, BPSliderCom
                 majorStepSize={this.state.step*10}
                 buttonPosition="none"
                 draggableIcon={false}
+                transformValue={transformValue}
+                invTransformValue={invTransformValue}
                 onChange2={(v, last) => {
                     if(this.state.readOnly) return
                     this.setValue(v, last)
                 }}
             />), (
             <Slider
-                value={Math.min(this.state.max, Math.max(this.state.min, this.state.value))}
+                value={invTransformValue_(Math.min(this.state.max, Math.max(this.state.min, this.state.value)))}
                 key={this.props.config.uuid + '_slider'}
                 disabled={this.state.disabled}
-                min={this.state.min} max={this.state.max} stepSize={this.state.step}
+                min={invTransformValue_(this.state.min)}
+                max={invTransformValue_(this.state.max)}
+                stepSize={invTransformValue_(this.state.step)}
                 labelRenderer={false}
                 // labelStepSize={(max - min)}
                 // labelValues={[]}
                 onChange={(v) => {
                     if(this.state.readOnly) return
-                    this.setValue(v, false)
+                    this.setValue(transformValue_(v), false)
                 }}
                 onRelease={(v) => {
                     if(this.state.readOnly) return
-                    this.setValue(v, true)
+                    this.setValue(transformValue_(v), true)
                 }}
             />
         ),

@@ -6,12 +6,14 @@ import type {Vector2, Vector3, Vector4} from "three";
 import {ExtendedNumericInput} from "../components/ExtendedNumericInput";
 import {wIcon3, xIcon3, yIcon3, zIcon3} from "../components/variableIcons";
 import {getOrCall} from 'ts-browser-helpers'
+import {getNumberTransformFunctions} from "./GetNumberTransformFunctions";
 
 export type BPVectorComponentState = BPValueComponentState<Vector2|Vector3|Vector4> & {
     min: number,
     max: number,
     step: number,
     components: 1|2|3|4,
+    unit?: string,
 }
 
 export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vector4, BPVectorComponentState> {
@@ -73,21 +75,34 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
         let ret = []
         if (!this.state.value) return <></>;
 
+        const unit = this.props.config.unit as string|undefined; // todo add to uiconfig, getOrCall
+        const unitType = this.props.config.unitType as string|undefined; // todo add to uiconfig, getOrCall
+        const targetUnit = this.state.unit || unit
+        const transformValue = getNumberTransformFunctions(unit, unitType, targetUnit);
+
+        const props = {
+            disabled: this.state.disabled,
+            readOnly: this.state.readOnly,
+            min: this.state.min,
+            max: this.state.max,
+            stepSize: this.state.step,
+            minorStepSize: this.state.step / 10,
+            majorStepSize: this.state.step * 10,
+            buttonPosition: "none",
+            ...transformValue,
+        } as const
+
         // console.warn(this.state.value)
         if (this.state.components > 0) {
             const x = (
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
-                    disabled={this.state.disabled} readOnly={this.state.readOnly}
                     // defaultValue={state}
                     leftIcon={xIcon3}
                     value={this.state.value.x}
                     key={this.props.config.uuid + '_x'}
                     ref={this._inputs[0]}
-                    min={this.state.min} max={this.state.max} stepSize={this.state.step}
-                    minorStepSize={this.state.step / 10}
-                    majorStepSize={this.state.step * 10}
-                    buttonPosition="none"
+                    {...props}
                     onChange2={(v, last) => {
                         this.state.value.x = v
                         this.setValue(this.state.value, last) // todo: does need refresh?
@@ -100,15 +115,11 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
                     // defaultValue={state}
-                    disabled={this.state.disabled} readOnly={this.state.readOnly}
                     value={this.state.value.y}
                     leftIcon={yIcon3}
                     key={this.props.config.uuid + '_y'}
                     ref={this._inputs[1]}
-                    min={this.state.min} max={this.state.max} stepSize={this.state.step}
-                    minorStepSize={this.state.step / 10}
-                    majorStepSize={this.state.step * 10}
-                    buttonPosition="none"
+                    {...props}
                     onChange2={(v, last) => {
                         this.state.value.y = v
                         this.setValue(this.state.value, last) // todo: does need refresh?
@@ -121,15 +132,11 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
                     // defaultValue={state}
-                    disabled={this.state.disabled} readOnly={this.state.readOnly}
                     value={(this.state.value as Vector3|Vector4).z}
                     key={this.props.config.uuid + '_z'}
                     leftIcon={zIcon3}
-                    min={this.state.min} max={this.state.max} stepSize={this.state.step}
                     ref={this._inputs[2]}
-                    minorStepSize={this.state.step / 10}
-                    majorStepSize={this.state.step * 10}
-                    buttonPosition="none"
+                    {...props}
                     onChange2={(v, last) => {
                         (this.state.value as Vector3 | Vector4).z = v
                         this.setValue(this.state.value, last) // todo: does need refresh?
@@ -142,15 +149,11 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
                     // defaultValue={state}
-                    disabled={this.state.disabled} readOnly={this.state.readOnly}
                     value={(this.state.value as Vector4).w}
                     key={this.props.config.uuid + '_w'}
                     leftIcon={wIcon3}
                     ref={this._inputs[3]}
-                    min={this.state.min} max={this.state.max} stepSize={this.state.step}
-                    minorStepSize={this.state.step / 10}
-                    majorStepSize={this.state.step * 10}
-                    buttonPosition="none"
+                    {...props}
                     onChange2={(v, last) => {
                         (this.state.value as Vector4).w = v
                         this.setValue(this.state.value, last) // todo: does need refresh?
