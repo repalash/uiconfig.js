@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.9",
+  "version": "0.1.0-dev.11",
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -9,14 +9,36 @@
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "browser": "./dist/index.js"
+    },
+    "./lib/esm": {
+      "types": "./dist/index.d.ts",
+      "import": "./lib/esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./lib/esm/*": {
+      "types": "./lib/esm/*.d.ts",
+      "import": "./lib/esm/*.js"
+    },
+    "./lib/css/*": {
+      "import": "./lib/css/*.css",
+      "require": "./lib/css/*.css"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "compile": "run-p \"compile:*\"",
+    "compile": "run-p \"compile:*\" && npm run postcompile:esm",
     "compile:esm:watch": "tsc -p ./src  --watch",
     "compile:esm": "tsc -p ./src",
     "compile:css": "sass-compile ./src",
+    "postcompile:esm": "node scripts/fix-css-imports.mjs",
     "dev:lib": "run-p \"compile:esm --watch\" \"compile:css --watch\"",
     "dist:css": "css-dist lib/css",
-
     "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
     "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version",
     "dev": "vite",
@@ -46,7 +68,8 @@
     "dist",
     "src",
     "docs",
-    "tsconfig.json"
+    "tsconfig.json",
+    "README.md"
   ],
   "repository": {
     "type": "git",
@@ -106,8 +129,8 @@
     "blueprint-styler": "^5.0.2"
   },
   "dependencies": {
-    "ts-browser-helpers": "^0.17.1",
-    "uiconfig.js": "^0.1.5",
+    "ts-browser-helpers": "^0.18.0",
+    "uiconfig.js": "^0.1.6",
     "@blueprintjs/icons": "^5.11.0",
     "@blueprintjs/select": "^5.2.2",
     "blueprint-styler": "^5.0.2",
