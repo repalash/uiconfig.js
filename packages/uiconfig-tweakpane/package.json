@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-tweakpane",
   "name:umd": "tpui",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -10,7 +10,10 @@
   "source": "src/index.ts",
   "sideEffects": false,
   "scripts": {
-    "build": "vite build",
+    "compile:esm:watch": "tsc -p ./src  --watch",
+    "compile:esm": "tsc -p ./src",
+
+    "build": "vite build && npm run compile:esm",
     "start": "vite",
     "dev": "NODE_ENV=development vite build --watch",
     "test": "npm run check",
@@ -34,6 +37,14 @@
     "./dist/": {
       "import": "./dist/",
       "require": "./dist/"
+    },
+    "./lib/esm": {
+      "types": "./lib/esm/index.d.ts",
+      "import": "./lib/esm/index.js"
+    },
+    "./lib/esm/*": {
+      "types": "./lib/esm/*.d.ts",
+      "import": "./lib/esm/*.js"
     }
   },
   "clean-package": {
@@ -45,6 +56,7 @@
     ]
   },
   "files": [
+    "lib",
     "dist",
     "src",
     "docs",
@@ -73,7 +85,7 @@
   "devDependencies": {
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-replace": "^6.0.2",
-    "@tweakpane/core": "^1.1.9",
+    "@tweakpane/core": "1.1.9",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "clean-package": "^2.2.0",
     "eslint": "^8.57.1",
@@ -83,21 +95,36 @@
     "local-web-server": "^5.3.0",
     "rimraf": "^5.0.1",
     "rollup-plugin-license": "^3.0.1",
-    "ts-browser-helpers": "^0.16.0",
     "tslib": "^2.5.0",
-    "tweakpane": "^3.1.10",
+    "tweakpane": "3.1.10",
     "typedoc": "^0.27.5",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11",
+    "vite": "^7.0.4",
     "vite-plugin-dts": "^4.4.0"
   },
   "dependencies": {
-    "@types/three": "^0.152.1",
-    "uiconfig.js": "^0.1.1"
+    "uiconfig.js": "^0.1.6",
+    "ts-browser-helpers": "^0.16.0"
+  },
+  "peerDependencies": {
+    "@tweakpane/core": "1.1.9",
+    "tweakpane": "3.1.10",
+    "@types/three": "^0.152.1"
+  },
+  "peerDependenciesMeta": {
+    "@tweakpane/core": {
+      "optional": true
+    },
+    "tweakpane": {
+      "optional": true
+    },
+    "@types/three": {
+      "optional": true
+    }
   },
   "//": {
     "dependencies": {
-      "uiconfig.js": "^0.1.0"
+      "uiconfig.js": "^0.1.6"
     },
     "local_dependencies": {
       "uiconfig.js": "file:./../uiconfig.js/"

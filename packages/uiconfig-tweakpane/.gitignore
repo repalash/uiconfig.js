@@ -60,6 +60,7 @@ typings/
 # next.js build output
 .next
 
+lib
 dist
 examples/dist
 docs
