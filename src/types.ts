@@ -10,6 +10,7 @@ export interface ChangeEvent {
     configPath?: UiObjectConfig[], // list of all configs from target to the one that triggered the change
     value?: any, // the new value
     lastValue?: any, // the old value
+    // todo add optional `key` to identify the property that changed, like x in vector etc
 }
 export type ChangeArgs = [ChangeEvent, ...any[]]
 export type OnClickReturnType = (void|(()=>any)|{action?: (()=>any), undo?: (()=>any), redo?: (()=>any)})
@@ -216,6 +217,13 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
     //  * In case of property it is appended to the property path.
     //  */
     // parentPath?: ValOrFunc<string|undefined>,
+
+    /**
+     * If this is true, the contents of the folder will be unwrapped and rendered as children of the folder.
+     * Works only for one level at a time, and only in react based renderers.
+     * Prefer to use css based unwrapping for simple cases.
+     */
+    unwrapContents?: boolean,
 
 
     /**

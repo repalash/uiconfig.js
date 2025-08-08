@@ -1,8 +1,17 @@
 import {ChangeArgs, ChangeEvent, UiObjectConfig} from './types'
-import {Fof, getOrCall, safeSetProperty, uuidV4} from 'ts-browser-helpers'
+import {
+    clonePrimitive,
+    copyPrimitive,
+    equalsPrimitive,
+    Fof,
+    getOrCall,
+    PrimitiveVal,
+    recordUndoCommand,
+    setValueUndoCommand,
+    uuidV4
+} from 'ts-browser-helpers'
 import {UiConfigRendererBase} from './UiConfigRendererBase'
-import {ActionCommand, SetValueCommand} from './undo_commands'
-import {clonePrimitive, copyPrimitive, equalsPrimitive, PrimitiveVal} from './primitive_value'
+import {ActionCommand, SetValueCommand, SetValueCommandProps, undoCommandTypes} from './undo_commands'
 
 export class UiConfigMethods {
     constructor(protected _renderer: UiConfigRendererBase) {
@@ -91,72 +100,24 @@ export class UiConfigMethods {
     undoEditingWaitTime = 2000
     recordUndo(com: SetValueCommand|ActionCommand) {
         const um = this._renderer.undoManager
-        if (!um || !um.enabled) return
-        const c = com as SetValueCommand
-        if (c.type !== 'UiConfigMethods_set') return um.record(com)
-
-        const lastCommand = um.peek()
-        let sameType = !!lastCommand && (lastCommand as SetValueCommand).type === 'UiConfigMethods_set' && (lastCommand as SetValueCommand).config === c.config
-        if (sameType) {
-            const cLast = lastCommand as SetValueCommand
-            if (!cLast.final && (c.time - cLast.time) < this.undoEditingWaitTime) {
-                // replace cLast with c using lastVal from cLast
-                c.lastVal = cLast.lastVal
-                c.val = clonePrimitive(c.val)
-                um.replaceLast(c)
-            } else {
-                sameType = false
-            }
-        }
-        if (!sameType) {
-            if (!equalsPrimitive(c.lastVal, c.val)) {
-                c.val = clonePrimitive(c.val)
-                um.record(c)
-            }
-        }
+        recordUndoCommand(um, com, undoCommandTypes.setValue, this.undoEditingWaitTime)
     }
 
     /**
      *
      * @param config
      * @param value
-     * @param props - only the prop `last` need to be set, rest are optional. `lastValue` can be set if known (but it should be exactly equal to the value in the binding and not cloned). `config`, `configPath` are for parentOnChange, no need to set that.
+     * @param props - only the prop `last` need to be set, rest are optional. `lastValue` can be set if known (but it should be exactly equal to the value in the binding and not cloned).
      * @param forceOnChange
      * @param trackUndo
      */
-    async setValue<T extends PrimitiveVal>(config: UiObjectConfig<T>, value: T, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], lastValue?: T}, forceOnChange?: boolean, trackUndo = true) {
+    async setValue<T extends PrimitiveVal>(config: UiObjectConfig<T>, value: T, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], value?: any, lastValue?: any}, forceOnChange?: boolean, trackUndo = true) {
         return this.runAtEvent(config, () => {
-            const [tar, key] = this.getBinding(config)
-            const lastValueRaw = props.lastValue ?? tar?.[key] as T
-            let failed = false
-            const final = props.last ?? true
-
-            const same = equalsPrimitive(lastValueRaw, value)
-            const lastValue = clonePrimitive(lastValueRaw)
-            if (same) failed = !final
-            else if (tar) {
-                const a = copyPrimitive(lastValueRaw, value)
-                if (a !== lastValueRaw) failed = !safeSetProperty(tar, key, value, true, true)
-                else failed = false
-            } else failed = true
-
-            // console.log('set', config, value, lastValue, failed, same, final)
-            if (failed) {
-                if (!forceOnChange) return false
-            }
-
-            if (trackUndo && !failed && (final || !same)) {
-                this.recordUndo({
-                    type: 'UiConfigMethods_set',
-                    config,
-                    lastVal: lastValue,
-                    val: value,
-                    final,
-                    props,
-                    time: Date.now(),
-                })
-            }
-            this.dispatchOnChangeSync(config, {...props, last: final, value, lastValue: lastValue})
+            const binding = this.getBinding(config)
+            const um = this._renderer.undoManager
+            const ev = setValueUndoCommand(um, binding, value, props, config, undoCommandTypes.setValue, trackUndo, this.undoEditingWaitTime, false, undefined)
+            if(!ev.undoable && !forceOnChange) return false
+            this.dispatchOnChangeSync(config, {...props, ...ev})
             return true
         })
     }
@@ -164,9 +125,9 @@ export class UiConfigMethods {
     /**
      *
      * @param config
-     * @param props - only last needs to be set. check the docs for `setValue`
+     * @param props - only last needs to be set, rest are optional. `lastValue` can be set if known (but it should be exactly equal to the value in the binding and not cloned). `config`, `configPath` are for parentOnChange, no need to set that.
      */
-    async dispatchOnChange<T>(config: UiObjectConfig<T>, props: {last?: boolean, config?: UiObjectConfig, configPath?: UiObjectConfig[], value?: any, lastValue?: any}) {
+    async dispatchOnChange<T>(config: UiObjectConfig<T>, props: (SetValueCommandProps&{value?: PrimitiveVal, [key:string]:any})) {
         return this.runAtEvent(config, () => {
             this.dispatchOnChangeSync(config, props)
         })
@@ -213,7 +174,7 @@ export class UiConfigMethods {
                 if (typeof undo === 'function') {
                     this.recordUndo({
                         type: 'UiConfigMethods_action',
-                        config,
+                        uid: config,
                         target: targ,
                         undo: undo,
                         redo: redo,
@@ -283,21 +244,21 @@ export class UiConfigMethods {
     }
 
     undoPresets = {
-        ['UiConfigMethods_set']: (c: SetValueCommand)=>{
-            const ref = ()=>c.config.uiRefresh?.(false)
+        [undoCommandTypes.setValue]: (c: SetValueCommand)=>{
+            const ref = ()=>c.uid.uiRefresh?.(false)
             return {
                 undo: ()=>{
                     // console.log('undo', c.lastVal)
-                    this.setValue(c.config, c.lastVal, c.props, undefined, false).then(ref)
+                    this.setValue(c.uid, c.lastVal, c.props, undefined, false).then(ref)
                 },
                 redo: ()=>{
                     // console.log('redo', c.val)
-                    this.setValue(c.config, c.val, c.props, undefined, false).then(ref)
+                    this.setValue(c.uid, c.val, c.props, undefined, false).then(ref)
                 },
             }
         },
-        ['UiConfigMethods_action']: (c: ActionCommand)=>{
-            const ref = ()=>c.config.uiRefresh?.(false)
+        [undoCommandTypes.action]: (c: ActionCommand)=>{
+            const ref = ()=>c.uid.uiRefresh?.(false)
             return {
                 undo: async()=>{
                     await c.undo.call(c.target, ...c.args)

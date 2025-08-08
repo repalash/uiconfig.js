@@ -1,16 +1,17 @@
 {
     "name": "uiconfig.js",
-    "version": "0.1.6",
+    "version": "0.2.0",
     "description": "A framework for building user interface layouts with JSON configuration.",
     "main": "dist/index.js",
-    "module": "dist/index.js",
+    "module": "dist/index.mjs",
     "types": "dist/index.d.ts",
     "source": "src/index.ts",
+    "browser": "dist/index.js",
     "sideEffects": false,
     "type": "module",
     "scripts": {
-        "build": "rimraf dist && NODE_ENV=production rollup -c",
-        "dev": "rollup -c -w",
+        "build": "rimraf dist ; vite build",
+        "dev": "NODE_ENV=development vite build --watch",
         "serve-docs": "ws -d docs -p 8080",
         "build-examples": "NODE_ENV=production rollup --config examples/rollup.config.js",
         "dev-examples": "rollup -w --config examples/rollup.config.js",
@@ -28,12 +29,17 @@
     },
     "exports": {
         ".": {
-            "import": "./dist/index.js",
-            "types": "./dist/index.d.ts"
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
         },
         "./dist/": {
             "import": "./dist/",
             "require": "./dist/"
+        },
+        "./src/": {
+            "import": "./src/",
+            "require": "./src/"
         }
     },
     "clean-package": {
@@ -76,24 +82,27 @@
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
+        "clean-package": "^2.2.0",
+        "rollup-plugin-license": "^3.0.1",
+        "typedoc": "^0.28.9",
+        "rollup-plugin-delete": "^3.0.1",
+        "typescript": "^5.7.2",
+        "vite": "^6.0.5",
+        "tslib": "^2.8.1",
+        "local-web-server": "^5.4.0",
+        "vite-plugin-dts": "^4.4.0",
+        "rimraf": "^6.0.1",
+        "@rollup/plugin-replace": "^6.0.2",
+        "typedoc-plugin-markdown": "^4.8.0",
         "@typescript-eslint/eslint-plugin": "^5.53.0",
         "@typescript-eslint/parser": "^5.53.0",
-        "clean-package": "^2.2.0",
         "eslint": "^8.57.1",
         "eslint-plugin-deprecation": "^3.0.0",
         "eslint-plugin-html": "^8.1.2",
-        "eslint-plugin-import": "^2.31.0",
-        "glob": "^11.0.0",
-        "local-web-server": "^5.4.0",
-        "rimraf": "^6.0.1",
-        "rollup": "^3.29.5",
-        "rollup-plugin-delete": "^2.1.0",
-        "rollup-plugin-license": "^3.5.3",
-        "rollup-plugin-multi-input": "^1.5.0",
-        "ts-browser-helpers": "^0.16.1",
-        "tslib": "^2.6.3",
-        "typedoc": "^0.27.5",
-        "typescript": "^5.7.2"
+        "eslint-plugin-import": "^2.31.0"
+    },
+    "dependencies": {
+        "ts-browser-helpers": "^0.19.0"
     },
     "optionalDependencies": {
         "win-node-env": "^0.6.1"

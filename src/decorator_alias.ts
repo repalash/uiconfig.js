@@ -44,11 +44,11 @@ export function uiToggle<T=any>(label?: string, params?: TParams<T>): PropertyDe
     return uiConfig('checkbox', {label, params})
 }
 
-export function uiPanelContainer<TP = any>(label: ValOrFunc<string, [TP]>, params?: any) {
+export function uiPanelContainer<TP = any, T=any>(label: ValOrFunc<string, [TP]>, params?: TParams<T>) {
     return uiContainer(label, params, 'panel')
 }
 
-export function uiFolderContainer<TP = any>(label: ValOrFunc<string, [TP]>, params?: any) {
+export function uiFolderContainer<TP = any, T=any>(label: ValOrFunc<string, [TP]>, params?: TParams<T>) {
     return uiContainer(label, params, 'folder')
 }
 
