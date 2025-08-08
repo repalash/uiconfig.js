@@ -16,7 +16,8 @@ import {
 import {generateUiConfig, generateUiFolder, generateValueConfig, UiConfigTypeMap} from './decorator_utils'
 import {
     ChangeArgs,
-    ChangeEvent, createValueUiConfig,
+    ChangeEvent,
+    createValueUiConfig,
     IUiConfigContainer,
     TUiRefreshModes,
     UiConfigContainer,
@@ -30,7 +31,7 @@ import {UiConfigMethods} from './UiConfigMethods'
 export {UiConfigRendererBase, UiConfigRenderer, UiConfigMethods, createValueUiConfig}
 export type {UiConfigContainer, IUiConfigContainer, UiObjectConfig, UiObjectType, TUiRefreshModes, ChangeArgs, ChangeEvent}
 
-export {type PrimitiveVal, type PrimitiveValObject, clonePrimitive, equalsPrimitive, copyPrimitive} from './primitive_value'
+export {type PrimitiveVal, type PrimitiveValObject, clonePrimitive, equalsPrimitive, copyPrimitive} from 'ts-browser-helpers'
 
 // decorators
 export {uiConfig, uiContainer}
@@ -42,4 +43,5 @@ export {uiPanelContainer, uiFolderContainer}
 export {generateUiConfig, generateUiFolder, generateValueConfig, UiConfigTypeMap}
 export type {TParams}
 
-export type {ActionCommand, SetValueCommand} from './undo_commands'
+export type {ActionCommand, SetValueCommand, SetValueCommandProps} from './undo_commands'
+export {undoCommandTypes} from './undo_commands'
