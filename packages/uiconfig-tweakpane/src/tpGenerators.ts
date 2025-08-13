@@ -1,6 +1,6 @@
-import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi} from 'tweakpane'
+import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi, TabApi} from 'tweakpane'
 import {BladeController, TextView, View} from '@tweakpane/core'
-import {tweakPaneMoveToParentIndex} from './tpUtils'
+import {setupPropertyForwarding, tweakPaneMoveToParentIndex} from './tpUtils'
 import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
@@ -38,13 +38,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
             plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
         }
-        if (child.property === undefined &&
-            child.value === undefined &&
-            child.getValue === undefined &&
-            child.setValue === undefined &&
-            child.type !== 'button' &&
-            (config.property !== undefined || config.value !== undefined)
-        ) child.property = config.property !== undefined ? config.property : [config, 'value']
+        setupPropertyForwarding(child, config)
 
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
@@ -131,6 +125,7 @@ export const tpButtonInputGenerator = (parent: FolderApi, config: UiObjectConfig
     }
     if (input) {
         input.title = plugin.methods.getLabel(config) || 'click me'
+        input.disabled = getOrCall(config.disabled) || getOrCall(config.readOnly) || false
     }
     return input
 }
@@ -151,6 +146,15 @@ export const tpSliderInputGenerator = (parent: FolderApi, config: UiObjectConfig
     const min = (bounds?.length ?? 0) >= 1 ? bounds![0] : 0
     const step = getOrCall(config.stepSize) || undefined
     return tpInputGenerator(parent, config, plugin, {min, max, step, ...params ?? {}})
+}
+
+export const tpSeparatorGenerator = (parent: FolderApi, config: UiObjectConfig, _plugin: UiConfigRendererTweakpane, _params?: any) => {
+    let separator = config.uiRef
+    if (separator?.controller_?.viewProps.get('disposed')) separator = undefined
+    if (!separator) {
+        separator = parent.addSeparator()
+    }
+    return separator
 }
 
 export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, params?: any) => {
@@ -269,4 +273,73 @@ export const tpVecInputGenerator = (parent: FolderApi, config: UiObjectConfig, r
     if (config.type === 'vec3' || config.type === 'vec4') pp.z = p
     if (config.type === 'vec4') pp.w = p
     return tpInputGenerator(parent, config, renderer, {...pp, ...params ?? {}})
+}
+
+export const tpTabGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
+    let tabs = config.uiRef as TabApi | undefined
+    if (tabs?.controller_.viewProps.get('disposed')) tabs = undefined
+
+    const childObjects = plugin.methods.getChildren(config)
+
+    if (!tabs) {
+        // Create pages configuration based on children (folders)
+        const pages = childObjects.map((child, i) => ({
+            title: plugin.methods.getLabel(child) || `Tab ${i + 1}`,
+        }))
+
+        tabs = parent.addTab({pages})
+    }
+
+    if (!tabs) return tabs
+
+    // Always render/re-render each folder's children into their respective tab pages
+    childObjects.forEach((folderConfig, index) => {
+        const tabPage = tabs.pages[index]
+        if (!tabPage) return
+
+        // Set up parent change handler for the folder
+        folderConfig.parentOnChange = (ev: ChangeEvent, ...args) => {
+            plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
+        }
+
+        // Set up property forwarding for the folder config from the parent tab config
+        setupPropertyForwarding(folderConfig, config)
+
+        // Get the children of this folder
+        const folderChildren = plugin.methods.getChildren(folderConfig)
+
+        // Clear existing children in the tab page first
+        while (tabPage.children.length > 0) {
+            const child = tabPage.children[0]
+            tabPage.remove(child)
+        }
+
+        // Render each child of the folder into the tab page
+        for (const child of folderChildren) {
+            child.parentOnChange = (ev: ChangeEvent, ...args) => {
+                plugin.methods.dispatchOnChangeSync(folderConfig, {...ev}, ...args)
+            }
+
+            setupPropertyForwarding(child, folderConfig)
+
+            // todo this recreates the complete ui, ideally there should be a proper refresh logic for children.
+
+            // Force clear uiRef to ensure fresh rendering during re-render
+            child.uiRef = undefined
+            child.uiRefType = undefined
+
+            // Render the child into the tab page
+            plugin.renderUiObject(child, tabPage)
+        }
+    })
+
+    // Update tab titles based on folder labels (in case they changed)
+    childObjects.forEach((folderConfig, index) => {
+        const tabPage = tabs.pages[index]
+        if (tabPage) {
+            tabPage.title = plugin.methods.getLabel(folderConfig) || `Tab ${index + 1}`
+        }
+    })
+
+    return tabs
 }

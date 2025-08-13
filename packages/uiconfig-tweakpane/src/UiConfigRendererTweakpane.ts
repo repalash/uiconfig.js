@@ -1,13 +1,14 @@
 import {AnyOptions, createDiv, createStyles, css, getOrCall, JSUndoManager} from 'ts-browser-helpers'
-import {BladeApi, FolderApi, Pane} from 'tweakpane'
+import {BladeApi, FolderApi, Pane, TabPageApi} from 'tweakpane'
 import {TUiRefreshModes, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
 import {
     tpButtonInputGenerator,
     tpDropdownInputGenerator,
     tpFolderGenerator,
-    tpInputGenerator,
+    tpInputGenerator, tpSeparatorGenerator,
     tpSliderInputGenerator,
+    tpTabGenerator,
     tpVecInputGenerator,
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
@@ -74,7 +75,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         this.renderUiObject(uiConfig)
     }
 
-    renderUiObject(uiConfig: UiObjectConfig, parent?: FolderApi) {
+    renderUiObject(uiConfig: UiObjectConfig, parent?: FolderApi | TabPageApi) {
         parent = parent ?? this._root
         if (!uiConfig.type) return
         this.methods.initUiConfig(uiConfig)
@@ -85,7 +86,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         const ui = uiConfig.type ? this.typeGenerators[uiConfig.type]?.(parent, uiConfig, this) as BladeApi<BladeController<View>> | undefined : undefined
         if (ui) {
             ui.hidden = getOrCall(uiConfig.hidden) ?? false
-            ui.disabled = getOrCall(uiConfig.disabled) ?? false // todo: also see if property is writable?
+            if (uiConfig.type !== 'button') ui.disabled = getOrCall(uiConfig.disabled) ?? false // todo: also see if property is writable?
             ;(ui as any).srcUiConfig = uiConfig
         }
         uiConfig.uiRef = ui
@@ -120,9 +121,13 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
 const defaultGenerators = {
     panel: tpFolderGenerator,
     folder: tpFolderGenerator,
+    tab: tpTabGenerator,
+    tabs: tpTabGenerator,
     input: tpInputGenerator,
     number: tpInputGenerator,
     slider: tpSliderInputGenerator,
+    separator: tpSeparatorGenerator,
+    divider: tpSeparatorGenerator,
     dropdown: tpDropdownInputGenerator,
     checkbox: tpInputGenerator,
     toggle: tpInputGenerator,
