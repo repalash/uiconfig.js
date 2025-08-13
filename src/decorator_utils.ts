@@ -70,9 +70,13 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
                 delete params1.params
                 if (typeof config === 'function') {
                     const c1: Fof<any, any> = config
-                    config = ()=>Object.assign(c1(), {...params1, ...extraParams})
+                    config = ()=>{
+                        const res = c1()
+                        return !res ? res : Object.assign(res, {...params1, ...extraParams})
+                    }
+                }else {
+                    Object.assign(config, {...params1, ...extraParams})
                 }
-                Object.assign(config, {...params1, ...extraParams})
             }
             result.push(config)
 

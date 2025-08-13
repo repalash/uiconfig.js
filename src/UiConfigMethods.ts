@@ -245,7 +245,10 @@ export class UiConfigMethods {
 
     undoPresets = {
         [undoCommandTypes.setValue]: (c: SetValueCommand)=>{
-            const ref = ()=>c.uid.uiRefresh?.(false)
+            const ref = ()=>{
+                c.onUndoRedo && c.onUndoRedo(c)
+                c.uid.uiRefresh?.(false)
+            }
             return {
                 undo: ()=>{
                     // console.log('undo', c.lastVal)
@@ -258,7 +261,10 @@ export class UiConfigMethods {
             }
         },
         [undoCommandTypes.action]: (c: ActionCommand)=>{
-            const ref = ()=>c.uid.uiRefresh?.(false)
+            const ref = ()=>{
+                c.onUndoRedo && c.onUndoRedo(c)
+                c.uid.uiRefresh?.(false)
+            }
             return {
                 undo: async()=>{
                     await c.undo.call(c.target, ...c.args)
