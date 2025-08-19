@@ -1,6 +1,6 @@
 {
     "name": "uiconfig.js",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "description": "A framework for building user interface layouts with JSON configuration.",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -102,7 +102,7 @@
         "eslint-plugin-import": "^2.31.0"
     },
     "dependencies": {
-        "ts-browser-helpers": "^0.19.3"
+        "ts-browser-helpers": "^0.19.4"
     },
     "optionalDependencies": {
         "win-node-env": "^0.6.1"
