@@ -7,6 +7,7 @@ export class UiConfigTypeMap {
 
 export function generateValueConfig(obj: any, key: string | number, label?: string, val?: any) {
     val = val ?? obj[key]
+    label = label ?? key + ''
     const config = val?.uiConfig
     let result: UiObjectConfig|undefined = undefined
     if (config) {
@@ -14,15 +15,14 @@ export function generateValueConfig(obj: any, key: string | number, label?: stri
     } else {
         const uiType = valueToUiType(val)
         if (uiType === 'folder') {
-            result = generateUiFolder(key + '', val, {}, 'folder', true)
+            result = generateUiFolder(label, val, {}, 'folder', true)
         } else if (uiType)
             result = {
                 type: uiType,
-                label: key + '',
+                label: label,
                 property: [obj, key],
             }
     }
-    label = label ?? key + ''
     if (result && !result.label) result.label = label
     return result
 }
@@ -94,10 +94,10 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
     return result
 }
 
-export function generateUiFolder(label: string, obj: any, params: any = {}, type = 'folder', dynamic = false): UiObjectConfig {
+export function generateUiFolder(label: UiObjectConfig['label'], obj: any, params: Partial<UiObjectConfig> = {}, type: UiObjectConfig['type'] = 'folder', dynamic = false): UiObjectConfig {
     return {
         type, label,
-        children: !dynamic ? generateUiConfig(obj) : ()=> generateUiConfig(obj),
+        children: !dynamic ? generateUiConfig(obj) : [()=>generateUiConfig(obj)],
         uuid: uuidV4(),
         ...params,
     }

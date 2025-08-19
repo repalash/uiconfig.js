@@ -1,5 +1,6 @@
 import {ChangeArgs, ChangeEvent, UiObjectConfig} from './types'
 import {
+    AnyFunction,
     clonePrimitive,
     copyPrimitive,
     equalsPrimitive,
@@ -104,6 +105,36 @@ export class UiConfigMethods {
     }
 
     /**
+     * Performs an action with undo/redo support.
+     * @param action - a function that returns - 1. an undo function, 2. an object with undo and redo functions (and optional action)
+     * @param targ - the target object to call the action on
+     * @param args - the arguments to pass to the action function
+     * @param config - ui config
+     * @param onUndoRedo - optional callback function to be called on undo/redo of the command. Not called on first action execution, only on undo/redo.
+     */
+    async performAction<T extends AnyFunction>(targ: any|undefined, action: T, args: Parameters<T>, config: UiObjectConfig, onUndoRedo?: (c: ActionCommand)=>void) {
+        const ac = ()=> targ === undefined ? action(...args) : action.call(targ, ...args) // if a function is returned, it is treated as undo function
+        let res = await ac()
+        const undo = typeof res === 'function' ? res : res?.undo?.bind(res)
+        const resAction = typeof res !== 'function' ? res?.action?.bind(res) : null
+        const redo = typeof res === 'function' ? ac : res?.redo?.bind(res) ?? resAction
+        if (typeof resAction === 'function') {
+            res = await resAction() // execute the action now. adding await just in case
+        }
+        if (typeof undo === 'function') {
+            this.recordUndo({
+                type: 'UiConfigMethods_action',
+                uid: config,
+                target: targ,
+                undo: undo,
+                redo: redo,
+                args,
+                onUndoRedo,
+            } as ActionCommand)
+        }
+    }
+
+    /**
      *
      * @param config
      * @param value
@@ -164,23 +195,7 @@ export class UiConfigMethods {
                 actions.push([config.onClick, config])
             }
             for (const [action, targ] of actions) {
-                let res = await action.call(targ, ...args) // if a function is returned, it is treated as undo function
-                const undo = typeof res === 'function' ? res : res?.undo?.bind(res)
-                const resAction = typeof res !== 'function' ? res?.action?.bind(res) : null
-                const redo = typeof res === 'function' ? action : res?.redo?.bind(res) ?? resAction
-                if (typeof resAction === 'function') {
-                    res = await resAction() // execute the action now. adding await just in case
-                }
-                if (typeof undo === 'function') {
-                    this.recordUndo({
-                        type: 'UiConfigMethods_action',
-                        uid: config,
-                        target: targ,
-                        undo: undo,
-                        redo: redo,
-                        args,
-                    } as ActionCommand)
-                }
+                await this.performAction(targ, action, args, config)
             }
 
             await this.dispatchOnChange(config, {})
