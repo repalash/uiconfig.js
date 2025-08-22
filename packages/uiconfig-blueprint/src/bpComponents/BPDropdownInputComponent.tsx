@@ -3,6 +3,7 @@ import {Button, MenuItem} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";
 import {BPValueComponentState} from "./BPValueComponent";
 import {ItemRenderer, Select} from "@blueprintjs/select";
+import {cleanLabel} from "../utils";
 
 export interface DropdownItem{
     label: string,
@@ -40,8 +41,8 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
 
     getUpdatedState(state: BPDropdownComponentState): BPDropdownComponentState {
         const children = this.context.methods.getChildren(this.props.config)
-        const options: DropdownItem[] = children.map(value => {
-            const label = this.context.methods.getLabel(value)
+        const options: DropdownItem[] = children.map((value, i) => {
+            const label = cleanLabel(this.context.methods.getLabel(value)) || `Option ${i}`
             return {label, value: value!.value ?? label}
         })
 

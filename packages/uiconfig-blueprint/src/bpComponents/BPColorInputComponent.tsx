@@ -39,7 +39,7 @@ export class BPColorInputComponent extends BPValueComponent<ColorRepresentation,
         else console.error('not supported color', val)
         this._tempColor.set(val)
         if (srgbConvert) this._tempColor.convertLinearToSRGB()
-        const value = '#' + this._tempColor.getHexString()
+        const value = '#' + this._tempColor.getHexString().toUpperCase()
         // console.log('color', mode, value, val)
         return {...state, mode, value, lastValue: val, srgbConvert} // default config.srgb = false
     }

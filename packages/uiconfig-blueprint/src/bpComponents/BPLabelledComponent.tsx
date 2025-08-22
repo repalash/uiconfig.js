@@ -1,4 +1,5 @@
 import {BPComponent, BPComponentProps, BPComponentState, UiConfigRendererContextType} from "./BPComponent";
+import {cleanLabel} from "../utils";
 
 export type BPLabelledComponentState = BPComponentState & {
     label: string
@@ -12,8 +13,7 @@ export abstract class BPLabelledComponent<TValue, TState, TProps extends BPCompo
     getUpdatedState(state: TState & BPLabelledComponentState): TState & BPLabelledComponentState {
         return super.getUpdatedState({
             ...state,
-            label: this.context.methods.getLabel(this.props.config) || state.label,
+            label: cleanLabel(this.context.methods.getLabel(this.props.config)) || state.label,
         })
     }
-
 }

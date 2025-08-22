@@ -27,6 +27,10 @@
   display: flex;
   flex-direction: column;
   background-color: $light-gray4 !important;
+
+
+  //border-top: #7c7c7c7c 1px solid !important;
+  //border-bottom: #7c7c7c7c 1px solid !important;
 }
 .bp5-dark .folder-card {
   background-color: $dark-gray1 !important;
@@ -44,6 +48,9 @@
 
 
 .folder-trigger-button {
+  font-size: 12px !important;
+  font-weight: 550 !important;
+
   margin-top: 1px;
   display: flex;
   align-items: center;
@@ -76,7 +83,7 @@
   }
 
   &.folder-trigger-button-expanded{
-    background-color: $dark-gray2 !important;
+    //background-color: $dark-gray2 !important;
   }
 }
 
@@ -119,3 +126,12 @@
   }
 }
 
+.folder-card{
+  .bp5-input-group .bp5-input{
+    font-size: var(--pt-font-size-small);
+  }
+
+  .bp5-button{
+    font-size: var(--pt-font-size-small);
+  }
+}

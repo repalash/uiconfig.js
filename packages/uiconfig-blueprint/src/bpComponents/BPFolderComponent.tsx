@@ -90,7 +90,8 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                     disabled={props.disabled}
                     small={props.minimal}
                     style={props.level ? {marginLeft: "6px"} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
-                    intent={props.open ? Intent.PRIMARY : Intent.NONE}
+                    // intent={props.open ? Intent.PRIMARY : Intent.NONE}
+                    intent={Intent.NONE}
                     // icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
                     icon={(
                         <>
@@ -99,7 +100,8 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                                 transition: "rotate 0.25s ease-in-out"
                             }}/>
                         </>
-                    )}>{props.label}
+                    )}
+                >{props.label}
                 </Button>
                 {hasEnabled && <Checkbox
                     style={{margin: 0, position: 'absolute', left: '10px'}}

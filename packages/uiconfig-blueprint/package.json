@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.11",
+  "version": "0.1.0-dev.12",
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -16,10 +16,13 @@
       "require": "./dist/index.js",
       "browser": "./dist/index.js"
     },
+    "./dist/": {
+      "import": "./dist/",
+      "require": "./dist/"
+    },
     "./lib/esm": {
-      "types": "./dist/index.d.ts",
-      "import": "./lib/esm/index.js",
-      "require": "./dist/index.js"
+      "types": "./lib/esm/index.d.ts",
+      "import": "./lib/esm/index.js"
     },
     "./lib/esm/*": {
       "types": "./lib/esm/*.d.ts",
@@ -28,6 +31,10 @@
     "./lib/css/*": {
       "import": "./lib/css/*.css",
       "require": "./lib/css/*.css"
+    },
+    "./src/": {
+      "import": "./src/",
+      "require": "./src/"
     },
     "./package.json": "./package.json"
   },

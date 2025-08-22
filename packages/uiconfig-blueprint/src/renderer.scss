@@ -71,7 +71,7 @@
   max-width: calc(8 * $pt-font-size-small);
   min-width: calc(8 * $pt-font-size-small);
   width: calc(8 * $pt-font-size-small);
-  font-size: $pt-font-size-small;
+  //font-size: $pt-font-size-small;
   height: $pt-input-height;
   line-height: normal;
 
@@ -85,6 +85,9 @@
   .bp5-dark & {
     color: $gray5;
   }
+
+  font-size: 11px !important;
+  font-weight: 450 !important;
 }
 
 .switch{
