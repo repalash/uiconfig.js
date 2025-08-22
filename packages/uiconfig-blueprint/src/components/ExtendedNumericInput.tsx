@@ -291,7 +291,7 @@ export class ExtendedNumericInput extends React.PureComponent<Props, IExtendedNu
         return (+value).toString();
     };
 
-    private roundValue = (value: number, precision: number = 1) => {
+    private roundValue = (value: number, precision: number = 6) => {
         // round to at most two decimal places
         return Math.round(value * 10 ** precision) / 10 ** precision;
     };

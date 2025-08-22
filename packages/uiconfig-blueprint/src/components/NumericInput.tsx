@@ -45,7 +45,6 @@ import {
     parseStringToStringNumber,
     sanitizeNumericInput,
     toLocaleString,
-    toMaxPrecision,
 } from "@blueprintjs/core/src/components/forms/numericInputUtils";
 
 export interface NumericInputProps extends InputSharedProps {
@@ -174,7 +173,7 @@ export interface NumericInputState {
     prevMinProp?: number;
     prevMaxProp?: number;
     shouldSelectAfterUpdate: boolean;
-    stepMaxPrecision: number;
+    // stepMaxPrecision: number;
     value: string;
 }
 
@@ -241,19 +240,19 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
         // in controlled mode, use props.value
         // in uncontrolled mode, if state.value has not been assigned yet (upon initial mount), use props.defaultValue
         const value = props.value?.toString() ?? state.value;
-        const stepMaxPrecision = NumericInput.getStepMaxPrecision(props);
+        // const stepMaxPrecision = NumericInput.getStepMaxPrecision(props);
 
         const sanitizedValue =
             value !== NumericInput.VALUE_EMPTY
-                ? NumericInput.roundAndClampValue(value, stepMaxPrecision, props.min, props.max, 0, props.locale)
+                ? NumericInput.roundAndClampValue(value, /*stepMaxPrecision,*/ props.min, props.max, 0, props.locale)
                 : NumericInput.VALUE_EMPTY;
 
         // if a new min and max were provided that cause the existing value to fall
         // outside of the new bounds, then clamp the value to the new valid range.
         if (didBoundsChange && sanitizedValue !== state.value) {
-            return { ...nextState, stepMaxPrecision, value: sanitizedValue };
+            return { ...nextState, /*stepMaxPrecision,*/ value: sanitizedValue };
         }
-        return { ...nextState, stepMaxPrecision, value };
+        return { ...nextState, /*stepMaxPrecision,*/ value };
     }
 
     private static CONTINUOUS_CHANGE_DELAY = 300;
@@ -262,17 +261,17 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
 
     // Value Helpers
     // =============
-    private static getStepMaxPrecision(props: HTMLInputProps & NumericInputProps) {
-        if (props.minorStepSize != null) {
-            return Utils.countDecimalPlaces(props.minorStepSize);
-        } else {
-            return Utils.countDecimalPlaces(props.stepSize!);
-        }
-    }
+    // private static getStepMaxPrecision(props: HTMLInputProps & NumericInputProps) {
+    //     if (props.minorStepSize != null) {
+    //         return Utils.countDecimalPlaces(props.minorStepSize);
+    //     } else {
+    //         return Utils.countDecimalPlaces(props.stepSize!);
+    //     }
+    // }
 
     private static roundAndClampValue(
         value: string,
-        stepMaxPrecision: number,
+        // stepMaxPrecision: number,
         min: number | undefined,
         max: number | undefined,
         delta = 0,
@@ -282,7 +281,8 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
             return NumericInput.VALUE_EMPTY;
         }
         const currentValue = parseStringToStringNumber(value, locale);
-        const nextValue = toMaxPrecision(Number(currentValue) + delta, stepMaxPrecision);
+        // const nextValue = toMaxPrecision(Number(currentValue) + delta, stepMaxPrecision);
+        const nextValue = (Number(currentValue) + delta);
         const clampedValue = clampValue(nextValue, min, max);
         return toLocaleString(clampedValue, locale);
     }
@@ -290,7 +290,7 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
     public state: NumericInputState = {
         currentImeInputInvalid: false,
         shouldSelectAfterUpdate: false,
-        stepMaxPrecision: NumericInput.getStepMaxPrecision(this.props),
+        // stepMaxPrecision: NumericInput.getStepMaxPrecision(this.props),
         value: getValueOrEmptyValue(this.props.value ?? this.props.defaultValue),
     };
 
@@ -664,7 +664,7 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
     private roundAndClampValue(value: string, delta = 0) {
         return NumericInput.roundAndClampValue(
             value,
-            this.state.stepMaxPrecision,
+            // this.state.stepMaxPrecision,
             this.props.min,
             this.props.max,
             delta,

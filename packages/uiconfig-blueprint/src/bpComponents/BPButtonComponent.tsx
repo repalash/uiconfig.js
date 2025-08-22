@@ -22,7 +22,7 @@ export class BPButtonComponent extends BPLabelledComponent<()=>void, BPLabelledC
                  style={{flexBasis: this.state.baseWidth ?? this.flexBasis}}
             >
                 <Button className="bpButton"
-                        disabled={this.state.disabled}
+                        disabled={this.state.disabled || this.state.readOnly}
                         intent={Intent.PRIMARY}
                         // small={true}
                         fill={true}
