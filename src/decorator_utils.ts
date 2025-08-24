@@ -5,7 +5,7 @@ export class UiConfigTypeMap {
     static Map = new Map<ObjectConstructor, any[]>()
 }
 
-export function generateValueConfig(obj: any, key: string | number, label?: string, val?: any) {
+export function generateValueConfig(obj: any, key: string | number, label?: string, val?: any, dynamicChildren = true) {
     val = val ?? obj[key]
     label = label ?? key + ''
     const config = val?.uiConfig
@@ -15,7 +15,7 @@ export function generateValueConfig(obj: any, key: string | number, label?: stri
     } else {
         const uiType = valueToUiType(val)
         if (uiType === 'folder') {
-            result = generateUiFolder(label, val, {}, 'folder', true)
+            result = generateUiFolder(label, val, {}, 'folder', dynamicChildren)
         } else if (uiType)
             result = {
                 type: uiType,
@@ -44,8 +44,7 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
             const val = obj[key]
             if (val === undefined || val === null) continue
             // if (Array.isArray(obj)) debugger
-            // todo: make only the children of folder inside the value config dynamic instead of the whole thing? as in webgi
-            const c = ()=>generateValueConfig(obj, key, key + '', val)
+            const c = generateValueConfig(obj, key, key + '', val, true)
             if (c) result.push(c)
         }
     }
