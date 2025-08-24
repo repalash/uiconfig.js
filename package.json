@@ -1,6 +1,6 @@
 {
     "name": "uiconfig.js",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "A framework for building user interface layouts with JSON configuration.",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -25,7 +25,7 @@
         "prepublishOnly": "npm run test",
 
         "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-        "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version"
+        "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && PKG=$(npm pack) && clean-package restore && npm publish \"$PKG\" && git tag v$npm_package_version"
     },
     "exports": {
         ".": {
