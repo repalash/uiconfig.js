@@ -148,6 +148,16 @@ export const tpSliderInputGenerator = (parent: FolderApi, config: UiObjectConfig
     return tpInputGenerator(parent, config, plugin, {min, max, step, ...params ?? {}})
 }
 
+export const tpTextAreaInputGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, params?: any) => {
+    const lineCount = getOrCall(config.rows) || getOrCall(config.lineCount) || 4
+    const placeholder = getOrCall(config.placeholder) || 'Type here...'
+    return tpInputGenerator(parent, config, plugin, {view: 'textarea',
+        lineCount: lineCount,
+        rows: lineCount, // its called rows since tweakpane 4
+        placeholder,
+        ...params ?? {}})
+}
+
 export const tpSeparatorGenerator = (parent: FolderApi, config: UiObjectConfig, _plugin: UiConfigRendererTweakpane, _params?: any) => {
     let separator = config.uiRef
     if (separator?.controller_?.viewProps.get('disposed')) separator = undefined

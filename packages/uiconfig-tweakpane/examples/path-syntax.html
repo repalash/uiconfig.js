@@ -31,6 +31,7 @@
             }
         ],
         city: 'New York',
+        description: 'This is a sample description.\nYou can write multiple lines here.',
     };
     const uiConfig = {
         type: 'folder',
@@ -81,6 +82,11 @@
                 label: 'City',
                 path: 'city',
                 children: ['New York', 'Paris', 'London'].map((v) => ({label: v})),
+            },
+            {
+                type: 'textarea',
+                label: 'Description',
+                path: 'description',
             },
             {
                 type: 'divider',
@@ -137,6 +143,7 @@
                     data.dob.month = 1;
                     data.dob.day = 1;
                     data.city = 'New York';
+                    data.description = 'This is a sample description.\nYou can write multiple lines here.';
                     data.tabs[0].str = 'test';
                     data.tabs[0].num = 1;
                     data.tabs[1].str = 'test2';

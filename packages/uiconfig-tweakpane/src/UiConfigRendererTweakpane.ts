@@ -8,10 +8,11 @@ import {
     tpFolderGenerator,
     tpInputGenerator, tpSeparatorGenerator,
     tpSliderInputGenerator,
-    tpTabGenerator,
+    tpTabGenerator, tpTextAreaInputGenerator,
     tpVecInputGenerator,
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
+import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
 
 export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
@@ -61,6 +62,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         `)
 
         this._root = new Pane({title: 'Configuration', container})
+        this._root.registerPlugin(TextareaPlugin)
         return container
     }
 
@@ -129,6 +131,7 @@ const defaultGenerators = {
     separator: tpSeparatorGenerator,
     divider: tpSeparatorGenerator,
     dropdown: tpDropdownInputGenerator,
+    select: tpDropdownInputGenerator,
     checkbox: tpInputGenerator,
     toggle: tpInputGenerator,
     button: tpButtonInputGenerator,
@@ -137,6 +140,9 @@ const defaultGenerators = {
     vec2: tpVecInputGenerator,
     vec3: tpVecInputGenerator,
     vec4: tpVecInputGenerator,
+    textarea: tpTextAreaInputGenerator,
+    textArea: tpTextAreaInputGenerator,
+    multiline: tpTextAreaInputGenerator,
 
     // three
     color: tpColorInputGenerator,

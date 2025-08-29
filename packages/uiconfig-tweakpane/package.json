@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-tweakpane",
   "name:umd": "tpui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -100,7 +100,8 @@
     "typedoc": "^0.27.5",
     "typescript": "^5.7.2",
     "vite": "^7.0.4",
-    "vite-plugin-dts": "^4.4.0"
+    "vite-plugin-dts": "^4.4.0",
+    "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
   },
   "dependencies": {
     "uiconfig.js": "^0.2.1",
