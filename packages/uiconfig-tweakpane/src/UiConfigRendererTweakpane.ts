@@ -80,6 +80,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     renderUiObject(uiConfig: UiObjectConfig, parent?: FolderApi | TabPageApi) {
         parent = parent ?? this._root
         if (!uiConfig.type) return
+        console.log(`Render ui ${uiConfig.label} in ${parent?.title}`)
         this.methods.initUiConfig(uiConfig)
         if (uiConfig.uiRef && uiConfig.uiRefType !== uiConfig.type) {
             // console.log('Removing UI object because of type mismatch', uiConfig.uiRef)

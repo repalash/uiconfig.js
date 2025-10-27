@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-tweakpane",
   "name:umd": "tpui",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -104,13 +104,14 @@
     "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
   },
   "dependencies": {
-    "uiconfig.js": "^0.2.1",
-    "ts-browser-helpers": "^0.19.3"
+    "uiconfig.js": ">=0.2.1",
+    "ts-browser-helpers": ">=0.19.3"
   },
   "peerDependencies": {
     "@tweakpane/core": "1.1.9",
     "tweakpane": "3.1.10",
-    "@types/three": "^0.152.1"
+    "@types/three": ">=0.152.1",
+    "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
   },
   "peerDependenciesMeta": {
     "@tweakpane/core": {
@@ -120,6 +121,9 @@
       "optional": true
     },
     "@types/three": {
+      "optional": true
+    },
+    "@pangenerator/tweakpane-textarea-plugin": {
       "optional": true
     }
   },

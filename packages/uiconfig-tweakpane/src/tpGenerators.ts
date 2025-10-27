@@ -10,6 +10,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     if (folder?.controller_.viewProps.get('disposed')) folder = undefined
     const lastExpanded = folder?.expanded
     if (!folder) {
+        // console.log(`Adding ${config.label} to ${parent.title}`, parent)
         const folder1 = parent.addFolder({
             title: '',
         })
@@ -34,6 +35,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     // if (childObjects) {
     // const children = childObjects?.map(value => value.uiRef) as BladeApi<BladeController<View>>[]
     let i = 0
+    const newChildren = []
     for (const child of childObjects) { // todo check comparison with uiConfig.uuid
         child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
             plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
@@ -60,32 +62,54 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         }
 
         if (ui) {
+            newChildren.push(ui)
             const moved = tweakPaneMoveToParentIndex(ui, folder, i++)
             if (moved) {
+                // console.log('Moved child', child.label, 'to folder', config.label, 'index', i - 1)
                 // child.uiRefresh?.('postFrame', false)
                 // plugin._refreshUiObject({uiConfig: child}, folder)
                 plugin.renderUiObject(child, folder) // its the same as refresh
             }
         }
     }
-    let ch = folder.children
-    while (ch.length > i) {
-        const rm = ch[ch.length - 1]
-        folder.remove(rm) // todo; remove listeners etc
-        ch = folder.children
-        const child = (rm as any).srcUiConfig as UiObjectConfig
-        if (child) {
-            child.parentOnChange = undefined
-            if (Array.isArray(child.property) &&
-                (child.property === config.property ||
-                    child.property[0] === config &&
+    for (const uichild of [...folder.children]) {
+
+        if (!newChildren.includes(uichild as any)) {
+            folder.remove(uichild)
+            const child = (uichild as any).srcUiConfig as UiObjectConfig
+            if (child) {
+                uichild.dispose()
+                // child.uiRef = undefined
+                child.parentOnChange = undefined
+                if (Array.isArray(child.property) &&
+                    (child.property === config.property ||
+                        child.property[0] === config &&
                         child.property[1] === 'value'
-                )
-            ) delete child.property
-            // todo: remove uiRef here?
+                    )
+                ) delete child.property
+            }
         }
-        // todo: do we need to do disposeUiConfig?
     }
+    // let ch = folder.children
+    // while (ch.length > i) {
+    //     const rm = ch[ch.length - 1]
+    //     folder.remove(rm) // todo; remove listeners etc
+    //     ch = folder.children
+    //     const child = (rm as any).srcUiConfig as UiObjectConfig
+    //     if (child) {
+    //         rm.dispose()
+    //         child.uiRef = undefined
+    //         child.parentOnChange = undefined
+    //         if (Array.isArray(child.property) &&
+    //             (child.property === config.property ||
+    //                 child.property[0] === config &&
+    //                     child.property[1] === 'value'
+    //             )
+    //         ) delete child.property
+    //         // todo: remove uiRef here?
+    //     }
+    //     // todo: do we need to do disposeUiConfig?
+    // }
 
     folder.controller_.props.set('title', plugin.methods.getLabel(config))
 
@@ -234,7 +258,11 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
         // placeholder for text input
         (input?.controller_.valueController.view as TextView<any>).inputElement?.setAttribute('placeholder', getOrCall(config.placeholder) ?? '')
 
-        input.refresh()
+        try {
+            input.refresh()
+        } catch (e) {
+            console.warn(e)
+        }
 
         const domChildren = getOrCall(config.domChildren, [])
         const container = input.controller_.view.element
