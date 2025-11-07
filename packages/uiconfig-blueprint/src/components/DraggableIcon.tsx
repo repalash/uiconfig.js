@@ -1,74 +1,96 @@
 import * as React from "react";
 import {Icon, IconName, MaybeElement} from "@blueprintjs/core";
+import {PointerLockManager} from "../utils/pointerLock";
 
 // todo: bounds and stepsize
+// todo use the old version in safari etc that change the page height on pointer lock
 export class DraggableIcon extends React.Component<{ icon: IconName | MaybeElement, size?: number, value: number, stepSize?: number, small?: boolean, disabled?: boolean, onChange: (v: number, last?: boolean) => void }> {
     private cursor = 'auto'
-    private dragStartOffset = -Infinity
     private dragStartValue = -Infinity
     private lastValue = -Infinity
+    private pointerLockManager: PointerLockManager | null = null
+    private divRef = React.createRef<HTMLDivElement>()
     private removeEvents = () => {
         if (isFinite(this.lastValue) && !this.props.disabled) this.props.onChange(this.lastValue)
         this.lastValue = -Infinity
-        this.dragStartOffset = -Infinity
         this.dragStartValue = -Infinity
-        document.removeEventListener('mousemove', this.mouseMoveEvent)
-        document.removeEventListener('mouseup', this.mouseUpEvent)
+
+        if (this.pointerLockManager) {
+            this.pointerLockManager.releaseLock()
+            this.pointerLockManager = null
+        }
+
         document.documentElement.style.cursor = this.cursor
         // setDragging(false)
     };
-    private mouseUpEvent = (ev: MouseEvent) => {
-        ev.stopPropagation()
-        ev.preventDefault()
-        this.removeEvents()
-    };
-    private mouseMoveEvent = (ev: MouseEvent) => {
-        ev.stopPropagation()
-        ev.preventDefault()
-        if (ev.buttons > 0) {
-            if (isFinite(this.dragStartValue) && isFinite(this.dragStartOffset)) {
-                let stepSize = (this.props.stepSize ?? 1) / 10
-                let curr = ev.clientX;
-                let mm = 100;
-                let off = this.dragStartOffset - curr;
-                // off = Math.min(mm, Math.max(-mm, off));
-                off = off / mm; //-1, 1
-                // off = (off + 1)/2;
-                // off *= (props.max - props.min) / 2
-                off *= ((stepSize) * 100) / 2
-                if (ev.shiftKey) off *= 10
-                if (ev.altKey) off *= 0.1
 
-                let val = this.dragStartValue - off;
-                // val = Math.min(props.max, Math.max(props.min, val)); // todo
-                val = Number(val.toFixed(Math.max(1, -Math.log10(stepSize / 10)))); // clip decimal places depending on step size
-                if(!this.props.disabled) this.props.onChange(val, false)
-                this.lastValue = val;
-            }
-        } else {
-            this.removeEvents()
-            // setDragging(false)
+    private handlePointerMove = (movementX: number, _movementY: number, _cursorX: number, _cursorY: number) => {
+        if (isFinite(this.dragStartValue)) {
+            let stepSize = (this.props.stepSize ?? 1) / 10
+
+            // Use movementX for horizontal dragging
+            let off = -movementX; // Negative because we want right movement to increase value
+
+            // Scale the movement
+            off *= stepSize;
+
+            // Apply modifiers - these need to be checked differently in pointer lock
+            // We'll accumulate the offset instead
+            if (!this.accumulatedOffset) this.accumulatedOffset = 0;
+            this.accumulatedOffset += off;
+
+            let val = this.dragStartValue + this.accumulatedOffset;
+            // val = Math.min(props.max, Math.max(props.min, val)); // todo
+            val = Number(val.toFixed(Math.max(1, -Math.log10(stepSize / 10)))); // clip decimal places depending on step size
+
+            if(!this.props.disabled) this.props.onChange(val, false)
+            this.lastValue = val;
         }
     };
+
+    private accumulatedOffset = 0;
 
     render() {
         // const [dragging, setDragging] = React.useState(false)
 
         return (
-            <div style={{cursor: !this.props.disabled ? 'ew-resize': 'auto', marginLeft: "6px", marginRight: "6px", marginTop: this.props.small ? "3px" : "6px", marginBottom: this.props.small ? "3px" : "6px"}}
-                 onMouseDown={(ev) => {
-                     // if(dragging) return
-                     if(this.props.disabled) return
-                     this.dragStartOffset = ev.clientX
-                     this.dragStartValue = this.props.value
-                     ev.stopPropagation()
-                     ev.preventDefault()
-                     this.cursor = document.documentElement.style.cursor
-                     document.documentElement.style.cursor = "ew-resize"
-                     document.addEventListener('mousemove', this.mouseMoveEvent)
-                     document.addEventListener('mouseup', this.mouseUpEvent)
-                     // setDragging(true)
-                 }}
+            <div
+                ref={this.divRef}
+                style={{cursor: !this.props.disabled ? 'ew-resize': 'auto', marginLeft: "6px", marginRight: "6px", marginTop: this.props.small ? "3px" : "6px", marginBottom: this.props.small ? "3px" : "6px"}}
+                onMouseDown={(ev) => {
+                    // if(dragging) return
+                    if(this.props.disabled) return
+                    if (!this.divRef.current) return;
+
+                    this.dragStartValue = this.props.value
+                    this.accumulatedOffset = 0
+
+                    this.cursor = document.documentElement.style.cursor
+                    document.documentElement.style.cursor = "none"
+
+                    // Create pointer lock manager
+                    this.pointerLockManager = new PointerLockManager(this.divRef.current, {
+                        onMove: this.handlePointerMove,
+                        onLockChange: (locked) => {
+                            if (!locked) {
+                                this.removeEvents();
+                            }
+                        }
+                    });
+
+                    this.pointerLockManager.requestLock(ev.clientX, ev.clientY);
+                    ev.stopPropagation()
+                    ev.preventDefault()
+
+                    // Add mouseup listener to release lock
+                    const handleMouseUp = () => {
+                        this.removeEvents();
+                        document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    document.addEventListener('mouseup', handleMouseUp);
+
+                    // setDragging(true)
+                }}
             >
                 <Icon icon={this.props.icon} size={this.props.size} aria-disabled={this.props.disabled} />
             </div>
