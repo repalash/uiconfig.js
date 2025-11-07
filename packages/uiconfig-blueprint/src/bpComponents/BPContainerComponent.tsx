@@ -8,7 +8,7 @@ export type BPContainerComponentState = BPLabelledComponentState & {
     children: UiObjectConfig[]
     expanded: boolean
 }
-export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState> extends BPLabelledComponent<void, TState, BPComponentProps<void> & PanelActions> {
+export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState, TProps={}> extends BPLabelledComponent<void, TState, BPComponentProps<void> & PanelActions & TProps> {
 
     protected _childParentOnChange: UiObjectConfig['parentOnChange'] = (ev, ...args) => {
         // console.warn('child change', ev, this.props.config)
@@ -38,7 +38,7 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
         ) delete child.property
     }
 
-    constructor(props: BPComponentProps<void> & PanelActions, context: UiConfigRendererContextType, state: TState) {
+    constructor(props: BPComponentProps<void> & PanelActions & TProps, context: UiConfigRendererContextType, state: TState) {
         super(props, context, state);
     }
 

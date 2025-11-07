@@ -1,24 +1,27 @@
-import {FileComponent} from "../components/FileComponent";
+import {FileComponent, FileComponentProps} from "../components/FileComponent";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";
 import {FormGroupComponent} from "../components/FormGroupComponent";
 
 type StateValue = string | File | null
 type FileImportType = any
-export type BPFileComponentState = BPValueComponentState<StateValue> & {
-    mode: 'url'|'file',
+export type BPFileComponentState<TSV=never> = BPValueComponentState<TSV|StateValue> & {
+    mode: 'url'|'file'|'asset',
     preview?: string,
 }
 
-type BPFileComponentExtras = {fileLoader?: {load: (v: string|File|{path: string, file: File|Blob})=>Promise<FileImportType>}}
-type BPFileComponentContextType = UiConfigRendererContextType & BPFileComponentExtras
+type BPFileComponentProps<TSV=never> = {
+    fileLoader?: {load: (v: string|File|{path: string, file: File|Blob})=>Promise<FileImportType>},
+    AssetPicker?: FileComponentProps<TSV>['AssetPicker']
+}
+type BPFileComponentContextType<TSV=never> = UiConfigRendererContextType & BPFileComponentProps<TSV>
 
 // todo make this abstract?
 // @ts-ignore
-export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> extends BPValueComponent<T | null, BPFileComponentState, StateValue> {
-    declare context: BPFileComponentContextType
-    declare props: BPComponentProps<T | null> & BPFileComponentExtras & TP
-    constructor(props: BPComponentProps<T | null> & BPFileComponentExtras & TP, context: BPFileComponentContextType) {
+export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}, TSV = never> extends BPValueComponent<T | null, BPFileComponentState<TSV>, TSV|StateValue> {
+    declare context: BPFileComponentContextType<TSV>
+    declare props: BPComponentProps<T | null> & BPFileComponentProps<TSV> & TP
+    constructor(props: BPComponentProps<T | null> & BPFileComponentProps<TSV> & TP, context: BPFileComponentContextType<TSV>) {
         super(props, context, {
             mode: 'url',
             value: null,
@@ -28,7 +31,7 @@ export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> e
     }
 
     // reimplemented in subclass
-    convertValueToState(_val: T | null, _state: BPFileComponentState): BPFileComponentState {
+    convertValueToState(_val: T | null, _state: BPFileComponentState<TSV>): BPFileComponentState<TSV> {
         throw new Error('Not Implemented')
         // let mode: BPFileComponentState['mode'] = state.mode
         // let value = state.value
@@ -46,19 +49,19 @@ export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> e
         // return {...state, mode, value}
     }
 
-    async convertStateToValue(state: BPFileComponentState): Promise<T|null> {
+    async convertStateToValue(state: BPFileComponentState<TSV>): Promise<T|null> {
         const value = state.value
+        if(!value) return null
         let val: any
         const last = this.context.methods.getRawValue(this.props.config as any) ?? null
         const lastState = this.convertValueToState(last as any, {...this.state, value: null})
-        if (value === null) {
-            val = null
-        } else if (typeof value === 'string') {
+        if (typeof value === 'string') {
             val = value === lastState.value ? last : await (this.context.fileLoader ?? this.props.fileLoader)!.load(value);
-        } else {
+        } else if(typeof (value as File).arrayBuffer === 'function'){
+            const file = (value as File)
             // todo handle blob with no name
-            val = value === lastState.value ? last : await (this.context.fileLoader ?? this.props.fileLoader)!.load({path: value.name || 'file', file: value});
-        }
+            val = file === lastState.value ? last : await (this.context.fileLoader ?? this.props.fileLoader)!.load({path: file.name || 'file', file: file});
+        }else val = value
         // console.log(val)
         return val;
     }
@@ -91,9 +94,15 @@ export class BPFileComponent<T extends FileImportType=FileImportType, TP = {}> e
                 disabled={this.state.disabled}
                 flexBasis={this.state.baseWidth ?? this.flexBasis}
             >
-                <FileComponent previewSlot={this.renderPreviewSlot()} state={this.state} onChange={(s) =>
-                    this.updateStateValue({...this.state, preview: undefined, ...s}) // todo: set loading while this promise is happening.
-                } key={this.props.config.uuid}/>
+                <FileComponent<TSV>
+                    previewSlot={this.renderPreviewSlot()}
+                    state={this.state} // ignore ts f
+                    onChange={(s) =>
+                        this.updateStateValue({...this.state, preview: undefined, ...s}) // todo: set loading while this promise is happening.
+                    }
+                    key={this.props.config.uuid}
+                    AssetPicker={this.props.AssetPicker ?? this.context.AssetPicker} // todo which one first?
+                />
             </FormGroupComponent>
         ) : null
     }

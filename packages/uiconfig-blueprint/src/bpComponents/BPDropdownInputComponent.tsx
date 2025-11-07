@@ -42,8 +42,9 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
     getUpdatedState(state: BPDropdownComponentState): BPDropdownComponentState {
         const children = this.context.methods.getChildren(this.props.config)
         const options: DropdownItem[] = children.map((value, i) => {
-            const label = cleanLabel(this.context.methods.getLabel(value)) || `Option ${i}`
-            return {label, value: value!.value ?? label}
+            let label1 = this.context.methods.getLabel(value)
+            const label = cleanLabel(label1) || `Option ${i}`
+            return {label, value: value!.value ?? label1}
         })
 
         // const selected = options.find(o=>o.value===val)||options[0]
@@ -78,7 +79,7 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
                 itemRenderer={renderDropdownItem}
             >
                 {/* children become the popover target; render value here */}
-                <Button rightIcon="double-caret-vertical" small={true}
+                <Button endIcon="double-caret-vertical" size={"small"}
                         style={{whiteSpace: 'nowrap', textOverflow: "ellipsis", height: "100%"}}>{item.label}</Button>
             </Select>
         )

@@ -27,7 +27,6 @@ import {
     ControlGroup,
     DISPLAYNAME_PREFIX,
     type HTMLInputProps,
-    InputGroup,
     Intent,
     Position,
     refHandler,
@@ -46,6 +45,7 @@ import {
     sanitizeNumericInput,
     toLocaleString,
 } from "@blueprintjs/core/src/components/forms/numericInputUtils";
+import {InputGroup2} from "../bpComponents/InputGroup2";
 
 export interface NumericInputProps extends InputSharedProps {
     /**
@@ -439,8 +439,8 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
         const valueAsNumber = this.getCurrentValueAsNumber();
 
         return (
-            <InputGroup
-                asyncControl={this.props.asyncControl}
+            <InputGroup2
+                // asyncControl={this.props.asyncControl}
                 autoComplete="off"
                 id={this.numericInputId}
                 role={this.props.allowNumericCharactersOnly ? "spinbutton" : undefined}
@@ -451,7 +451,6 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
                 intent={this.state.currentImeInputInvalid ? Intent.DANGER : this.props.intent}
                 inputClassName={this.props.inputClassName}
                 inputRef={this.inputRef}
-                large={this.props.large}
                 leftElement={this.props.leftElement}
                 leftIcon={this.props.leftIcon}
                 onFocus={this.handleInputFocus}
@@ -463,7 +462,7 @@ export class NumericInput extends AbstractPureComponent<HTMLInputProps & Numeric
                 onPaste={this.handleInputPaste}
                 onValueChange={this.handleInputChange}
                 rightElement={this.props.rightElement}
-                small={this.props.small}
+                size={this.props.small ? "small" : this.props.large ? "large" : "medium"}
                 value={this.state.value}
             />
         );

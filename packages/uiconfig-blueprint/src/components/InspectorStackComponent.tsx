@@ -2,12 +2,14 @@ import React from "react";
 import {Card, Panel, PanelStack2} from "@blueprintjs/core";
 import {ConfigObject, ConfigProps} from "../ConfigObject";
 import {UiObjectConfig} from 'uiconfig.js'
-import {UiConfigRendererContext} from '../bpComponents/BPComponent'
+import {UiConfigRendererBaseBp, UiConfigRendererContext} from '../bpComponents/BPComponent'
+import {getOrCall, ValOrFunc} from "ts-browser-helpers";
 
 // import {ViewerAppContext} from "./ViewerAppComponent";
 
-export function InspectorStackComponent({config, className}: { config: UiObjectConfig<any, 'panel'>, className?: string }) {
-    const renderer = React.useContext(UiConfigRendererContext)
+export function useConfigToStackItem(config: UiObjectConfig<any, 'panel'>, renderer?: UiConfigRendererBaseBp){
+    renderer = renderer ?? React.useContext(UiConfigRendererContext)
+    if(!renderer) throw new Error('No renderer provided or found in context')
     const stackItem = React.useCallback(() => {
         return {
             props: {config: config},
@@ -20,13 +22,24 @@ export function InspectorStackComponent({config, className}: { config: UiObjectC
                     </ul>
                 )
             },
-            title: renderer.methods.getLabel(config)
+            title: renderer!.methods.getLabel(config)
         } as Panel<{ config: UiObjectConfig }>
     }, [config])
-    const [currentPanelStack, setCurrentPanelStack] = React.useState<Array<Panel<{ config: UiObjectConfig }>>>([stackItem()]);
+    return stackItem
+}
+export type InspectorStackItem = ValOrFunc<Panel<{ config: UiObjectConfig }>>
+function getStackItem(i: InspectorStackItem){
+    const r = getOrCall(i)
+    return r?[r] : []
+}
+export function InspectorStackComponent({stackItem, className}: {
+    stackItem: InspectorStackItem,
+    className?: string
+}) {
+    const [currentPanelStack, setCurrentPanelStack] = React.useState<Array<Panel<{ config: UiObjectConfig }>>>(getStackItem(stackItem));
     React.useEffect(() => {
-        // console.warn('change', config)
-        setCurrentPanelStack([stackItem()])
+        // console.warn('change', stackItem)
+        setCurrentPanelStack(getStackItem(stackItem))
     }, [setCurrentPanelStack, stackItem])
 
     return (

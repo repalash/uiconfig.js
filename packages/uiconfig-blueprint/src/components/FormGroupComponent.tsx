@@ -1,17 +1,21 @@
 import {FormGroup} from "@blueprintjs/core";
-import {PropsWithChildren} from "react";
+import {CSSProperties, PropsWithChildren, ReactNode} from "react";
 
-export function FormGroupComponent(props: PropsWithChildren<{ label: string, flexBasis?: string, disabled?: boolean }>) {
+export function FormGroupComponent(props: PropsWithChildren<{
+    label: string|ReactNode, flexBasis?: string, disabled?: boolean,
+    style?: CSSProperties
+}>) {
     return (
         <FormGroup className="xPaddedContent folderContent" contentClassName="formGroupContent"
                    style={{
                        justifyContent: "space-between",
                        marginTop: "2px",
                        marginBottom: "2px",
-                       flexBasis: props.flexBasis ?? "50%"
+                       flexBasis: props.flexBasis ?? "50%",
+                       ...props.style,
                    }}
             // helperText="Helper text with details..."
-                   label={(<span title={props.label}>{props.label}</span>)}
+                   label={typeof props.label !== 'string' ? props.label : (<span title={props.label}>{props.label}</span>)}
                    inline={true}
                    disabled={props.disabled}
             // labelInfo="(required)"

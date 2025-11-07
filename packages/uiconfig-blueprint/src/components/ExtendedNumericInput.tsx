@@ -105,14 +105,14 @@ export class ExtendedNumericInput extends React.PureComponent<Props, IExtendedNu
                         draggableIcon !== false ? <DraggableIcon icon={leftIcon ?? "variable"}
                                    size={16}
                                    disabled={props2.readOnly}
-                                   small={props2.small}
+                                   small={props2.small || props2.size as any === 'small'}
                                    value={parseFloat(value ?? '0')}
                                    stepSize={props2.stepSize}
                                    onChange={(v, last) => {
                                        this.handleValueChange(v, v.toString(), null, last, true)
                                    }}/> : undefined
                 )}
-                // leftIcon={"variable"}
+                // leftIcon={draggableIcon ? undefined : leftIcon}
                 buttonPosition={props2.buttonPosition ?? (props2.disabled ? "none" : "right")}
                 allowNumericCharactersOnly={false}
                 clampValueOnBlur={true}

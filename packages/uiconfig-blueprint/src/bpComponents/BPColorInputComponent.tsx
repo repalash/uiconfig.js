@@ -1,11 +1,12 @@
 import {createRef} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import {Button, Icon, InputGroup, Popover} from "@blueprintjs/core";
+import {Button, Icon, Popover} from "@blueprintjs/core";
 import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";
 import {HexColorPicker} from "react-colorful";
 import {FormGroupComponent} from "../components/FormGroupComponent";
 import {getOrCall} from 'ts-browser-helpers'
 import type {Color, ColorRepresentation} from "three"
+import {InputGroup2} from "../lib";
 
 export type BPColorComponentState = BPValueComponentState<string> & {
     mode: 'number' | 'string' | 'Color', lastValue?: ColorRepresentation,
@@ -89,10 +90,17 @@ export class BPColorInputComponent extends BPValueComponent<ColorRepresentation,
         document.removeEventListener('mouseup', this._mouseMove)
         if (!this._hasMouseUp) return
         this._hasMouseUp = false
-        this.setValue(this._inputRef.current!.value, true)
+        if(this._inputRef.current) {
+            this.setValue(this._inputRef.current.value, true)
+        }
 
         if (this._hasMouseUp) return
         document.addEventListener('mouseup', this._mouseUp)
+    }
+    async refreshConfigState(state?: BPColorComponentState): Promise<void> {
+        await super.refreshConfigState(state);
+        if(this._inputRef.current)
+            this._inputRef.current.value = this.state.value
     }
 
     protected flexBasis = "100%"
@@ -103,9 +111,10 @@ export class BPColorInputComponent extends BPValueComponent<ColorRepresentation,
                 label={this.state.label}
                 flexBasis={this.state.baseWidth ?? this.flexBasis}
             >
-                <InputGroup inputRef={this._inputRef}
+                <InputGroup2 inputRef={this._inputRef}
                             disabled={this.state.disabled} readOnly={this.state.readOnly}
                             fill={true}
+                            // leftElementWidth={"calc(3 * var(--pt-grid-size))"}
                             leftElement={(
                     <Popover
                         popoverClassName={'color-picker-popover'}
@@ -130,7 +139,7 @@ export class BPColorInputComponent extends BPValueComponent<ColorRepresentation,
                     <Button
                         disabled={this.state.disabled || this.state.readOnly}
                         icon={<Icon icon="full-circle" color={this.state.value}/>}
-                        text="" minimal
+                        text="" variant={"minimal"}
                     />
                 </Popover>
             )} key={this.props.config.uuid} defaultValue={this.state.value} onChange={(e) => {

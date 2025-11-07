@@ -1,11 +1,20 @@
-import {ChangeEventHandler} from "react";
+import React, {ChangeEventHandler} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import {InputGroup} from "@blueprintjs/core";
+import {InputGroup, TextArea} from "@blueprintjs/core";
 import {BPInputComponent} from "./BPInputComponent";
+import {BPValueComponentState} from "./BPValueComponent";
 
 export class BPTextInputComponent extends BPInputComponent<string> {
     constructor(props: BPComponentProps<string>, context: UiConfigRendererContextType) {
         super(props, context, {value: '', label: 'Input'});
+    }
+
+    private _inputRef = React.createRef<HTMLInputElement|HTMLTextAreaElement>()
+
+    async refreshConfigState(state?: BPValueComponentState<string>): Promise<void> {
+        await super.refreshConfigState(state);
+        if (this._inputRef.current)
+            this._inputRef.current.value = this.state.value
     }
 
     private _onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -13,10 +22,29 @@ export class BPTextInputComponent extends BPInputComponent<string> {
     }
 
     renderInput() {
+        const config = this.props.config as any;
+        const isMultiline = config.multiline === true;
+
+        if (isMultiline) {
+            return (
+                <TextArea
+                    defaultValue={this.state.value}
+                    inputRef={this._inputRef as any}
+                    disabled={this.state.disabled}
+                    readOnly={this.state.readOnly}
+                    key={this.props.config.uuid}
+                    fill={true}
+                    rows={config.rows}
+                    cols={config.cols}
+                    autoResize={config.autoResize}
+                    onChange={this._onChange as any}/>
+            )
+        }
+
         return (
             <InputGroup
-                // defaultValue={this.state.value} // for uncontrolled usage, we will also need ref and set ref.value on change: https://reactjs.org/docs/uncontrolled-components.html
-                value={this.state.value}
+                defaultValue={this.state.value}
+                inputRef={this._inputRef as any}
                 disabled={this.state.disabled}
                 readOnly={this.state.readOnly}
                 key={this.props.config.uuid}

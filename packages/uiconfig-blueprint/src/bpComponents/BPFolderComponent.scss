@@ -47,9 +47,11 @@
 //}
 
 
-.folder-trigger-button {
+.folder-trigger-text {
   font-size: 12px !important;
   font-weight: 550 !important;
+}
+.folder-trigger-button {
 
   margin-top: 1px;
   display: flex;
@@ -102,8 +104,8 @@
     //margin-right: $pt-grid-size;
     margin-right: 6px;
     //margin-left: $pt-grid-size;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     min-height: 36px;
   }
 }
@@ -115,6 +117,12 @@
   flex-direction: row;
   //box-shadow: 0 1px $pt-divider-black;
   //z-index: 1;
+
+  > .folder-trigger-button {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-height: 36px;
+  }
 
   > button {
     border-radius: 0;
@@ -131,7 +139,4 @@
     font-size: var(--pt-font-size-small);
   }
 
-  .bp5-button{
-    font-size: var(--pt-font-size-small);
-  }
 }

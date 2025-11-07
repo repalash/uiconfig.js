@@ -66,7 +66,7 @@ export class UiConfigRendererBlueprint extends UiConfigRenderer {
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig): void {
-        (config.uiRef as BPComponent<any, any>).refreshConfigState()
+        (config.uiRef as BPComponent<any, any>)?.refreshConfigState()
     }
 
     renderUiConfig(_: UiObjectConfig): void {

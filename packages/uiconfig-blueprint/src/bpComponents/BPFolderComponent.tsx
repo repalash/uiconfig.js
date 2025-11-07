@@ -1,9 +1,18 @@
 import React, {ChangeEventHandler, DOMAttributes} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
-import {Button, Checkbox, Collapse, Icon, Intent} from "@blueprintjs/core";
+import {
+    Button,
+    Checkbox,
+    Collapse,
+    Divider,
+    Icon,
+    IconName,
+    Intent,
+    MaybeElement, Menu, MenuItem, Popover
+} from "@blueprintjs/core";
 import {ConfigObject} from "../ConfigObject";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
-import {safeSetProperty} from 'ts-browser-helpers'
+import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
 import {BPContainerComponent, BPContainerComponentState} from './BPContainerComponent'
 import classNames from "classnames";
 import {Classes} from "@blueprintjs/core/src/common";
@@ -12,41 +21,79 @@ import {AnimationStates} from "@blueprintjs/core/lib/esm/components/collapse/col
 export type BPFolderComponentState = BPContainerComponentState & {
 }
 
-export class BPFolderComponent extends BPContainerComponent<BPFolderComponentState> {
-    constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
+export type BPFolderComponentProps = {
+    icon?: IconName | MaybeElement
+}
+
+
+export class BPFolderComponent extends BPContainerComponent<BPFolderComponentState, BPFolderComponentProps> {
+    constructor(props: BPComponentProps<void>&PanelActions&BPFolderComponentProps, context: UiConfigRendererContextType) {
         super(props, context, {children: [], expanded: false, label: 'Folder'});
     }
 
     render() {
+        const {
+            icon,
+            config,
+            level,
+            ...props
+        } = this.props
+
         const setExpanded = (e: boolean) => {
             if (e === this.state.expanded) return
             this.setState({...this.state, expanded: e})
-            safeSetProperty(this.props.config, "expanded", e, true)
+            safeSetProperty(config, "expanded", e, true)
             // if (e) this.state.children.forEach(c => Array.isArray(c) ? null : c.uiRefresh?.("postFrame", true, 1)) // todo: handle array and functions
         }
-        const children = this.state.children
+        let children = this.state.children
         const enabledToggle = children[0] && this.context.methods.getBinding(children[0])[1] === 'enabled' ? children[0] : undefined
-        enabledToggle && (enabledToggle.hidden = true)
+        if(enabledToggle) children = children.slice(1)
+
+        const ctxMenuBtns = children.filter(c=>{
+            return c.type === 'button' && c.tags?.includes('context-menu')
+        })
+        let endIcon: MaybeElement = undefined
+        if(ctxMenuBtns.length > 0){
+            children = children.filter(c=>!ctxMenuBtns.includes(c))
+            endIcon = (
+                <Popover
+                    content={<ContextMenu buttons={ctxMenuBtns} context={this.context} />}
+                    placement="bottom-end"
+                >
+                    <Button
+                        icon="more"
+                        variant={"minimal"}
+                        size={"small"}
+                    />
+                </Popover>
+            )
+        }
+
         return !this.state.hidden ? (
             <FolderHeadCard
-                key={this.props.config.uuid}
+                key={config.uuid}
                 open={this.state.expanded}
                 disabled={this.state.disabled}
-                level={this.props.level ?? 0}
-                minimal={(this.props.level ?? 0) > 0}
+                level={level ?? 0}
+                minimal={(level ?? 0) > 0}
                 onClick={() => {
                     if(this.state.readOnly) return
                     setExpanded(!this.state.expanded)
                 }}
+                icon={icon}
+                endIcon={endIcon}
                 label={this.state.label}
                 enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                 onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
             >
                 <Collapse2 isOpen={this.state.expanded} keepChildrenMounted={true} transitionDuration={300}>
-                    <div className="folder-children" style={{listStyleType: "none", paddingLeft: this.props.level??0 > 2 ? "6px" : 0}}> {/*todo use parameter instead of const 6*/}
+                    <div className="folder-children" style={{
+                        listStyleType: "none",
+                        paddingLeft: level??0 > 2 ? "6px" : 0}
+                    }> {/*todo use parameter instead of const 6*/}
                         {children.map((c, i) =>
-                            <ConfigObject key={'c' + i} {...this.props} config={c}
-                                          level={(this.props.level ?? 0) + 1}/>
+                            <ConfigObject key={'c' + i} {...props} config={c}
+                                          level={(level ?? 0) + 1}/>
                         )}
                     </div>
                 </Collapse2>
@@ -55,7 +102,15 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
     }
 }
 
-export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, label: string, minimal: boolean, level: number, disabled?: boolean, enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>, onClick: DOMAttributes<HTMLElement>['onClick'] }>> = (props) => {
+export const FolderHeadCard: React.FC<React.PropsWithChildren<{
+    open: boolean, label: string,
+    minimal: boolean, level: number,
+    disabled?: boolean,
+    enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>,
+    onClick: DOMAttributes<HTMLElement>['onClick']
+    icon?: IconName | MaybeElement
+    endIcon?: IconName | MaybeElement
+}>> = (props) => {
     const hasEnabled = (props.enabled !== undefined)
     return (
         <div
@@ -63,7 +118,13 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
             className="folder-card"
             // elevation={props.open ? 3 : undefined}
         >
-            <div className={props.minimal ? 'folder-head-card-minimal' : 'folder-head-card'}>
+            {props.level === 0 &&
+            <Divider style={{margin: 0}}/>
+            }
+            <div className={props.minimal ? 'folder-head-card-minimal' : 'folder-head-card'} style={{
+                paddingTop: props.level > 0 ? "unset" : undefined,
+                paddingBottom: props.level > 0 ? "unset" : undefined,
+            }}>
                 {/*<H6 className="folder-head-label"*/}
                 {/*    onClick={props.onClick}>{props.label}</H6>*/}
                 {/*<Icon icon="chevron-right" style={{*/}
@@ -71,9 +132,9 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                 {/*    transition: "rotate 0.25s ease-in-out"*/}
                 {/*}} className="folder-head-label-icon"/>*/}
 
-                {/*<Button className="folder-trigger-button" onClick={props.onClick}*/}
-                {/*        fill={true} minimal={true}*/}
-                {/*        rightIcon={(*/}
+                {/*<Button className="folder-trigger-button folder-trigger-text" onClick={props.onClick}*/}
+                {/*        fill={true} variant={"minimal"}*/}
+                {/*        endIcon={(*/}
                 {/*            <Icon icon="chevron-right" style={{*/}
                 {/*                rotate: props.open ? "90deg" : "0deg",*/}
                 {/*                transition: "rotate 0.25s ease-in-out"*/}
@@ -82,18 +143,18 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                 {/*</Button>*/}
 
                 <Button
-                    className={"folder-trigger-button " + (props.open ? "folder-trigger-button-expanded" : "")}
+                    className={"folder-trigger-button folder-trigger-text " + (props.open ? "folder-trigger-button-expanded" : "")}
                     // fill={!props.minimal}
                     fill={true}
                     onClick={props.onClick}
-                    minimal={true}
+                    variant={"minimal"}
                     disabled={props.disabled}
-                    small={props.minimal}
+                    size={props.minimal?"small":"medium"}
                     style={props.level ? {marginLeft: "6px"} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
                     // intent={props.open ? Intent.PRIMARY : Intent.NONE}
                     intent={Intent.NONE}
                     // icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
-                    icon={(
+                    icon={props.icon ?? (
                         <>
                             <Icon icon="caret-right" style={{
                                 rotate: props.open ? "90deg" : "0deg",
@@ -105,12 +166,15 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{ open: boolean, l
                 </Button>
                 {hasEnabled && <Checkbox
                     style={{margin: 0, position: 'absolute', left: '10px'}}
-                    large inline
+                    inline size={"large"}
                     defaultChecked={props.enabled}
                     onChange={props.onEnabledChange}
                     disabled={props.disabled}
                     onClick={(e) => e.stopPropagation()}
                 />}
+                {props.endIcon && <div style={{position: 'absolute', right: '10px'}}>
+                    {props.endIcon}
+                </div>}
             </div>
             {props.children}
         </div>
@@ -180,3 +244,27 @@ export class Collapse2 extends Collapse{
     }
 
 }
+
+export const ContextMenu: React.FC<{
+    buttons: any[];
+    context: UiConfigRendererContextType;
+}> = ({ buttons, context }) => {
+    return (
+        <Menu>
+            {buttons.map((btn, i) => {
+                const hidden = getOrCall(btn.hidden) ?? false;
+                return hidden ? null : (
+                    <MenuItem
+                        key={'ctx' + i}
+                        text={context.methods.getLabel(btn)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // todo loading state for promise
+                            context.methods.clickButton(btn, { args: [e] });
+                        }}
+                    />
+                );
+            })}
+        </Menu>
+    );
+};

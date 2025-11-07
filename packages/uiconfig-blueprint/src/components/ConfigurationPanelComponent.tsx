@@ -21,10 +21,10 @@ export function ConfigurationPanelComponent({config}: { config: UiObjectConfig<a
             renderPanel(props: ConfigProps) {
                 // console.log(props.config === config)
                 return (
-                    <ul style={{listStyleType: "none", paddingLeft: "0", margin: "0"}}>
+                    <div style={{listStyleType: "none", paddingLeft: "0", margin: "0"}}>
                         {/*{v && (<ConfigObject {...props}/>)}*/}
                         {config && (<ConfigObject {...props} isPanel={true}/>)}
-                    </ul>
+                    </div>
                 )
             },
             title: renderer.methods.getLabel(config)

@@ -117,14 +117,14 @@
   --background-color-transition-time: 0.2s;
   --background-color-transition: background-color var(--background-color-transition-time) ease-in-out;
 }
-.bp5-panel-stack-view {
+.bp5-panel-stack2-view {
   background-color: $light-gray4 !important;
   transition: var(--background-color-transition);
 }
 
 .bp5-dark{
-  .bp5-panel-stack-view {
-    background-color: $dark-gray2 !important;
+  .bp5-panel-stack2-view {
+    background-color: $dark-gray1 !important;
   }
 }
 
@@ -232,10 +232,6 @@
   }
 }
 
-.bp5-panel-stack2-view{
-  background: transparent;
-}
-
 .bp5-slider-handle{
   border-radius: 100%;
 }
@@ -264,4 +260,20 @@
   //background-color: hsla(var(--pt-intent-primary-hsl), 0.7) !important;
   background-color: hsla(var(--pt-intent-primary-hsl), 1) !important;
   //backdrop-filter: blur(4px);
+}
+
+.bp5-button.bp5-small {
+  .bp5-button-text{
+    font-size: $pt-font-size-small;
+    padding: calc($pt-grid-size * 0.5) 0 calc($pt-grid-size * 0.5) 0;
+  }
+  .bp5-icon > svg{
+    width: $pt-font-size;
+    height: $pt-font-size;
+  }
+}
+
+// todo not sure why its required again, its also in blueprint...
+.bp5-dark .bp5-divider{
+  border-color:rgba(255, 255, 255, 0.2);
 }

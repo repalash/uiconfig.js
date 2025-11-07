@@ -29,6 +29,7 @@ export abstract class BPInputComponent<
             <FormGroupComponent disabled={this.state.disabled}
                                 label={this.state.label}
                                 flexBasis={this.state.baseWidth ?? this.flexBasis}
+                                key={this.props.config.uuid}
             >
                 {this.renderInput()}
             </FormGroupComponent>

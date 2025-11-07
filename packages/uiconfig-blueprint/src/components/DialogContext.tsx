@@ -20,12 +20,12 @@ export const defaultDialogContext = {
 export function setupDialog(){
     const [dialog, setDialog] = useState<DialogStateType>(defaultDialogContext)
     const open = useCallback((d: Partial<DialogStateType>)=>{
-        setDialog({...dialog, isOpen: true, ...d})
-    }, [dialog, setDialog])
-    const close = useCallback(()=>setDialog({...dialog, isOpen: false}), [dialog, setDialog])
+        setDialog((d1)=>({...d1, ...d, isOpen: true}))
+    }, [])
+    const close = useCallback(()=>setDialog((d1)=>({...d1, isOpen: false})), [])
     const setDialogState = useCallback((state: any)=>{
-        setDialog({...dialog, state})
-    }, [dialog, setDialog])
+        setDialog((d1)=>({...d1, state}))
+    }, [])
     return {dialog, open, close, setDialog, state: dialog.state, setState: setDialogState}
 }
 export const DialogContext = createContext<{
@@ -62,13 +62,13 @@ interface DialogPromptState {
     value: string,
     intent: Intent,
     helperText: string,
+    key: string,
 }
-interface DialogPromptProps extends Partial<DialogStateType>{
+interface DialogPromptProps extends Partial<DialogStateType>, Partial<DialogPromptState>{
     closeButtonText?: string,
     submitButtonText?: string,
     message?: string,
     placeholder?: string,
-    value?: string,
     showInput?: boolean,
     onClose?: (value: string)=>boolean|undefined|Promise<boolean|undefined>, // does not close if false
     onSubmit?: (value: string)=>boolean|undefined|any|Promise<boolean|undefined|any>, // does not close if false
@@ -99,15 +99,17 @@ export function useDialogPrompt(){
         value = '',
         showInput = true,
         onClose, onSubmit,
+        helperText = '',
+        intent = Intent.NONE,
         ...props}: DialogPromptProps) => {
         return new Promise<string|null>((resolve)=>{
             open({
                 canClose: false,
-                ...props,
                 state: {
                     value,
-                    intent: Intent.NONE,
-                    helperText: '',
+                    intent,
+                    helperText,
+                    key: Math.random().toString(36).slice(2, 10),
                 } as DialogPromptState,
                 content: (
                     <DialogPromptContent message={message} showInput={showInput} placeholder={placeholder}/>
@@ -115,10 +117,11 @@ export function useDialogPrompt(){
                 actions: (
                     <DialogPromptButtons closeButtonText={closeButtonText} submitButtonText={submitButtonText} onClose={onClose} onSubmit={onSubmit} resolve={resolve}/>
                 ),
+                ...props,
             })
         })
     }, [open, close])
-    return {prompt, close}
+    return {prompt, close, open}
 }
 
 function DialogPromptButtons({
@@ -192,6 +195,7 @@ function DialogPromptContent({
         labelFor="dialog-prompt-text-input"
     >
         <InputGroup
+            key={state.key}
             intent={state.intent}
             id="dialog-prompt-text-input"
             placeholder={placeholder}

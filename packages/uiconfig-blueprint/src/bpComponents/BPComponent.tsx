@@ -1,12 +1,13 @@
 import React, {createContext} from "react";
 import type {UiConfigRendererBase} from 'uiconfig.js'
 import {UiObjectConfig} from 'uiconfig.js'
-import {getOrCall} from 'ts-browser-helpers'
+import {getOrCall, ValOrFunc} from 'ts-browser-helpers'
 import {THREE} from "../threejs";
 
 export type BPComponentProps<T> = {
     config: UiObjectConfig<T>,
     level?: number
+    disabled?: ValOrFunc<boolean> // todo add to uiconfig-react as well
 }
 export type BPComponentState = {
     hidden?: boolean
@@ -48,7 +49,7 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
      */
     getUpdatedState(state: TState): TState{
         const hidden = getOrCall(this.props.config.hidden) ?? false
-        const disabled = getOrCall(this.props.config.disabled) ?? false
+        const disabled = getOrCall(this.props.disabled ?? this.props.config.disabled) ?? false
         const readOnly = getOrCall(this.props.config.readOnly) ?? false
         const baseWidth = getOrCall(this.props.config.baseWidth) ?? undefined
         if(hidden !== state.hidden
@@ -93,7 +94,6 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
         super.componentDidMount?.();
         this.props.config.uiRef = this
         this.props.config.uiRefresh = (deep = false, mode = 'postFrame', delay = 0) => {
-            // console.log('refresh', this.props.config.label, this.props.config.type)
             this.context.addToRefreshQueue(mode, this.props.config, deep, delay)
         }
         // console.log('mount', this.props.config.label, this.props.config.type, this.props.config)

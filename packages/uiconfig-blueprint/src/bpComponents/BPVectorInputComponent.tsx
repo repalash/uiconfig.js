@@ -2,22 +2,24 @@ import React from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {BPInputComponent} from "./BPInputComponent";
 import {BPValueComponentState} from "./BPValueComponent";
-import type {Vector2, Vector3, Vector4} from "three";
+import type {Vector2, Vector3,Euler, Vector4} from "three";
 import {ExtendedNumericInput} from "../components/ExtendedNumericInput";
 import {wIcon3, xIcon3, yIcon3, zIcon3} from "../components/variableIcons";
 import {getOrCall} from 'ts-browser-helpers'
 import {getNumberTransformFunctions} from "./GetNumberTransformFunctions";
+import {HTMLSelect} from "@blueprintjs/core";
 
-export type BPVectorComponentState = BPValueComponentState<Vector2|Vector3|Vector4> & {
+export type BPVectorComponentState = BPValueComponentState<Vector2|Vector3|Euler|Vector4> & {
     min: number,
     max: number,
     step: number,
     components: 1|2|3|4,
     unit?: string,
+    isEuler: boolean,
 }
 
-export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vector4, BPVectorComponentState> {
-    constructor(props: BPComponentProps<Vector2|Vector3|Vector4>, context: UiConfigRendererContextType) {
+export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Euler|Vector4, BPVectorComponentState> {
+    constructor(props: BPComponentProps<Vector2|Vector3|Euler|Vector4>, context: UiConfigRendererContextType) {
         super(props, context, {
             value: new context.THREE!.Vector2(),
             label: 'Vector',
@@ -25,6 +27,7 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
             max: Infinity,
             step: 0.01,
             components: 2,
+            isEuler: false,
         });
     }
 
@@ -46,6 +49,10 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
         // console.warn(state.value)
         let com = this.props.config.type!.replace('vector', '').replace('vec', '')
         let components: any = 0;
+        // Check if this is an Euler object
+        const isEuler = typeof (state.value as any).order === 'string';
+        state.isEuler = isEuler;
+
         // console.log(com, components)
         if(!com.length){
             let v = state.value as any;
@@ -62,6 +69,8 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
     }
 
     private _inputs = [React.createRef<ExtendedNumericInput>(), React.createRef<ExtendedNumericInput>(), React.createRef<ExtendedNumericInput>(), React.createRef<ExtendedNumericInput>()]
+    private _parent = React.createRef<HTMLDivElement>()
+    private _lastWidth?: number
 
     async refreshConfigState(state?: BPVectorComponentState): Promise<void> {
         await super.refreshConfigState(state);
@@ -69,6 +78,28 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
         await this._inputs[1].current?.setValue(this.state.value.y)
         await this._inputs[2].current?.setValue((this.state.value as any).z)
         await this._inputs[3].current?.setValue((this.state.value as any).w)
+    }
+    // todo can we do it with css instead of ResizeObserver
+    private _resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+            const newWidth = entry.contentRect.width
+            if (Math.abs(newWidth - (this._lastWidth||0)) > 5) {
+                this._lastWidth = newWidth
+                this.forceUpdate()
+            }
+        }
+    })
+
+    componentDidMount() {
+        if (this._parent.current) {
+            this._resizeObserver.observe(this._parent.current)
+        }
+        super.componentDidMount()
+    }
+
+    componentWillUnmount() {
+        this._resizeObserver.disconnect()
+        super.componentWillUnmount()
     }
 
     renderInput() {
@@ -92,13 +123,25 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
             ...transformValue,
         } as const
 
-        // console.warn(this.state.value)
+        const showIcon = this._parent.current?.offsetWidth ? this._parent.current.offsetWidth > (60 * this.state.components) : true
+
+        // Euler rotation order options
+        const eulerOrderOptions = [
+            { label: 'XYZ', value: 'XYZ' },
+            { label: 'YXZ', value: 'YXZ' },
+            { label: 'ZXY', value: 'ZXY' },
+            { label: 'ZYX', value: 'ZYX' },
+            { label: 'YZX', value: 'YZX' },
+            { label: 'XZY', value: 'XZY' }
+        ];
+
         if (this.state.components > 0) {
             const x = (
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
                     // defaultValue={state}
                     leftIcon={xIcon3}
+                    draggableIcon={showIcon}
                     value={this.state.value.x}
                     key={this.props.config.uuid + '_x'}
                     ref={this._inputs[0]}
@@ -117,6 +160,7 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
                     // defaultValue={state}
                     value={this.state.value.y}
                     leftIcon={yIcon3}
+                    draggableIcon={showIcon}
                     key={this.props.config.uuid + '_y'}
                     ref={this._inputs[1]}
                     {...props}
@@ -132,26 +176,48 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
                     // defaultValue={state}
-                    value={(this.state.value as Vector3|Vector4).z}
+                    value={(this.state.value as Vector3|Euler|Vector4).z}
                     key={this.props.config.uuid + '_z'}
                     leftIcon={zIcon3}
+                    draggableIcon={showIcon}
                     ref={this._inputs[2]}
                     {...props}
                     onChange2={(v, last) => {
-                        (this.state.value as Vector3 | Vector4).z = v
+                        (this.state.value as Vector3|Euler | Vector4).z = v
                         this.setValue(this.state.value, last) // todo: does need refresh?
                     }}
                 />)
             ret.push(z)
+
+            // Add Euler rotation order dropdown after z component
+            if(this.state.isEuler && this.props.config.showOrderSelector) { // todo add showOrderSelector to uiconfig types and other renderers
+                const eulerOrderDropdown = (
+                    <HTMLSelect
+                        options={eulerOrderOptions}
+                        minimal={true}
+                        fill={false}
+                        disabled={this.state.disabled || this.state.readOnly}
+                        value={(this.state.value as Euler).order}
+                        key={this.props.config.uuid + '_order'}
+                        onChange={(event) => {
+                            (this.state.value as Euler).order = event.currentTarget.value as any;
+                            this.setValue(this.state.value, true);
+                        }}
+                        style={{maxWidth: "6rem", minWidth: "2rem"}}
+                    />
+                );
+                ret.push(eulerOrderDropdown);
+            }
         }
         if(this.state.components>3) {
-            const z = (
+            const w = (
                 <ExtendedNumericInput
                     style={{maxWidth: "8rem", minWidth: "2rem"}}
                     // defaultValue={state}
                     value={(this.state.value as Vector4).w}
                     key={this.props.config.uuid + '_w'}
                     leftIcon={wIcon3}
+                    draggableIcon={showIcon}
                     ref={this._inputs[3]}
                     {...props}
                     onChange2={(v, last) => {
@@ -159,8 +225,12 @@ export class BPVectorInputComponent extends BPInputComponent<Vector2|Vector3|Vec
                         this.setValue(this.state.value, last) // todo: does need refresh?
                     }}
                 />)
-            ret.push(z)
+            ret.push(w)
         }
-        return ret
+        return <div ref={this._parent}
+                    className={"formGroupContent"}
+        >
+            {ret}
+        </div>
     }
 }

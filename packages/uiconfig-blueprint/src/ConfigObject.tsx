@@ -10,10 +10,10 @@ import {BPSliderInputComponent} from "./bpComponents/BPSliderInputComponent";
 import {BPDropdownInputComponent} from "./bpComponents/BPDropdownInputComponent";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {BPPanelComponent} from "./bpComponents/BPPanelComponent";
-import {BPTreeFolderComponent} from "./bpComponents/BPTreeFolderComponent";
 import {UiObjectConfig} from 'uiconfig.js'
 import {BPColorInputComponent} from './bpComponents/BPColorInputComponent'
 import {BPVectorInputComponent} from './bpComponents/BPVectorInputComponent'
+import {IconName, MaybeElement} from "@blueprintjs/core";
 // import {BPVectorInputComponent} from "./bpComponents/BPVectorInputComponent";
 // import {BPFileComponent} from "./bpComponents/BPFileComponent";
 // import {BPColorInputComponent} from "./bpComponents/BPColorInputComponent";
@@ -21,13 +21,14 @@ import {BPVectorInputComponent} from './bpComponents/BPVectorInputComponent'
 
 export type UiConfigTypes = 'input' | 'button' | 'folder' | 'checkbox' | 'toggle' |
     'dropdown' | 'slider' | 'color' | 'image' | 'number' | 'panel' | 'tree' | 'hierarchy' | 'materials' | 'textures' |
-    'vec' | 'vec2' | 'vec3' | 'vec4' | 'monitor' | 'vector'
+    'vec' | 'vec2' | 'vec3' | 'vec4' | 'monitor' | 'vector' | 'select' | 'textarea' | 'tabs'
 
 export interface ConfigProps extends PanelActions {
     config: UiObjectConfig;
     isPanel?: boolean,
     level?: number,
     className?: string
+    icon?: IconName|MaybeElement // only for top level folders right now.
 }
 
 export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Component<BPComponentProps<any>, BPComponentState>>> = {
@@ -41,8 +42,8 @@ export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Co
     checkbox: BPToggleInputComponent,
     toggle: BPToggleInputComponent,
     dropdown: BPDropdownInputComponent,
+    select: BPDropdownInputComponent,
     slider: BPSliderInputComponent,
-    tree: BPTreeFolderComponent,
     color: BPColorInputComponent,
     // image: BPFileComponent,
     vec: BPVectorInputComponent,
@@ -51,6 +52,8 @@ export const ConfigObjectGenerators: PartialRecord<UiConfigTypes, Class<React.Co
     vec4: BPVectorInputComponent,
     vector: BPVectorInputComponent,
     // hierarchy: BPHierarchyComponent,
+
+    // todo textarea, textArea, multiline, tabs, tab, other aliases
 }
 
 export class ConfigObject extends React.Component<ConfigProps, {}> {
@@ -88,7 +91,9 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
                     <FolderHeadCard
                         enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                         onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
-                        level={0} label={label} minimal={false} open={false} onClick={() => {
+                        level={0} label={label} minimal={false} open={false}
+                        icon={this.props.icon}
+                        onClick={() => {
                         this.props.openPanel<{ config: UiObjectConfig<any> }>({
                             props: {config: this.props.config},
                             title: label,
@@ -103,7 +108,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
             )
         }
         if (BPComp) {
-            return (<div key={this.props.config.uuid} style={orderStyle} className={this.props.className}><BPComp {...{...this.props, isPanel: undefined}} /></div>)
+            return (<div key={this.props.config.uuid} style={orderStyle} className={this.props.className}><BPComp {...{...this.props, isPanel: undefined, icon: this.props.icon}} /></div>)
         }
         return (<div key={this.props.config.uuid} style={orderStyle} className={this.props.className}>
             {/*Unknown type: {this.props.config.type}*/}

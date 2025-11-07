@@ -20,6 +20,10 @@
       "import": "./dist/",
       "require": "./dist/"
     },
+    "./lib": {
+      "types": "./lib/esm/lib.d.ts",
+      "import": "./lib/esm/lib.js"
+    },
     "./lib/esm": {
       "types": "./lib/esm/index.d.ts",
       "import": "./lib/esm/index.js"
@@ -47,7 +51,7 @@
     "dev:lib": "run-p \"compile:esm --watch\" \"compile:css --watch\"",
     "dist:css": "css-dist lib/css",
     "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-    "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version",
+    "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && PKG=$(npm pack) && clean-package restore && npm publish \"$PKG\" && git tag v$npm_package_version",
     "dev": "vite",
     "build": "vite build && npm run compile",
     "build-examples": "vite build -c vite.examples.config.js",
@@ -130,21 +134,21 @@
     "react-colorful": "^5.6.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
-    "@blueprintjs/core": "^5.11.0",
+    "@blueprintjs/core": "^5.19.1",
     "@types/three": "^0.152.1",
     "@types/webxr": "^0.5.10",
     "blueprint-styler": "^5.0.2"
   },
   "dependencies": {
-    "ts-browser-helpers": "^0.18.0",
-    "uiconfig.js": "^0.1.6",
-    "@blueprintjs/icons": "^5.11.0",
-    "@blueprintjs/select": "^5.2.2",
+    "ts-browser-helpers": "^0.19.4",
+    "uiconfig.js": "^0.3.1",
+    "@blueprintjs/icons": "^5.23.0",
+    "@blueprintjs/select": "^5.3.21",
     "blueprint-styler": "^5.0.2",
     "react-colorful": "^5.6.1"
   },
   "peerDependencies": {
-    "@blueprintjs/core": "^5.11.0",
+    "@blueprintjs/core": "^5.19.1",
     "@types/three": "^0.152.1",
     "@types/webxr": "^0.5.10",
     "@types/react": "^18.0.28",
@@ -176,12 +180,6 @@
     }
   },
   "//": {
-    "devDependencies": {
-      "uiconfig.js": "^0.0.12"
-    },
-    "local_dependencies": {
-      "uiconfig.js": "file:./../uiconfig/"
-    },
     "scripts": {
       "compile:cjs": "tsc -p ./src -m commonjs --verbatimModuleSyntax false --outDir lib/cjs",
       "compile:esnext": "tsc -p ./src -t esnext --outDir lib/esnext"
