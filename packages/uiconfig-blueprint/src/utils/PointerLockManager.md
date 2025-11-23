@@ -331,3 +331,4 @@ The Pointer Lock API is supported in all modern browsers:
 
 - [Pointer Lock API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API)
 - [DraggableIcon Component](../components/DraggableIcon.tsx) - Reference implementation
+

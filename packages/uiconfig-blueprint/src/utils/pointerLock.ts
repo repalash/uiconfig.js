@@ -5,10 +5,13 @@ class FakeCursor {
     private x = 0;
     private y = 0;
     private visible = false;
+    private originalCursor = '';
 
     constructor() {
         if (typeof document !== 'undefined') {
             this.createCursorElement();
+        }else {
+            console.warn('FakeCursor: document is undefined, cannot create cursor element.');
         }
     }
 
@@ -37,17 +40,29 @@ class FakeCursor {
         document.body.appendChild(this.element);
     }
 
-    show() {
+    show(useFallback: boolean) {
         if (this.element) {
             this.element.style.display = 'block';
             this.visible = true;
+            if(useFallback) {
+                this.originalCursor = document.documentElement.style.cursor;
+                document.documentElement.style.cursor = 'ew-resize';
+                this.element.style.opacity = '0'; // for pointer events
+                this.element.style.pointerEvents = 'auto'; // for pointer events
+            }
         }
     }
 
-    hide() {
+    hide(useFallback: boolean) {
         if (this.element) {
             this.element.style.display = 'none';
             this.visible = false;
+            // Restore original cursor
+            if (useFallback && this.originalCursor !== undefined) {
+                document.documentElement.style.cursor = this.originalCursor;
+            }
+            this.element.style.opacity = '1';
+            this.element.style.pointerEvents = 'none';
         }
     }
 
@@ -105,6 +120,9 @@ export class PointerLockManager {
     private isLocked = false;
     private cursorX = 0;
     private cursorY = 0;
+    private useFallback = false;
+    private lastMouseX = 0;
+    private lastMouseY = 0;
 
     constructor(element: HTMLElement, options: PointerLockOptions) {
         this.element = element;
@@ -112,22 +130,54 @@ export class PointerLockManager {
         this.fakeCursor = getFakeCursor();
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handlePointerLockChange = this.handlePointerLockChange.bind(this);
+        this.handleFallbackMouseMove = this.handleFallbackMouseMove.bind(this);
     }
 
     requestLock(initialX: number, initialY: number) {
         this.cursorX = initialX;
         this.cursorY = initialY;
+        this.lastMouseX = initialX;
+        this.lastMouseY = initialY;
         this.fakeCursor.setPosition(initialX, initialY);
-        this.fakeCursor.show();
 
-        this.element.requestPointerLock();
+        // Try to request pointer lock, but prepare for fallback
+        if (isSafari() || !this.element.requestPointerLock) {
+            // Use fallback immediately for Safari or if pointer lock is not supported
+            this.useFallback = true;
+            this.isLocked = true; // Treat fallback as "locked" state
+            this.fakeCursor.show(true);
+            // Don't show fake cursor in fallback mode
+            document.addEventListener('mousemove', this.handleFallbackMouseMove);
+            if (this.options.onLockChange) {
+                this.options.onLockChange(true);
+            }
+        } else {
+            this.useFallback = false
+            this.fakeCursor.show(false);
+            // Try pointer lock for other browsers
+            this.element.requestPointerLock();
+            document.addEventListener('pointerlockchange', this.handlePointerLockChange);
+            document.addEventListener('mousemove', this.handleMouseMove);
 
-        document.addEventListener('mousemove', this.handleMouseMove);
-        document.addEventListener('pointerlockchange', this.handlePointerLockChange);
+            // Fallback if pointer lock doesn't engage within 100ms
+            setTimeout(() => {
+                if (!this.isLocked && !this.useFallback) {
+                    this.useFallback = true;
+                    this.isLocked = true;
+                    this.fakeCursor.show(true);
+                    document.removeEventListener('mousemove', this.handleMouseMove);
+                    document.removeEventListener('pointerlockchange', this.handlePointerLockChange);
+                    document.addEventListener('mousemove', this.handleFallbackMouseMove);
+                    if (this.options.onLockChange) {
+                        this.options.onLockChange(true);
+                    }
+                }
+            }, 100);
+        }
     }
 
     releaseLock() {
-        if (this.isLocked) {
+        if (this.isLocked && !this.useFallback) {
             document.exitPointerLock();
         }
         this.cleanup();
@@ -135,9 +185,11 @@ export class PointerLockManager {
 
     private cleanup() {
         document.removeEventListener('mousemove', this.handleMouseMove);
+        document.removeEventListener('mousemove', this.handleFallbackMouseMove);
         document.removeEventListener('pointerlockchange', this.handlePointerLockChange);
-        this.fakeCursor.hide();
+        this.fakeCursor.hide(this.useFallback);
         this.isLocked = false;
+        this.useFallback = false;
     }
 
     private handlePointerLockChange() {
@@ -152,8 +204,26 @@ export class PointerLockManager {
         }
     }
 
+    private handleFallbackMouseMove(ev: MouseEvent) {
+        if (!this.isLocked || !this.useFallback) return;
+
+        // Calculate movement manually
+        const movementX = ev.clientX - this.lastMouseX;
+        const movementY = ev.clientY - this.lastMouseY;
+
+        this.lastMouseX = ev.clientX;
+        this.lastMouseY = ev.clientY;
+
+        // Update fake cursor position
+        this.cursorX = ev.clientX;
+        this.cursorY = ev.clientY;
+
+        this.fakeCursor.setPosition(this.cursorX, this.cursorY);
+        this.options.onMove(movementX, movementY, this.cursorX, this.cursorY);
+    }
+
     private handleMouseMove(ev: MouseEvent) {
-        if (!this.isLocked) return;
+        if (!this.isLocked || this.useFallback) return;
 
         const movementX = ev.movementX || 0;
         const movementY = ev.movementY || 0;
@@ -187,3 +257,8 @@ export class PointerLockManager {
     }
 }
 
+// Detect if we're running in Safari
+function isSafari(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
