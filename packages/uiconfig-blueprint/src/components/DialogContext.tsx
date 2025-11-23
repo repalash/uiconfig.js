@@ -50,7 +50,11 @@ export function DialogProvider({children}: {children: ReactNode}){
 export function DialogComponent(){
     const {dialog, close} = useDialog()
     return (
-        <Dialog title={dialog.title} isOpen={dialog.isOpen} isCloseButtonShown={dialog.canClose} onClose={() => {dialog.canClose && close()}}>
+        <Dialog title={dialog.title}
+                isOpen={dialog.isOpen}
+                usePortal={false}
+                isCloseButtonShown={dialog.canClose}
+                onClose={() => {dialog.canClose && close()}}>
         <DialogBody>
             {dialog.content}
         </DialogBody>

@@ -1,4 +1,3 @@
-
 // todo move to uiConfigMethods
 export function cleanLabel(varName?: string): string|undefined {
     if (!varName || typeof varName !== 'string') {
@@ -25,9 +24,14 @@ export function cleanLabel(varName?: string): string|undefined {
 
     // Split into words, capitalize first letter of each word, and join with spaces
     const words = result.split(/\s+/).filter(word => word.length > 0);
-    const capitalizedWords = words.map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    );
+    const capitalizedWords = words.map(word => {
+        // Preserve acronyms (all uppercase words with 2+ chars)
+        if (word.length >= 2 && word === word.toUpperCase()) {
+            return word;
+        }
+        // Regular word capitalization
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    });
 
 
     return capitalizedWords.join(' ');

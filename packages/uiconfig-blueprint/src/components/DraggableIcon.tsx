@@ -29,7 +29,7 @@ export class DraggableIcon extends React.Component<{ icon: IconName | MaybeEleme
             let stepSize = (this.props.stepSize ?? 1) / 10
 
             // Use movementX for horizontal dragging
-            let off = -movementX; // Negative because we want right movement to increase value
+            let off = movementX;
 
             // Scale the movement
             off *= stepSize;

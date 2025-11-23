@@ -49,13 +49,13 @@ export abstract class BPValueComponent<TValue extends PrimitiveVal, TState exten
         super.setState(state, callback);
     }
 
-    async setValue(value: TStateValue, last?: boolean) {
-        return this.updateStateValue({...this.state, value}, last)
+    async setValue(value: TStateValue, last?: boolean, refreshState = true) {
+        return this.updateStateValue({...this.state, value}, last, refreshState)
     }
 
     forceOnChange: boolean = false
 
-    async updateStateValue(state: TState, last?: boolean) {
+    async updateStateValue(state: TState, last?: boolean, refreshState = true) {
         if (!this.doesNeedRefresh(state, last)) {
             await this.setStatePromise(state)
             return
@@ -63,7 +63,7 @@ export abstract class BPValueComponent<TValue extends PrimitiveVal, TState exten
         let val = await this.convertStateToValue(state)
         this._lastValRef = val
         await this.context.methods.setValue(this.props.config, val, {last}, this.forceOnChange)
-        await this.refreshConfigState(state)
+        if(refreshState) await this.refreshConfigState(state)
     }
 
 }

@@ -64,6 +64,7 @@ export class ConfigObject extends React.Component<ConfigProps, {}> {
     render() {
         if (!this.props.config || !this.props.config.type) return (<div key={this.props.config.uuid} className={this.props.className}></div>)
         this.context.methods.initUiConfig(this.props.config)
+        if(!this.props.config.dispatchMode) this.props.config.dispatchMode = 'immediate'
 
         const order = this.props.config.order ? getOrCall(this.props.config.order, this.props.config) ?? undefined : undefined
         const orderStyle = {order: order && typeof order === 'string' ? parseInt(order): order}

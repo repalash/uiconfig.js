@@ -11,14 +11,19 @@ export class BPTextInputComponent extends BPInputComponent<string> {
 
     private _inputRef = React.createRef<HTMLInputElement|HTMLTextAreaElement>()
 
+    private _iv = 0
     async refreshConfigState(state?: BPValueComponentState<string>): Promise<void> {
+        const iv = this._iv
         await super.refreshConfigState(state);
-        if (this._inputRef.current)
-            this._inputRef.current.value = this.state.value
+        if(iv === this._iv) {
+            if (this._inputRef.current && this._inputRef.current.value !== this.state.value)
+                this._inputRef.current.value = this.state.value
+        }
     }
 
     private _onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-        this.setValue(e.target.value); // todo: set loading while this promise is happening.
+        this._iv+=1
+        this.setValue(e.target.value, false); // todo: set loading while this promise is happening.
     }
 
     renderInput() {
