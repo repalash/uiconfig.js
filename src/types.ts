@@ -38,7 +38,7 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * This can be an array of UiObjectConfig objects, or an array of functions that returns an array of UiObjectConfig objects.
      * Note: technically, it could be a function that returns an array as well, but it's not added to the types, and should not be done. This is so that external plugins/code can append to the children array.
      */
-    children?: (UiObjectConfig | Fof<ValOrArrOp<UiObjectConfig>>)[],
+    children?: (UiObjectConfig | Fof<ValOrArrOp<UiObjectConfig>, [UiObjectConfig]>)[],
 
     /**
      * The property to bind to. This is used for inputs.
@@ -225,6 +225,12 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      */
     unwrapContents?: boolean,
 
+    // todo for textarea
+    rows?: number
+    placeholder?: string // todo add to other places also
+
+    // to identify the property key in case of dynamic generation, it might not be unique like uuid
+    propertyKey?: string
 
     /**
      * Individual components can support custom options. These can be added to the config object.

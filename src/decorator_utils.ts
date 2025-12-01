@@ -2,11 +2,11 @@ import {UiObjectConfig} from './types'
 import {Fof, uuidV4} from 'ts-browser-helpers'
 
 export class UiConfigTypeMap {
-    static Map = new Map<ObjectConstructor, any[]>()
+    static Map = new WeakMap<ObjectConstructor, any[]>()
 }
 
-export function generateValueConfig(obj: any, key: string | number, label?: string, val?: any, dynamicChildren = true) {
-    val = val ?? obj[key]
+export function generateValueConfig(obj: any, key: string | number, label?: UiObjectConfig['label'], val?: any, dynamicChildren = true): undefined | UiObjectConfig {
+    val = val !== undefined ? val : obj[key]
     label = label ?? key + ''
     const config = val?.uiConfig
     let result: UiObjectConfig|undefined = undefined
@@ -15,12 +15,13 @@ export function generateValueConfig(obj: any, key: string | number, label?: stri
     } else {
         const uiType = valueToUiType(val)
         if (uiType === 'folder') {
-            result = generateUiFolder(label, val, {}, 'folder', dynamicChildren)
+            result = generateUiFolder(label, val, {}, 'folder', dynamicChildren, key + '')
         } else if (uiType)
             result = {
                 type: uiType,
                 label: label,
                 property: [obj, key],
+                propertyKey: key + '',
             }
     }
     if (result && !result.label) result.label = label
@@ -93,11 +94,12 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
     return result
 }
 
-export function generateUiFolder(label: UiObjectConfig['label'], obj: any, params: Partial<UiObjectConfig> = {}, type: UiObjectConfig['type'] = 'folder', dynamic = false): UiObjectConfig {
+export function generateUiFolder(label: UiObjectConfig['label'], obj: any, params: Partial<UiObjectConfig> = {}, type: UiObjectConfig['type'] = 'folder', dynamic = false, propertyKey?: string): UiObjectConfig {
     return {
         type, label,
         children: !dynamic ? generateUiConfig(obj) : [()=>generateUiConfig(obj)],
         uuid: uuidV4(),
+        propertyKey: propertyKey,
         ...params,
     }
 }
