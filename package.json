@@ -1,6 +1,6 @@
 {
     "name": "uiconfig.js",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "description": "A framework for building user interface layouts with JSON configuration.",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
@@ -10,7 +10,7 @@
     "sideEffects": false,
     "type": "module",
     "scripts": {
-        "build": "rimraf dist ; vite build",
+        "build": "rimraf dist ; tsc && vite build",
         "dev": "NODE_ENV=development vite build --watch",
         "serve-docs": "ws -d docs -p 8080",
         "build-examples": "NODE_ENV=production rollup --config examples/rollup.config.js",
