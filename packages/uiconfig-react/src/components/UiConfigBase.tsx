@@ -1,6 +1,5 @@
 import React, {createContext, ReactNode} from "react";
-import {PrimitiveVal, UiObjectConfig} from 'uiconfig.js'
-import {getOrCall} from 'ts-browser-helpers'
+import {PrimitiveVal, UiObjectConfig, UiConfigMethods} from 'uiconfig.js'
 import {UiConfigRendererReact} from "../lib/UiConfigRendererReact.tsx";
 
 export type UiConfigBaseProps<T> = {
@@ -52,18 +51,14 @@ export class UiConfigBase<TValue extends PrimitiveVal|void, TState extends UiCon
      * @param state - the current state
      */
     getUpdatedState(state: TState): TState{
-        const hidden = getOrCall(this.props.config.hidden) ?? false
-        const disabled = getOrCall(this.props.config.disabled) ?? false
-        const readOnly = getOrCall(this.props.config.readOnly) ?? false
-        if(hidden !== state.hidden
-            || disabled !== state.disabled
-            || readOnly !== state.readOnly
+        const newState = UiConfigMethods.GetBaseProps(this.props.config)
+        if(newState.hidden !== state.hidden
+            || newState.disabled !== state.disabled
+            || newState.readOnly !== state.readOnly
         ) this.keyVersion++
         return {
             ...state,
-            hidden,
-            disabled,
-            readOnly,
+            ...newState
         }
     }
 

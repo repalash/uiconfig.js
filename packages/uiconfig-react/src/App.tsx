@@ -41,7 +41,24 @@ const uiConfig: UiObjectConfig = {
     onChange: (ev) => {
         console.log(ev)
     },
-    children: people.map((p,i)=>{
+    children: [{
+        type: 'button',
+        label: 'Add Person',
+        uuid: 'addPerson',
+        order: 1000,
+        onClick: () => {
+            const newPerson = {
+                name: 'New Person',
+                age: 20,
+                city: 'New City',
+                location: [0, 0, 0],
+                accept: false,
+                color: '#000000',
+            }
+            people.push(newPerson)
+            uiConfig.uiRefresh?.(true)
+        }
+    },()=>people.map((p,i)=>{
         const ui = {
             type: 'folder',
             value: p,
@@ -113,7 +130,7 @@ const uiConfig: UiObjectConfig = {
                 } as UiObjectConfig,
             ]} as UiObjectConfig
         return ui
-    }),
+    })],
 }
 
 function App() {

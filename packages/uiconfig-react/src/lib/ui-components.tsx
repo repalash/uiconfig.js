@@ -418,6 +418,7 @@ export const ConfigObjectGeneratorsSample = {
     button: ButtonComponent,
     folder: FolderComponent,
     dropdown: DropdownComponent,
+    select: DropdownComponent,
     slider: SliderComponent,
     checkbox: CheckboxComponent,
     toggle: CheckboxComponent,
