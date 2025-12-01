@@ -87,7 +87,7 @@
         "typedoc": "^0.28.9",
         "rollup-plugin-delete": "^3.0.1",
         "typescript": "^5.7.2",
-        "vite": "^6.0.5",
+        "vite": "^7.2.6",
         "tslib": "^2.8.1",
         "local-web-server": "^5.4.0",
         "vite-plugin-dts": "^4.4.0",
@@ -102,7 +102,7 @@
         "eslint-plugin-import": "^2.31.0"
     },
     "dependencies": {
-        "ts-browser-helpers": "^0.19.4"
+        "ts-browser-helpers": ">=0.19.4"
     },
     "optionalDependencies": {
         "win-node-env": "^0.6.1"
