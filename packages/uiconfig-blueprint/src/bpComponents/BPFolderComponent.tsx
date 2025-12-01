@@ -13,7 +13,7 @@ import {
 import {ConfigObject} from "../ConfigObject";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
-import {BPContainerComponent, BPContainerComponentState} from './BPContainerComponent'
+import {BPContainerComponent, BPContainerComponentState, BPContainerComponentProps} from './BPContainerComponent'
 import classNames from "classnames";
 import {Classes} from "@blueprintjs/core/src/common";
 import {AnimationStates} from "@blueprintjs/core/lib/esm/components/collapse/collapse";
@@ -21,7 +21,7 @@ import {AnimationStates} from "@blueprintjs/core/lib/esm/components/collapse/col
 export type BPFolderComponentState = BPContainerComponentState & {
 }
 
-export type BPFolderComponentProps = {
+export type BPFolderComponentProps = BPContainerComponentProps & {
     icon?: IconName | MaybeElement
 }
 
@@ -36,6 +36,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
             icon,
             config,
             level,
+            filter,
             ...props
         } = this.props
 
@@ -252,13 +253,22 @@ export const ContextMenu: React.FC<{
     return (
         <Menu>
             {buttons.map((btn, i) => {
-                const hidden = getOrCall(btn.hidden) ?? false;
-                return hidden ? null : (
+                const getProps = ()=>{ // todo use UiConfigMethods.getBaseProps
+                    const hidden = getOrCall(btn.hidden) ?? false
+                    const disabled = getOrCall(btn.disabled) ?? false
+                    const readOnly = getOrCall(btn.readOnly) ?? false
+                    return { hidden, disabled, readOnly }
+                }
+                const props = getProps()
+                return props.hidden ? null : (
                     <MenuItem
                         key={'ctx' + i}
+                        disabled={props.disabled || props.readOnly}
                         text={context.methods.getLabel(btn)}
                         onClick={(e) => {
                             e.stopPropagation();
+                            const {hidden, disabled, readOnly} = getProps()
+                            if (hidden || disabled || readOnly) return;
                             // todo loading state for promise
                             context.methods.clickButton(btn, { args: [e] });
                         }}

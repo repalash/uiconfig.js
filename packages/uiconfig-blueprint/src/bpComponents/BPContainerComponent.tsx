@@ -4,11 +4,22 @@ import {PanelActions} from '@blueprintjs/core/lib/esm/components/panel-stack2/pa
 import {UiObjectConfig} from 'uiconfig.js'
 import {getOrCall} from 'ts-browser-helpers'
 
+declare module '../ConfigObject' {
+    interface ConfigProps {
+        filter?: (child: UiObjectConfig) => boolean
+    }
+}
+
 export type BPContainerComponentState = BPLabelledComponentState & {
     children: UiObjectConfig[]
     expanded: boolean
 }
-export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState, TProps={}> extends BPLabelledComponent<void, TState, BPComponentProps<void> & PanelActions & TProps> {
+
+export type BPContainerComponentProps = {
+    filter?: (child: UiObjectConfig) => boolean
+}
+
+export class BPContainerComponent<TState extends BPContainerComponentState=BPContainerComponentState, TProps extends BPContainerComponentProps=BPContainerComponentProps> extends BPLabelledComponent<void, TState, BPComponentProps<void> & PanelActions & TProps> {
 
     protected _childParentOnChange: UiObjectConfig['parentOnChange'] = (ev, ...args) => {
         // console.warn('child change', ev, this.props.config)
@@ -44,7 +55,7 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
 
     getUpdatedState(state: TState) {
         const oldChildren = state.children
-        const newChildren = this.context.methods.getChildren(this.props.config)
+        let newChildren = this.context.methods.getChildren(this.props.config)
             .flatMap(c=>{
                 if(c.type === 'folder' &&
                     c.unwrapContents === true
@@ -56,6 +67,12 @@ export class BPContainerComponent<TState extends BPContainerComponentState=BPCon
                 }
                 return c
             })
+
+        // Apply filter if provided
+        if (this.props.filter) {
+            newChildren = newChildren.filter(this.props.filter)
+        }
+
         const removed = oldChildren.filter(c => !newChildren.includes(c))
         const added = newChildren.filter(c => !oldChildren.includes(c))
         // console.warn(this, this._registerChild, this._childParentOnChange, added, removed)

@@ -4,15 +4,15 @@ import {BPLabelledComponentState} from "./BPLabelledComponent";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {UiObjectConfig} from 'uiconfig.js'
 import {safeSetProperty} from 'ts-browser-helpers'
-import {BPContainerComponent} from './BPContainerComponent'
+import {BPContainerComponent, BPContainerComponentProps} from './BPContainerComponent'
 
 export type BPPanelComponentState = BPLabelledComponentState & {
     children: UiObjectConfig[]
     expanded: boolean
 }
 
-export class BPPanelComponent extends BPContainerComponent<BPPanelComponentState> {
-    constructor(props: BPComponentProps<void>&PanelActions, context: UiConfigRendererContextType) {
+export class BPPanelComponent extends BPContainerComponent<BPPanelComponentState, BPContainerComponentProps> {
+    constructor(props: BPComponentProps<void>&PanelActions&BPContainerComponentProps, context: UiConfigRendererContextType) {
         super(props, context, {
             children: [],
             expanded: false,

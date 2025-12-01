@@ -14,6 +14,15 @@
 @import "blueprint-styler/base/blueprint";
 @import "blueprint-styler/base/tokens.scss";
 
+.bp5-vars, :root {
+  //--pt-icon-color: var(--pt-text-color);
+}
+
+.bp5-dark {
+  --pt-icon-color: var(--pt-text-color);
+  --menu-background-color: var(--tooltip-background-color);
+}
+
 :root.bpx-bpv3{
   @import "blueprint-styler/overrides/bpv3/custom-tokens.scss";
   @import "blueprint-styler/overrides/bpv3/override";
@@ -249,7 +258,7 @@
 }
 
 .bp5-dark {
-  --slider-progress-color: hsla(var(--gray4-hsl),0.15);
+  --slider-progress-color: hsla(var(--gray4-hsl), 0.15);
 }
 
 .bp5-slider-progress, .bp5-slider-track{
@@ -277,3 +286,4 @@
 .bp5-dark .bp5-divider{
   border-color:rgba(255, 255, 255, 0.2);
 }
+

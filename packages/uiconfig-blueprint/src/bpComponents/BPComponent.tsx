@@ -48,6 +48,7 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
      * @param state - the current state
      */
     getUpdatedState(state: TState): TState{
+        // todo use UiConfigMethods.GetBaseProps
         const hidden = getOrCall(this.props.config.hidden) ?? false
         const disabled = getOrCall(this.props.disabled ?? this.props.config.disabled) ?? false
         const readOnly = getOrCall(this.props.config.readOnly) ?? false
