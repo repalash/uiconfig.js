@@ -1,8 +1,6 @@
 import type {ValOrFunc} from 'ts-browser-helpers'
-import {getOrCall} from 'ts-browser-helpers'
 import {UiObjectConfig} from './types'
 import {generateUiFolder, UiConfigTypeMap} from './decorator_utils'
-
 
 export type TParams<T> = ValOrFunc<Partial<UiObjectConfig>, [T]>
 
@@ -40,7 +38,7 @@ export function uiConfig<T=any>(uiType?: string, params?: Partial<UiObjectConfig
 export function uiContainer<TP = any>(label: ValOrFunc<string, [TP]>, params?: any, type = 'panel') {
     return <T extends new (...args: any[]) => any>(constructor: T) => {
         return class extends constructor {
-            uiConfig = generateUiFolder(getOrCall(label, this) || '', this, params || {}, type)
+            uiConfig = generateUiFolder(label, this, params || {}, type)
         }
     }
 }

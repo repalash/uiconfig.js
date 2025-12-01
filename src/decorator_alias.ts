@@ -28,6 +28,8 @@ export function uiInput<T=any>(label?: string, params?: TParams<T>): PropertyDec
     return uiConfig('input', {label, params})
 }
 
+// todo textarea? or rows with input is enough
+
 export function uiNumber<T=any>(label?: string, params?: TParams<T>): PropertyDecorator {
     return uiConfig('number', {label, params})
 }
