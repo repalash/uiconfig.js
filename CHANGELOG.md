@@ -2,6 +2,38 @@
 
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
+## v0.4.0
+- **Breaking Changes**
+  - Set default dispatch mode to `immediate` in `UiConfigMethods`, previously it was `postFrame`
+  - Make functions in `UiConfigMethods` static, functions deprecated - `getBounds`, `initUiConfig`, `getChildren`, `getLabel`, `getBinding`, `dispatchOnChangeSync`
+- Add optional `propertyKey`, `rows`, `placeholder` to `UiObjectConfig` type.
+- Minor fix in `UiObjectConfig.children` type 
+- Use `WeakMap` in `UiConfigTypeMap`. 
+- Fix for `null` value in `generateValueConfig`.
+- Save `propertyKey` in config when generating within `generateValueConfig`, `generateUiFolder`.
+- Fix label auto-refresh in `uiContainer` decorator.
+- Add static helpers in `UiConfigMethods`
+
+## v0.3.1
+- Nested object children fix
+
+## v0.3.0
+- Add `UiConfigMethods.performAction`
+- Fix decorator `label` type
+
+## v0.2.1
+- Fix for empty ui config in auto generated UI.
+
+## v0.2.0
+- Move `primitive_value`, undo commands to `ts-browser-helpers` package
+- `[Dev]` Migrate to vite, proper exports in package.json
+
+## v0.1.6
+- Add optional `baseWidth` property to `UiObjectConfig` type.
+
+## v0.1.5
+- Add optional `order` property to `UiObjectConfig` type.
+
 ## v0.1.4
 - Add property `undoEditingWaitTime` to `UiConfigMethods`
 
