@@ -13,6 +13,7 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 - Save `propertyKey` in config when generating within `generateValueConfig`, `generateUiFolder`.
 - Fix label auto-refresh in `uiContainer` decorator.
 - Add static helpers in `UiConfigMethods`
+- Set `ts-browser-helpers` dependency to `>=0.19.4`
 
 ## v0.3.1
 - Nested object children fix
