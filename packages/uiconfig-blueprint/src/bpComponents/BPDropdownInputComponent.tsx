@@ -8,6 +8,7 @@ import {cleanLabel} from "../utils";
 export interface DropdownItem{
     label: string,
     value: string|number,
+    uuid?: string
 }
 
 export type BPDropdownComponentState = BPValueComponentState<string|number> & {
@@ -23,7 +24,7 @@ const renderDropdownItem: ItemRenderer<DropdownItem> = (item, { handleClick, han
             label={''}
             roleStructure="listoption"
             active={modifiers.active}
-            key={item.value}
+            key={item.uuid || (typeof item.value === 'string' ? item.value : item.label)}
             onClick={handleClick}
             onFocus={handleFocus}
         />
@@ -44,7 +45,7 @@ export class BPDropdownInputComponent extends BPInputComponent<string|number, BP
         const options: DropdownItem[] = children.map((value, i) => {
             let label1 = this.context.methods.getLabel(value)
             const label = cleanLabel(label1) || `Option ${i}`
-            return {label, value: value!.value ?? label1}
+            return {label, value: value!.value ?? label1, uuid: value!.uuid}
         })
 
         // const selected = options.find(o=>o.value===val)||options[0]
