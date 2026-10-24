@@ -32,7 +32,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -43,14 +43,16 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-#    - run: npm run docs # this is done in prepare also
+    # npm ci no longer builds (prepack, not prepare); build, examples and docs of uiconfig.js only
+    - run: npm run prepack -w uiconfig.js
     - run: mv -t docs dist examples README.md LICENSE
+      working-directory: packages/uiconfig.js
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: 'docs'
+        path: 'packages/uiconfig.js/docs'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-    - run: rm -rf docs
+    - run: rm -rf packages/uiconfig.js/docs
 
