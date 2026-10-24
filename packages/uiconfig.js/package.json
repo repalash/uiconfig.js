@@ -57,7 +57,8 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/repalash/uiconfig.js.git"
+        "url": "git+https://github.com/repalash/uiconfig.js.git",
+        "directory": "packages/uiconfig.js"
     },
     "keywords": [
         "javascript",
@@ -74,7 +75,7 @@
     "bugs": {
         "url": "https://github.com/repalash/uiconfig.js/issues"
     },
-    "homepage": "https://github.com/repalash/uiconfig.js#readme",
+    "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig.js#readme",
     "devDependencies": {
         "@rollup/plugin-commonjs": "^26.0.1",
         "@rollup/plugin-json": "^6.1.0",
