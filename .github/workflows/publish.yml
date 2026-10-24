@@ -1,6 +1,7 @@
 # Publishes each public package in packages/* whose version is not on npm yet.
 # Release a package: bump "version" in its package.json, add the matching section to its
-# CHANGELOG.md, push to master. The publish job waits for the npm-publish environment.
+# CHANGELOG.md, push to master. A Discord notice (secret DISCORD_WEBHOOK_URL) links the run; the
+# publish job waits for approval of the npm-publish environment.
 # Each package needs a trusted publisher on npmjs.com: repository repalash/uiconfig.js,
 # workflow publish.yml, environment npm-publish.
 
@@ -26,12 +27,21 @@ jobs:
       has_packages: ${{ steps.check.outputs.has_packages }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags and history for the commit list in the Discord notice
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
       - name: Find versions that are not on npm (and check their CHANGELOG entries)
         id: check
         run: node scripts/ci/publish-check.mjs
+      - name: Notify Discord
+        if: always() && (steps.check.outputs.has_packages == 'true' || steps.check.outcome == 'failure')
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PACKAGES: ${{ steps.check.outputs.packages || '[]' }}
+          CHECK_OK: ${{ steps.check.outcome == 'success' }}
+        run: node .github/scripts/notify-discord.mjs
 
   publish:
     needs: check
