@@ -5,6 +5,7 @@ import dts from 'vite-plugin-dts'
 import packageJson from "./package.json";
 import license from 'rollup-plugin-license';
 import replace from '@rollup/plugin-replace';
+import {fixDtsImports} from '../../scripts/fix-dts-imports.mjs';
 
 const { name, version, author } = packageJson
 
@@ -70,7 +71,7 @@ export default defineConfig({
         }
     },
     plugins: [
-        dts(),
+        dts({afterBuild: fixDtsImports}),
         react(),
         // del({
         //     targets: 'dist/*',

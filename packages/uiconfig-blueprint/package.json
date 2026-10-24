@@ -47,7 +47,7 @@
     "compile:esm:watch": "tsc -p ./src  --watch",
     "compile:esm": "tsc -p ./src",
     "compile:css": "sass-compile ./src",
-    "postcompile:esm": "node scripts/fix-css-imports.mjs",
+    "postcompile:esm": "node scripts/fix-css-imports.mjs && node ../../scripts/fix-dts-imports.mjs lib/esm",
     "dev:lib": "run-p \"compile:esm --watch\" \"compile:css --watch\"",
     "dist:css": "css-dist lib/css",
     "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore",
