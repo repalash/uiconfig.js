@@ -5,6 +5,7 @@ import packageJson from './package.json';
 import license from 'rollup-plugin-license';
 import replace from '@rollup/plugin-replace';
 import path from 'node:path';
+import {fixDtsImports} from './scripts/fix-dts-imports.mjs';
 
 const isProd = process.env.NODE_ENV === 'production'
 const { name, version, author } = packageJson
@@ -49,7 +50,7 @@ export default defineConfig({
         },
     },
     plugins: [
-        isProd ? dts({tsconfigPath: './tsconfig.json'}) : null,
+        isProd ? dts({tsconfigPath: './tsconfig.json', afterBuild: fixDtsImports}) : null,
         replace({
             'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
             preventAssignment: true,
