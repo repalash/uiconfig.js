@@ -18,14 +18,13 @@
         "test": "npm run check",
 
         "serve": "ws",
-        "prepare": "npm run build && npm run build-examples && npm run docs",
+        "prepack": "npm run build && npm run build-examples && npm run docs",
         "docs": "npx typedoc ./src/index.ts",
         "lint": "eslint src examples --fix",
         "check": "tsc -p tsconfig.json --noEmit && eslint src examples",
         "prepublishOnly": "npm run test",
 
-        "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-        "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && PKG=$(npm pack) && clean-package restore && npm publish \"$PKG\" && git tag v$npm_package_version"
+        "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore"
     },
     "exports": {
         ".": {

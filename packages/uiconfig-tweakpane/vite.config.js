@@ -35,7 +35,7 @@ export default defineConfig({
         outDir: 'dist',
         emptyOutDir: isProd,
         commonjsOptions: {
-            exclude: [/uiconfig.js/, /ts-browser-helpers/],
+            exclude: [/[\\/]uiconfig\.js[\\/](dist|src)[\\/]/, /ts-browser-helpers/],
         },
         rollupOptions: {
             output: {

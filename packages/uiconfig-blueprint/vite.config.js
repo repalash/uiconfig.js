@@ -26,7 +26,7 @@ export default defineConfig({
         outDir: 'dist',
         emptyOutDir: true,
         commonjsOptions: {
-            exclude: [/uiconfig.js/],
+            exclude: [/[\\/]uiconfig\.js[\\/](dist|src)[\\/]/],
         },
         rollupOptions: {
             // external: ['react', 'react-dom'],
