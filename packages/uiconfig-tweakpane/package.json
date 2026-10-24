@@ -63,7 +63,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/repalash/uiconfig-tweakpane.git"
+    "url": "git+https://github.com/repalash/uiconfig.js.git",
+    "directory": "packages/uiconfig-tweakpane"
   },
   "keywords": [
     "javascript",
@@ -78,9 +79,9 @@
   "author": "repalash <palash@shaders.app>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/repalash/uiconfig-tweakpane/issues"
+    "url": "https://github.com/repalash/uiconfig.js/issues"
   },
-  "homepage": "https://github.com/repalash/uiconfig-tweakpane#readme",
+  "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-tweakpane#readme",
   "devDependencies": {
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-replace": "^6.0.2",

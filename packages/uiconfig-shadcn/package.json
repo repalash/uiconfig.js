@@ -3,6 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/repalash/uiconfig.js.git",
+    "directory": "packages/uiconfig-shadcn"
+  },
+  "bugs": {
+    "url": "https://github.com/repalash/uiconfig.js/issues"
+  },
+  "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-shadcn#readme",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

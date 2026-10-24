@@ -83,7 +83,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/repalash/uiconfig-blueprint.git"
+    "url": "git+https://github.com/repalash/uiconfig.js.git",
+    "directory": "packages/uiconfig-blueprint"
   },
   "keywords": [
     "javascript",
@@ -98,9 +99,9 @@
   "author": "repalash <palash@shaders.app>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/repalash/uiconfig-blueprint/issues"
+    "url": "https://github.com/repalash/uiconfig.js/issues"
   },
-  "homepage": "https://github.com/repalash/uiconfig-blueprint#readme",
+  "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-blueprint#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",

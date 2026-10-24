@@ -105,27 +105,26 @@ ui.THREE = {Color, Vector4, Vector3, Vector2}
 
 ## Development
 
-Clone the project and install dependencies.
+This package lives in the [uiconfig monorepo](https://github.com/repalash/uiconfig.js). Clone it and install the dependencies at the root.
 ```bash
-git clone git://github.com/repalash/uiconfig-blueprint.git
+git clone https://github.com/repalash/uiconfig.js.git
+cd uiconfig.js
 npm install
+npm run build -w uiconfig.js
 ```
 
 Run the development server.
 ```bash
-npm run dev
+npm run dev -w uiconfig-blueprint
 ```
 Navigate to the given URL to view the examples. Make changes in the `src` folder and the page will automatically reload.
 
 Build the project.
 ```bash
-npm run build
+npm run build -w uiconfig-blueprint
 ```
 
-Publish the project to npm.
-```bash
-npm publish
-```
+Releases are published to npm from GitHub Actions: see the root README.
 
 ## License
 All code is licensed under [Apache 2.0](LICENSE).

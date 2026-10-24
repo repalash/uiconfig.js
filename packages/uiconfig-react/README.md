@@ -4,9 +4,9 @@ Base classes, sample react renderer and components for [uiconfig.js](https://git
 
 Checkout the renderers using `uiconfig-react`
 
-- Un-styled JSX - [uiconfig-react](https://github.com/repalash/uiconfig-react) (This package)
-- [shadcn/ui](https://ui.shadcn.com/) - [uiconfig-shadcn](https://github.com/repalash/uiconfig-shadcn)
-- [Blueprint JS](https://blueprintjs.com/) - [uiconfig-blueprint](https://github.com/repalash/uiconfig-blueprint)
+- Un-styled JSX - [uiconfig-react](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-react) (This package)
+- [shadcn/ui](https://ui.shadcn.com/) - [uiconfig-shadcn](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-shadcn)
+- [Blueprint JS](https://blueprintjs.com/) - [uiconfig-blueprint](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-blueprint)
 - [HeroUI/NextUI](https://www.heroui.com/) - [uiconfig-heroui](https://github.com/repalash/uiconfig-heroui)
 
 ## Installation

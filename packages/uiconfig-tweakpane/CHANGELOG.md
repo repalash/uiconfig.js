@@ -1,0 +1,34 @@
+# Changelog for uiconfig-tweakpane
+
+## [Unreleased]
+- `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-tweakpane`. The npm package name stays `uiconfig-tweakpane`.
+- Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
+- The bundles in `dist/` include `uiconfig.js` 0.4.0 (1.0.1 bundled 0.2.1).
+
+## [1.0.1] - 2025-10-27
+- Remove `console.log` calls.
+
+## [1.0.0] - 2025-10-27
+- Changes to how folders are handled, some examples and tests.
+
+## [0.1.1] - 2025-08-29
+- Add textarea component.
+
+## [0.1.0] - 2025-08-13
+- Add divider and basic tabs.
+
+## [0.0.12] - 2025-08-07
+- Add the `lib/esm` build.
+
+## [0.0.11] - 2025-07-15
+- Support `domChildren` in `inputGenerator`.
+
+## [0.0.10] - 2024-12-29
+- Use vite instead of rollup, update to TypeScript 5 and uiconfig.js v0.1.0, add support for undo, add basic examples.
+
+## [0.0.8] - 2023-12-18
+- Support trickling down property and value from parent to children.
+- Option to add extra options to the ui config when appending, fix the color setter for number and string values.
+
+## 0.0.2 to 0.0.7 - 2023-03-11 to 2023-12-10
+- First releases: Tweakpane renderer for uiconfig.js, vector and color inputs, fixes in folder UI and Tweakpane dispose.

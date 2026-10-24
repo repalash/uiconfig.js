@@ -14,7 +14,7 @@ Github: https://github.com/repalash/uiconfig.js
 
 It includes several themes/renderers with components for editor-like user interfaces like panels, sliders, pickers, inputs for string, number, file, vector, colors, etc.
 
-Available Renderers: [uiconfig-tweakpane](https://github.com/repalash/uiconfig-tweakpane), [uiconfig-blueprint](https://github.com/repalash/uiconfig-blueprint)
+Available Renderers: [uiconfig-tweakpane](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-tweakpane), [uiconfig-blueprint](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-blueprint)
 
 The UI components are bound to javascript/typescript objects and properties through a JSON configuration.
 
@@ -612,7 +612,7 @@ renderer.appendUiConfig(config);
 
 If supported in the renderer(like in tweakpane) the three.js objects will work out of the box for Color and Vector2,
 Vector3, Vector4 types.
-See [uiconfig-tweakpane](https://github.com/repalash/uiconfig-tweakpane)
+See [uiconfig-tweakpane](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-tweakpane)
 
 For viewing textures and images check the implementation in [threepipe](https://threepipe.org) under[@threepipe/plugin-tweakpane](https://github.com/repalash/threepipe/tree/main/plugins/tweakpane/src/TweakpaneUiPlugin.ts)
 
