@@ -1,0 +1,5 @@
+node_modules/
+*.log
+*.tgz
+.DS_Store
+.idea/workspace.xml

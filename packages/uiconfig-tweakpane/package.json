@@ -18,15 +18,14 @@
     "dev": "NODE_ENV=development vite build --watch",
     "test": "npm run check",
 
-    "prepare": "npm run build && npm run docs",
+    "prepack": "npm run build && npm run docs",
     "docs": "npx typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
     "serve": "ws",
     "lint": "eslint src --fix",
     "check": "tsc -p tsconfig.json --noEmit && eslint src",
 
-    "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-    "new:publish": "npm run test && git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && npm publish && clean-package restore && git tag v$npm_package_version"
+    "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore"
   },
   "exports": {
     ".": {
@@ -125,14 +124,6 @@
     },
     "@pangenerator/tweakpane-textarea-plugin": {
       "optional": true
-    }
-  },
-  "//": {
-    "dependencies": {
-      "uiconfig.js": "^0.1.6"
-    },
-    "local_dependencies": {
-      "uiconfig.js": "file:./../uiconfig.js/"
     }
   },
   "optionalDependencies": {
