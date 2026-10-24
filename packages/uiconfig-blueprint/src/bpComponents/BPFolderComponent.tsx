@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, DOMAttributes} from "react";
+import React, {ChangeEventHandler, DOMAttributes, ReactElement} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
 import {
     Button,
@@ -50,13 +50,48 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
         const enabledToggle = children[0] && this.context.methods.getBinding(children[0])[1] === 'enabled' ? children[0] : undefined
         if(enabledToggle) children = children.slice(1)
 
-        const ctxMenuBtns = children.filter(c=>{
-            return c.type === 'button' && c.tags?.includes('context-menu')
+        const headerActionBtns = children.filter(c=>{
+            // todo only supported with icon right now
+            return c.type === 'button' && c.tags?.includes('header-action') && !!c.icon
         })
-        let endIcon: MaybeElement = undefined
+        const ctxMenuBtns = children.filter(c=>{
+            return c.type === 'button' && c.tags?.includes('context-menu') && headerActionBtns.indexOf(c) === -1
+        })
+        let endIcon: (ReactElement | null)[] = []
+        if(headerActionBtns.length > 0){
+            children = children.filter(c=>!headerActionBtns.includes(c))
+            endIcon = headerActionBtns.map((btn, i) => {
+                const getProps = ()=>{ // todo use UiConfigMethods.getBaseProps
+                    const hidden = getOrCall(btn.hidden) ?? false
+                    const disabled = getOrCall(btn.disabled) ?? false
+                    const readOnly = getOrCall(btn.readOnly) ?? false
+                    return { hidden, disabled, readOnly }
+                }
+                const props = getProps()
+                let icon = typeof btn.icon === 'string' ? btn.icon : null;
+                if(icon?.startsWith('bp-')) icon = icon.replace('bp-', '')
+                return props.hidden ? null : (
+                    <Button
+                        key={'ha' + i}
+                        icon={icon as IconName | null}
+                        disabled={props.disabled || props.readOnly}
+                        variant={"minimal"}
+                        size={"small"}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const {hidden, disabled, readOnly} = getProps()
+                            if (hidden || disabled || readOnly) return;
+                            // todo loading state for promise
+                            this.context.methods.clickButton(btn, { args: [e] });
+                        }}
+                    />
+                )
+            })
+
+        }
         if(ctxMenuBtns.length > 0){
             children = children.filter(c=>!ctxMenuBtns.includes(c))
-            endIcon = (
+            endIcon.push((
                 <Popover
                     content={<ContextMenu buttons={ctxMenuBtns} context={this.context} />}
                     placement="bottom-end"
@@ -67,7 +102,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                         size={"small"}
                     />
                 </Popover>
-            )
+            ))
         }
 
         return !this.state.hidden ? (
@@ -82,7 +117,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                     setExpanded(!this.state.expanded)
                 }}
                 icon={icon}
-                endIcon={endIcon}
+                endIcon={endIcon.length ? <>{endIcon}</> : undefined}
                 label={this.state.label}
                 enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                 onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
@@ -90,7 +125,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                 <Collapse2 isOpen={this.state.expanded} keepChildrenMounted={true} transitionDuration={300}>
                     <div className="folder-children" style={{
                         listStyleType: "none",
-                        paddingLeft: level??0 > 2 ? "6px" : 0}
+                        paddingLeft: (level??0) > 2 ? "6px" : 0}
                     }> {/*todo use parameter instead of const 6*/}
                         {children.map((c, i) =>
                             <ConfigObject key={'c' + i} {...props} config={c}
@@ -110,7 +145,7 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{
     enabled?: boolean, onEnabledChange?: ChangeEventHandler<HTMLInputElement>,
     onClick: DOMAttributes<HTMLElement>['onClick']
     icon?: IconName | MaybeElement
-    endIcon?: IconName | MaybeElement
+    endIcon?: React.ReactElement
 }>> = (props) => {
     const hasEnabled = (props.enabled !== undefined)
     return (
@@ -260,9 +295,12 @@ export const ContextMenu: React.FC<{
                     return { hidden, disabled, readOnly }
                 }
                 const props = getProps()
+                let icon = typeof btn.icon === 'string' ? btn.icon : null;
+                if(icon?.startsWith('bp-')) icon = icon.replace('bp-', '')
                 return props.hidden ? null : (
                     <MenuItem
                         key={'ctx' + i}
+                        icon={icon as IconName | null}
                         disabled={props.disabled || props.readOnly}
                         text={context.methods.getLabel(btn)}
                         onClick={(e) => {
