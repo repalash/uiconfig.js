@@ -51,9 +51,7 @@ Internal dependencies (for example `uiconfig-tweakpane` on `uiconfig.js`) use ve
 2. In its `CHANGELOG.md`, rename `## [Unreleased]` to the version (`## [1.2.3]` or `## v1.2.3`).
 3. Push to `master`.
 
-For each public package whose version is not on npm, the workflow builds it (`prepack`: build, examples, docs), checks the declarations, publishes it with provenance through npm trusted publishing, and pushes the tag `<package name>-<version>`. A version without a CHANGELOG entry stops the run. A prerelease version (`1.2.3-beta.1`) goes to the dist-tag `next`, unless `publishConfig.tag` in its `package.json` sets one. Packages with `"private": true` are skipped.
-
-A local test of the publish script, without publishing: `PUBLISH_DRY_RUN=1 PUBLISH_PACKAGES='[{"name":"uiconfig-tweakpane","version":"<version>"}]' node scripts/ci/publish-packages.mjs`.
+It calls the shared workflow [repalash/release-tools](https://github.com/repalash/release-tools) (`npm-release.yml@v1`). For each public package whose version is not on npm, it builds and packs the package (`prepack`: build, examples, docs; `clean-package`), posts a Discord notice, and waits for approval of the `npm-publish` environment. It then publishes the package with provenance through npm trusted publishing and pushes the tag `<package name>-<version>`. A version without a CHANGELOG entry stops the run. A prerelease version (`1.2.3-beta.1`) goes to the dist-tag `next`, unless `publishConfig.tag` in its `package.json` sets one. Packages with `"private": true` are skipped.
 
 ## History
 
