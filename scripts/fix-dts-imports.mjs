@@ -1,4 +1,6 @@
 // Copied from threepipe scripts/vite-utils.mjs (https://github.com/repalash/threepipe/pull/60).
+// One copy for every package that emits declarations: the dts afterBuild hook in packages/*/vite.config.js,
+// and the CLI below for the lib/esm output of plain tsc (tweakpane compile:esm, blueprint postcompile:esm).
 import path from 'node:path'
 import {existsSync, readdirSync} from 'node:fs'
 import {pathToFileURL} from 'node:url'
