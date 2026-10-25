@@ -1,6 +1,5 @@
 import React from 'react'
-import {Menu, MenuItem} from '@blueprintjs/core'
-import {Classes} from '@blueprintjs/core/src/common'
+import {Classes, Menu, MenuItem} from '@blueprintjs/core'
 
 export const defaultVisualStyle = {
     darkMode: true,
