@@ -54,36 +54,39 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
     protected _createUiContainer(): HTMLDivElement {
         const container = createDiv({id: 'tweakpaneUiContainer', addToBody: false})
-        createStyles(css`
-          :root{
-            --tweakpane-ui-container-width: 300px;
-          }
-          @media only screen and (min-width: 1500px) {
-            :root{
-              --tweakpane-ui-container-width: 300px;
-            }
-          }
-          @media only screen and (min-width: 2500px) {
-            :root{
-              --tweakpane-ui-container-width: 500px;
-            }
-          }
-          #tweakpaneUiContainer {
-            position: fixed;
-            top: 1rem;
-            padding-right: 4px;
-            padding-bottom: 20px;
-            right: 1rem;
-            width: var(--tweakpane-ui-container-width);
-            height: auto;
-            overflow-y: scroll;
-            z-index: 100;
-            pointer-events: auto;
-            max-height: calc(100% - 3rem);
-            border-radius: 0.5rem;
-            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-          }
-        `)
+        // added to the document once, not for each renderer
+        if (!document.querySelector('style[data-uiconfig-tweakpane]')) {
+            createStyles(css`
+              :root{
+                --tweakpane-ui-container-width: 300px;
+              }
+              @media only screen and (min-width: 1500px) {
+                :root{
+                  --tweakpane-ui-container-width: 300px;
+                }
+              }
+              @media only screen and (min-width: 2500px) {
+                :root{
+                  --tweakpane-ui-container-width: 500px;
+                }
+              }
+              #tweakpaneUiContainer {
+                position: fixed;
+                top: 1rem;
+                padding-right: 4px;
+                padding-bottom: 20px;
+                right: 1rem;
+                width: var(--tweakpane-ui-container-width);
+                height: auto;
+                overflow-y: scroll;
+                z-index: 100;
+                pointer-events: auto;
+                max-height: calc(100% - 3rem);
+                border-radius: 0.5rem;
+                font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+              }
+            `).dataset.uiconfigTweakpane = 'container'
+        }
 
         this._container = container
         this._root = new Pane({title: 'Configuration', container})

@@ -21,33 +21,36 @@ export class UiConfigRendererBlueprint extends UiConfigRenderer {
         FocusStyleManager.onlyShowFocusOnTabs();
 
         const container = createDiv({id: 'blueprintUiContainer', addToBody: false})
-        createStyles(css`
-            :root {
-                --blueprint-ui-container-width: 300px;
-            }
-
-            @media only screen and (min-width: 1500px) {
+        // the styles (about 3 MB) are added to the document once, not for each renderer
+        if (!document.querySelector('style[data-uiconfig-blueprint]')) {
+            createStyles(css`
                 :root {
-                    --blueprint-ui-container-width: 400px;
+                    --blueprint-ui-container-width: 300px;
                 }
-            }
-            @media only screen and (min-width: 2500px) {
-                :root {
-                    --blueprint-ui-container-width: 500px;
+    
+                @media only screen and (min-width: 1500px) {
+                    :root {
+                        --blueprint-ui-container-width: 400px;
+                    }
                 }
-            }
-
-            @media only screen and (min-width: 600px) {
-                #blueprintUiContainer {
-                    min-width: var(--blueprint-ui-container-width);
-                    min-height: 200px;
-                    max-height: 100%;
-                    max-width: 100%;
-                    resize: both;
+                @media only screen and (min-width: 2500px) {
+                    :root {
+                        --blueprint-ui-container-width: 500px;
+                    }
                 }
-            }
-        `)
-        createStyles(rendererCss)
+    
+                @media only screen and (min-width: 600px) {
+                    #blueprintUiContainer {
+                        min-width: var(--blueprint-ui-container-width);
+                        min-height: 200px;
+                        max-height: 100%;
+                        max-width: 100%;
+                        resize: both;
+                    }
+                }
+            `).dataset.uiconfigBlueprint = 'container'
+            createStyles(rendererCss).dataset.uiconfigBlueprint = 'renderer'
+        }
 
         this._root = createRoot(container, {
             identifierPrefix: 'bpUi',

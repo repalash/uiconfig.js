@@ -1,6 +1,7 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
+- The renderer adds its stylesheet (about 3 MB) to the document once, for the first renderer, instead of once for each renderer: a page with several Blueprint panels parses and matches one copy of the rules.
 - Text inputs set the value once more on blur after an edit, with `last: true`, so the change event marks the end of the edit and the undo manager closes the step. They already set the value on each keystroke, with `last: false`.
 - License: MIT from this release (releases up to 0.1.0-dev.15 stay under Apache 2.0).
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-blueprint`. The npm package name stays `uiconfig-blueprint`.

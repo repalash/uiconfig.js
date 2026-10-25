@@ -1,6 +1,7 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+- The renderer adds its container stylesheet to the document once, for the first renderer, instead of once for each renderer.
 - Add an opt-in theme with the color modes `light`, `dark`, `blue`, `white` and `black`, from threepipe's Tweakpane plugin: the stylesheet `uiconfig-tweakpane/theme.css` (`dist/theme.css`), `UiConfigRendererTweakpane.setTheme(mode)` and `applyTweakpaneTheme(element, mode)`. The theme applies only inside an element with its classes, so pages that do not use it do not change.
 - Text inputs with `liveUpdate: true` in their config set the value on each keystroke, with `last: false`, and on Enter or blur with `last: true`; the undo manager records one step for the edit. Without the option, the value is set on Enter or blur, as before.
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-tweakpane`. The npm package name stays `uiconfig-tweakpane`.
