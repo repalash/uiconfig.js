@@ -1,4 +1,4 @@
-import {UiConfigContainer} from 'uiconfig'
+import {UiConfigContainer} from 'uiconfig.js'
 
 export const data: UiConfigContainer = {
     name: 'John',

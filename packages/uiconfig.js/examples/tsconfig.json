@@ -1,10 +1,6 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "uiconfig": ["../src/index.ts"]
-        },
         "declaration": false,
         "declarationDir": null,
         "downlevelIteration": true,
