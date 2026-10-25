@@ -64,6 +64,7 @@ function setupExample(main: HTMLElement) {
     addEventListener('paneltheme', showThemeMode)
 
     const renderers: Partial<Record<RendererName, Promise<UiConfigRenderer>>> = {}
+    let current: RendererName | undefined // the renderer that is shown
     const run = (name: RendererName) => {
         const host = document.getElementById(`ex-panel-${name}`)!
         renderers[name] = (async () => {
@@ -78,6 +79,8 @@ function setupExample(main: HTMLElement) {
                 view.querySelector('.panel-loading')?.remove()
                 ownView = Object.assign(document.createElement('div'), {className: 'ex-view-part'})
                 ownView.dataset.renderer = name
+                // the visitor can switch renderers while this one loads: show its view only if it is still selected
+                ownView.hidden = name !== current
                 view.append(ownView)
             }
             await module.default(ui, {log, view: ownView})
@@ -90,6 +93,7 @@ function setupExample(main: HTMLElement) {
     }
 
     const show = (name: RendererName) => {
+        current = name
         for (const el of document.querySelectorAll<HTMLElement>('[data-renderer]')) {
             if (el.tagName === 'BUTTON') el.setAttribute('aria-pressed', String(el.dataset.renderer === name))
             else el.hidden = el.dataset.renderer !== name
