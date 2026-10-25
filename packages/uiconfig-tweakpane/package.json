@@ -15,11 +15,13 @@
 
     "build": "vite build && vite build --mode umd && npm run compile:esm",
     "start": "vite",
+    "examples:dev": "vite --config vite.examples.config.js",
+    "examples:build": "vite build --config vite.examples.config.js",
     "dev": "NODE_ENV=development vite build --watch",
     "test": "npm run check",
 
     "prepack": "npm run build && npm run docs",
-    "docs": "npx typedoc ./src/index.ts",
+    "docs": "typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
     "serve": "ws",
     "lint": "eslint src --fix",
