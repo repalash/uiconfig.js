@@ -2,7 +2,7 @@
 # Each public package whose version is not on npm is published, dependencies first. Each needs a
 # CHANGELOG.md section for its version. The build step builds uiconfig.js, the workspace package
 # that the others build against, also when it is not released this time. clean-package mode then
-# runs each released package's prepack (build, examples, docs) before it strips the scripts.
+# runs each released package's prepack (build, docs) before it strips the scripts.
 # Tags: <name>-<version>.
 name: Publish packages to npm
 

@@ -5,7 +5,7 @@
 
 Describe a UI as plain objects bound to your data, and render it as a live panel with Tweakpane, Blueprint or your own components.
 
-**[Website](https://repalash.com/uiconfig.js/)** · **[Demos](https://repalash.com/uiconfig.js/examples/index.html)** · **[API docs](https://repalash.com/uiconfig.js/docs/)** · **[Guide](packages/uiconfig.js/README.md)**
+**[Website](https://repalash.com/uiconfig.js/)** · **[Examples](https://repalash.com/uiconfig.js/examples/)** · **[API docs](https://repalash.com/uiconfig.js/docs/)** · **[Guide](packages/uiconfig.js/README.md)**
 
 <p>
 <img src="website/public/screenshots/tweakpane-panel.png" alt="A config rendered by uiconfig-tweakpane" height="230">
@@ -93,8 +93,8 @@ The renderer READMEs list their components and options.
 ## Learn more
 
 - [Guide](packages/uiconfig.js/README.md): defining configs, the full config reference, binding, three.js.
-- [Demos](https://repalash.com/uiconfig.js/examples/index.html): objects, classes, decorators, paths, threepipe.
-- [API docs](https://repalash.com/uiconfig.js/docs/).
+- [Examples](https://repalash.com/uiconfig.js/examples/): live panels with their code, in Tweakpane and Blueprint: configs as objects, classes and decorators, bindings, every component, dynamic panels, undo, three.js and threepipe.
+- [API docs](https://repalash.com/uiconfig.js/docs/): the three packages in one reference, with one search.
 
 ## Contributing
 

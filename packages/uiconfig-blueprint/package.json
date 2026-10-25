@@ -56,13 +56,11 @@
     "dev:lib": "run-p \"compile:esm --watch\" \"compile:css --watch\"",
     "dist:css": "css-dist lib/css",
     "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore",
-    "dev": "vite",
     "build": "vite build && vite build --mode umd && npm run compile",
-    "build-examples": "vite build -c vite.examples.config.js",
     "docs": "typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
-    "prepack": "npm run build && npm run build-examples && npm run docs",
-    "lint": "eslint src examples --fix"
+    "prepack": "npm run build && npm run docs",
+    "lint": "eslint src --fix"
   },
   "clean-package": {
     "remove": [

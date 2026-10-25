@@ -29,7 +29,7 @@ Internal dependencies (for example `uiconfig-tweakpane` on `uiconfig.js`) use ve
 
 ## Website
 
-The website, the API docs of the three packages and their example pages are published together on GitHub Pages (https://repalash.com/uiconfig.js/) by `.github/workflows/docs-pages.yml`. `npm run pages` builds the whole site into `website/_site`; [website/README.md](website/README.md) explains the parts.
+The website, the example pages and the API docs of the three packages are published together on GitHub Pages (https://repalash.com/uiconfig.js/) by `.github/workflows/docs-pages.yml`. `npm run pages` builds the whole site into `website/_site`; [website/README.md](website/README.md) explains the parts.
 
 ## Publishing
 

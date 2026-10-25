@@ -13,7 +13,10 @@ npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
 npm run dev -w uiconfig-website       # dev server
 npm run build -w uiconfig-website     # type check and static build in website/dist
 npm run preview -w uiconfig-website   # serves website/dist
+npm run docs -w uiconfig-website      # API docs in website/dist-docs
 ```
+
+The dev server serves the example pages too: `/examples/`.
 
 After a change in one of the packages, build it again.
 
@@ -25,22 +28,56 @@ workflow [docs-pages.yml](../.github/workflows/docs-pages.yml) does:
 | Path | Content |
 |---|---|
 | `/` | this page (`website/dist`) |
-| `/docs/` | TypeDoc of uiconfig.js |
-| `/docs/uiconfig-tweakpane/`, `/docs/uiconfig-blueprint/` | TypeDoc of the renderers |
-| `/examples/` | example pages of uiconfig.js |
-| `/examples/uiconfig-tweakpane/`, `/examples/uiconfig-blueprint/` | example pages of the renderers |
+| `/examples/` | the example pages (`website/dist/examples`) |
+| `/docs/` | API docs of uiconfig.js, uiconfig-tweakpane and uiconfig-blueprint, one TypeDoc site (`website/dist-docs`) |
 | `/dist/` | the built uiconfig.js package |
 | `/README.md`, `/LICENSE` | of uiconfig.js |
 
-The uiconfig.js TypeDoc was at the root of the site before. [scripts/assemble-pages.mjs](scripts/assemble-pages.mjs)
-writes a redirect page at each old TypeDoc page path (`/classes/UiConfigMethods.html` to
-`/docs/classes/UiConfigMethods.html`, and so on).
+Older URLs keep working: [scripts/assemble-pages.mjs](scripts/assemble-pages.mjs) writes a redirect page at each
+old path, to the page that replaced it.
+
+| Old path | Now |
+|---|---|
+| `/classes/X.html` (the uiconfig.js TypeDoc at the root), `/docs/classes/X.html` | `/docs/classes/uiconfig.js.X.html` |
+| `/docs/uiconfig-tweakpane/classes/X.html`, `/docs/uiconfig-blueprint/…` | `/docs/classes/uiconfig-tweakpane.X.html`, … |
+| `/docs/uiconfig-tweakpane/index.html`, `modules.html` | `/docs/modules/uiconfig-tweakpane.html` |
+| `/examples/html/*.html`, `/examples/examples/*.html` | the example that covers the page, in the renderer that the page used |
+| `/examples/uiconfig-tweakpane/…`, `/examples/uiconfig-blueprint/…` | the same, with `?renderer=` of that package |
 
 All URLs are relative (`base: './'` in [vite.config.js](vite.config.js)), so the site works under
 `/uiconfig.js/` and at the root of a domain.
 
 To check the result locally, serve `website/_site` with any static server, for example
 `python3 -m http.server -d website/_site`.
+
+## Example pages
+
+[src/examples/registry.js](src/examples/registry.js) lists the examples by topic: slug, title, summary, the renderers
+that support each one, and the component types for the drawing on its card. An example is one file,
+`src/examples/code/<slug>.js` (or `.ts`): a default export that gets the renderer (`ui`) and `{log, view}`. The page
+runs that file and shows its source, the part between `// #region` and `// #endregion` (a file can have several
+regions, for example its imports and the body of the function), so the code on the page is the code that runs.
+
+The pages have no HTML files: [scripts/examples-pages.mjs](scripts/examples-pages.mjs) makes `examples/index.html` and
+`examples/<slug>.html` from the registry, and [vite.config.js](vite.config.js) serves them in the dev server and builds
+them with the landing page. [src/examples/main.ts](src/examples/main.ts) is their script: it creates the renderer that
+the visitor picks (`?renderer=tweakpane|blueprint` in the URL, else the last choice, else the first of the example) and
+runs the example in it; each renderer gets its own run, because a renderer keeps its state in the config objects.
+The panels on these pages have the renderers' default undo manager (Ctrl+Z), as the setup code on the page shows.
+The styles are in `src/styles/examples.css`.
+
+To add an example: write `src/examples/code/<slug>.js`, add its entry to the registry, and, if it replaces an old page,
+a redirect in `scripts/assemble-pages.mjs`.
+
+## API docs
+
+[typedoc.json](typedoc.json) builds one TypeDoc site for the three packages (`entryPointStrategy: "packages"`, each
+package from its `src/index.ts`), with [src/docs/index.md](src/docs/index.md) as its home page. The look comes from the
+site: [scripts/docs-theme.mjs](scripts/docs-theme.mjs) writes `dist-docs/assets/custom.css` from the font faces, the
+tokens and [src/docs/docs.css](src/docs/docs.css), and copies the two font files. [src/docs/docs.js](src/docs/docs.js)
+sets the color scheme from TypeDoc's theme setting, puts the site's brand and a package switcher in the top bar, and
+keeps the links to the site on the host that serves the docs. Each package also has its own `npm run docs` (TypeDoc in
+the package's `docs` folder, published with the package); the website does not use those.
 
 ## Notes
 

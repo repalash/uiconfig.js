@@ -11,11 +11,9 @@ The UI components are bound to javascript/typescript objects and properties thro
 
 ### Examples
 
-Basic Examples: https://repalash.com/uiconfig.js/examples/index.html
+Examples: https://repalash.com/uiconfig.js/examples/ (each example runs in Tweakpane; some are only for Tweakpane: themes, text areas and tabs, custom components)
 
-Renderer examples: https://repalash.com/uiconfig.js/examples/uiconfig-tweakpane/index.html
-
-API docs: https://repalash.com/uiconfig.js/docs/uiconfig-tweakpane/
+API docs: https://repalash.com/uiconfig.js/docs/modules/uiconfig-tweakpane.html
 
 Threepipe Basic UI: https://threepipe.org/examples/#tweakpane-ui-plugin/
 
