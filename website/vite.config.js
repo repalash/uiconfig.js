@@ -4,6 +4,7 @@ import path from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {highlightFile, highlightHtmlPage, sampleSource} from './scripts/highlight.mjs'
 import {examplePageHtml, examplePagePaths, exampleFile} from './scripts/examples-pages.mjs'
+import {absoluteUrl, pageMeta, socialTags} from './scripts/site.mjs'
 import {bindingFigure, icons} from './src/figures/figures.js'
 import {heroFigure} from './src/figures/hero-figure.js'
 
@@ -11,7 +12,9 @@ import {heroFigure} from './src/figures/hero-figure.js'
 // - `import html from './file.js?highlight'` gives the highlighted HTML of a sample file, `?sample` its text
 //   (the part between `// #region` and `// #endregion`, or the file without its `export {…}` line);
 // - <pre data-code="js|ts|sh|html"> blocks in index.html are highlighted;
-// - <svg data-figure="name"></svg> placeholders in index.html become the figures of src/figures.
+// - <svg data-figure="name"></svg> placeholders in index.html become the figures of src/figures;
+// - every page gets its canonical link and Open Graph tags (scripts/site.mjs: absolute URLs from SITE_URL, made from
+//   the page's <title> and description), the landing page its JSON-LD.
 // The example pages (examples/index.html, examples/<slug>.html) have no file: examplePages() makes their HTML from
 // src/examples/registry.js, for the dev server and for the build.
 function site() {
@@ -34,7 +37,8 @@ function site() {
             const text = m[1] === 'highlight' ? highlightFile(file) : sampleSource(readFileSync(file, 'utf8'))
             return `export default ${JSON.stringify(text)}`
         },
-        transformIndexHtml(html) {
+        transformIndexHtml(html, ctx) {
+            html = addSiteTags(html, path.relative(root, ctx.filename).split(path.sep).join('/'))
             html = html.replace(/<svg data-figure="([\w-]+)"><\/svg>/g, (m, name) => {
                 if (!figures[name]) throw new Error(`no figure named ${name}`)
                 return figures[name]()
@@ -45,6 +49,28 @@ function site() {
 }
 
 const root = path.dirname(fileURLToPath(import.meta.url))
+
+/** Canonical link and Open Graph tags for the page at `rel` (relative to website/), JSON-LD for the landing page. */
+function addSiteTags(html, rel) {
+    const page = rel === 'index.html' ? '' : rel.replace(/(^|\/)index\.html$/, '$1')
+    const {title, description} = pageMeta(html)
+    let tags = socialTags({title, description, path: page})
+    if (page === '') {
+        const data = {
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareSourceCode',
+            name: 'uiconfig.js',
+            description,
+            url: absoluteUrl(''),
+            codeRepository: 'https://github.com/repalash/uiconfig.js',
+            programmingLanguage: 'TypeScript',
+            license: 'https://opensource.org/licenses/MIT',
+            author: {'@type': 'Person', name: 'repalash', url: 'https://repalash.com'},
+        }
+        tags += `\n    <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
+    }
+    return html.replace('</head>', `    ${tags}\n</head>`)
+}
 
 function examplePages() {
     const pages = new Map(examplePagePaths.map(rel => [path.join(root, rel), rel]))

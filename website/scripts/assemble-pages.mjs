@@ -15,10 +15,15 @@
 // - the example pages of the three packages (/examples/html/*.html, /examples/examples/*.html,
 //   /examples/uiconfig-tweakpane/…, /examples/uiconfig-blueprint/…) to the example that covers them.
 // The old docs' CHANGELOG and LICENSE files are copied to their old paths.
-// Every path is relative, so the site works under any base path.
-import {cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync} from 'node:fs'
+//
+// For search engines and AI agents: sitemap.xml (every page, not the redirect pages), robots.txt, and the Markdown of
+// scripts/llms.mjs: /llms.txt, /llms-full.txt, /md/ (guide, renderer READMEs, API reference) and examples/<slug>.md.
+// Their absolute URLs come from SITE_URL (scripts/site.mjs); every link on the pages stays relative.
+import {cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync} from 'node:fs'
 import path from 'node:path'
 import {fileURLToPath} from 'node:url'
+import {agentDocs} from './llms.mjs'
+import {absoluteUrl, siteUrl} from './site.mjs'
 
 const website = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const repo = path.resolve(website, '..')
@@ -27,6 +32,7 @@ const core = path.join(repo, 'packages/uiconfig.js')
 const tweakpane = path.join(repo, 'packages/uiconfig-tweakpane')
 const blueprint = path.join(repo, 'packages/uiconfig-blueprint')
 const docs = path.join(website, 'dist-docs')
+const docsMarkdown = path.join(website, 'dist-docs-md')
 const packages = ['uiconfig.js', 'uiconfig-tweakpane', 'uiconfig-blueprint']
 
 // [source, destination in _site, command that builds the source]
@@ -43,7 +49,8 @@ const parts = [
     [path.join(blueprint, 'LICENSE'), 'docs/uiconfig-blueprint/LICENSE', ''],
 ]
 
-const missing = parts.filter(([src]) => !existsSync(src))
+// dist-docs-md: the API reference in Markdown, for the agent docs (not copied as a whole)
+const missing = [...parts, [docsMarkdown, null, 'npm run docs -w uiconfig-website']].filter(([src]) => !existsSync(src))
 if (missing.length) {
     for (const [src, , cmd] of missing) console.error(`missing ${path.relative(repo, src)}${cmd ? ` (build it with: ${cmd})` : ''}`)
     process.exit(1)
@@ -154,4 +161,44 @@ for (const [from, to] of redirects) {
     writeFileSync(dest, redirectPage(path.posix.relative(path.posix.dirname(from), to)))
 }
 
-console.log(`website/_site: ${parts.length} parts, ${redirects.size} redirect pages`)
+// ---------------------------------------------------------------- agent docs, sitemap, robots.txt
+
+const read = file => readFileSync(file, 'utf8')
+const agentFiles = agentDocs({
+    guide: read(path.join(core, 'README.md')),
+    readmes: {'uiconfig-tweakpane': read(path.join(tweakpane, 'README.md')), 'uiconfig-blueprint': read(path.join(blueprint, 'README.md'))},
+    api: Object.fromEntries(packages.map(p => [p, read(path.join(docsMarkdown, `${p}.md`))])),
+})
+for (const [rel, text] of Object.entries(agentFiles)) {
+    const dest = path.join(out, rel)
+    if (existsSync(dest)) throw new Error(`${rel} exists already`)
+    mkdirSync(path.dirname(dest), {recursive: true})
+    writeFileSync(dest, text)
+}
+
+// every HTML page except the redirect pages
+const pages = []
+function walkPages(dir) {
+    for (const name of readdirSync(dir).sort()) {
+        const file = path.join(dir, name)
+        const rel = path.relative(out, file).split(path.sep).join('/')
+        if (statSync(file).isDirectory()) {
+            if (!['assets', 'dist'].includes(rel) && rel !== 'docs/assets') walkPages(file)
+        } else if (name.endsWith('.html') && !redirects.has(rel)) {
+            pages.push(rel.replace(/(^|\/)index\.html$/, '$1'))
+        }
+    }
+}
+walkPages(out)
+// the landing page first, then the examples, then the docs
+const rank = p => p === '' ? 0 : p.startsWith('examples/') ? 1 : 2
+pages.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b))
+writeFileSync(path.join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(p => `<url><loc>${absoluteUrl(p)}</loc></url>`).join('\n')}
+</urlset>
+`)
+// read by crawlers only at the root of a host: at ${siteUrl} it counts when the site has a domain of its own
+writeFileSync(path.join(out, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${absoluteUrl('sitemap.xml')}\n`)
+
+console.log(`website/_site for ${siteUrl}: ${parts.length} parts, ${redirects.size} redirect pages, ${pages.length} pages in sitemap.xml, ${Object.keys(agentFiles).length} Markdown files for llms.txt`)
