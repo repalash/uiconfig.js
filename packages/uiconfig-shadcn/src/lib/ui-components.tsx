@@ -440,16 +440,20 @@ export function SelectComponent(props: UiConfigBaseProps<string | number>) {
                     <Label htmlFor={props.config.name||props.config.uuid}>{state.label}</Label>
                     <Select
                         {...props.config.props}
-                        value={item.value}
+                        value={item ? String(item.value) : ''}
                         disabled={state.disabled || state.readOnly}
-                        onValueChange={(e) => setValue(e)}
+                        onValueChange={(v) => {
+                            // option values can be numbers; the select reports strings
+                            const option = state.options.find(o => String(o.value) === v)
+                            if (option) setValue(option.value)
+                        }}
                     >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a value" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                            {state.options.map(o => <SelectItem key={o.value} value={o.value as any}>{o.label}</SelectItem>)}
+                            {state.options.map(o => <SelectItem key={o.value} value={String(o.value)}>{o.label}</SelectItem>)}
                             </SelectGroup>
                         </SelectContent>
                     </Select>

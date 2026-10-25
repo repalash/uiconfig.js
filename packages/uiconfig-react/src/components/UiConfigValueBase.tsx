@@ -149,7 +149,7 @@ export type TColorInputVal = string | number | TColorObj
 function colorToHex(color: TColorInputVal){
     if(typeof color === 'string') return color;
     if(typeof color === 'number') return '#' + Math.floor(color).toString(16).padStart(6, '0');
-    if(typeof color.getHexString === 'function') return color.getHexString();
+    if(typeof color.getHexString === 'function') return '#' + color.getHexString();
     const c = typeof color.toArray === 'function' ? color.toArray() : [color.r, color.g, color.b, color.a]
     return '#' + c.map(c => c === undefined ? '' : Math.floor(c * 255).toString(16).padStart(2, '0')).join('');
 }

@@ -400,9 +400,13 @@ export function DropdownComponent(props: UiConfigBaseProps<string | number>) {
                 >{state.label}
                     <select
                         {...props.config.props}
-                        value={item.value}
+                        value={item ? String(item.value) : ''}
                         disabled={state.disabled || state.readOnly}
-                        onChange={(e) => setValue(e.target.value)}
+                        onChange={(e) => {
+                            // option values can be numbers; the select reports strings
+                            const option = state.options.find(o => String(o.value) === e.target.value)
+                            if (option) setValue(option.value)
+                        }}
                     >
                         {state.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
