@@ -17,7 +17,7 @@
 
 export const topics = [
     {id: 'syntax', title: 'Writing configs', icon: 'syntax', intro: 'The same panel from a plain object, a class, TypeScript decorators, or generated from the data.'},
-    {id: 'binding', title: 'Binding to data', icon: 'binding', intro: 'How a component reads and writes its value: a property of an object, the config itself, functions, or a path.'},
+    {id: 'binding', title: 'Binding to data', icon: 'bind', intro: 'How a component reads and writes its value: a property of an object, the config itself, functions, or a path.'},
     {id: 'components', title: 'Components', icon: 'components', intro: 'The `type` of a config picks the component. Both renderers have the common set; Tweakpane adds a few.'},
     {id: 'dynamic', title: 'Dynamic panels', icon: 'playground', intro: 'Panels that change with the data: computed properties, children that come and go, change events, undo.'},
     {id: 'renderers', title: 'Renderers', icon: 'install', intro: 'Options of one renderer: the themes of uiconfig-tweakpane and components of your own.'},
@@ -81,6 +81,7 @@ export const examples = [
         slug: 'dropdowns', topic: 'components', title: 'Dropdowns', renderers: both,
         summary: 'The options of a `dropdown` (or `select`) are its `children`. An option without a `value` uses its `label`. A function in `children` makes the options on each refresh.',
         preview: ['dropdown', 'dropdown', 'dropdown'], log: true,
+        note: 'uiconfig-tweakpane reads the options once, when it creates the dropdown, so "Add a font" changes the list in Blueprint only.',
     },
     {
         slug: 'buttons', topic: 'components', title: 'Buttons', renderers: both,
