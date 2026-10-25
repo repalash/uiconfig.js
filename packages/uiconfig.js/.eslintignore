@@ -1,6 +1,5 @@
 node_modules
 dist
-examples/dist
 public
 config
 libs
