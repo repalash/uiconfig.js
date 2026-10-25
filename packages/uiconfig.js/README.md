@@ -618,6 +618,20 @@ See [uiconfig-tweakpane](https://github.com/repalash/uiconfig.js/tree/master/pac
 
 For viewing textures and images check the implementation in [threepipe](https://threepipe.org) under[@threepipe/plugin-tweakpane](https://github.com/repalash/threepipe/tree/main/plugins/tweakpane/src/TweakpaneUiPlugin.ts)
 
+## Examples
+
+The example pages are in [examples](./examples): `examples/index.html` links to the pages in `examples/html`, and `examples/src` has the TypeScript examples. The pages import the packages by name (`uiconfig.js`, `uiconfig-tweakpane`, `uiconfig-blueprint`). Vite bundles them from the built packages of this repository, so build those first. From the repository root:
+
+```bash
+npm install
+npm run build -w uiconfig.js
+npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
+npm run examples:dev -w uiconfig.js     # dev server; the printed URL opens the examples index
+npm run examples:build -w uiconfig.js   # static build in examples/dist
+```
+
+After a change in one of the packages, build it again. The GitHub Pages workflow runs the same build and publishes `examples/dist` as https://repalash.com/uiconfig.js/examples/index.html.
+
 ## Changelog
 
 See - [CHANGELOG.md](./CHANGELOG.md)
