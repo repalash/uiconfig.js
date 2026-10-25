@@ -55,6 +55,12 @@ main code, .footer code {
     font-size: 0.9em;
 }
 
+/* no programming ligatures: code on the site is copied, and `=>` must read as typed, not as an arrow glyph */
+code, pre, .cm-editor, .pg-fallback {
+    font-variant-ligatures: none;
+    font-feature-settings: 'liga' 0, 'calt' 0;
+}
+
 main p {
     margin: 0 0 1em;
     max-width: 68ch;
