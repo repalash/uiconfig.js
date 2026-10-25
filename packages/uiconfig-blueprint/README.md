@@ -11,7 +11,9 @@ The UI components are bound to javascript/typescript    objects and properties t
 
 ### Examples
 
-Basic Examples: https://repalash.com/uiconfig-blueprint/examples/index.html
+Basic Examples: https://repalash.com/uiconfig.js/examples/uiconfig-blueprint/index.html
+
+API docs: https://repalash.com/uiconfig.js/docs/uiconfig-blueprint/
 
 Threepipe Basic UI: https://threepipe.org/examples/#blueprintjs-ui-plugin/
 
