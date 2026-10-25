@@ -14,9 +14,33 @@ import {
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
 
+/** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
+export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
+export type TweakpaneThemeMode = typeof tweakpaneThemeModes[number]
+
+/**
+ * Applies a color mode of the theme in `uiconfig-tweakpane/theme.css` to an element and the Tweakpane panels in it,
+ * by setting the classes `tpTheme` and `tpTheme-<mode>`. Import the stylesheet once. `null` removes the theme.
+ * @param element - the panel's container, or any ancestor of the panels
+ * @param mode - the color mode, or null for the default Tweakpane look
+ */
+export function applyTweakpaneTheme(element: HTMLElement, mode: TweakpaneThemeMode | null) {
+    element.classList.remove('tpTheme', ...tweakpaneThemeModes.map(m => 'tpTheme-' + m))
+    if (mode) element.classList.add('tpTheme', 'tpTheme-' + mode)
+}
+
 export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
     protected _root?: Pane
+    protected _container?: HTMLDivElement
+
+    /**
+     * Applies a color mode of the theme in `uiconfig-tweakpane/theme.css` to this renderer's panel; `null` removes it.
+     * Import the stylesheet once (`import 'uiconfig-tweakpane/theme.css'`).
+     */
+    setTheme(mode: TweakpaneThemeMode | null) {
+        if (this._container) applyTweakpaneTheme(this._container, mode)
+    }
 
     unmount() {
         this._root?.dispose()
@@ -30,37 +54,41 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
     protected _createUiContainer(): HTMLDivElement {
         const container = createDiv({id: 'tweakpaneUiContainer', addToBody: false})
-        createStyles(css`
-          :root{
-            --tweakpane-ui-container-width: 300px;
-          }
-          @media only screen and (min-width: 1500px) {
-            :root{
-              --tweakpane-ui-container-width: 300px;
-            }
-          }
-          @media only screen and (min-width: 2500px) {
-            :root{
-              --tweakpane-ui-container-width: 500px;
-            }
-          }
-          #tweakpaneUiContainer {
-            position: fixed;
-            top: 1rem;
-            padding-right: 4px;
-            padding-bottom: 20px;
-            right: 1rem;
-            width: var(--tweakpane-ui-container-width);
-            height: auto;
-            overflow-y: scroll;
-            z-index: 100;
-            pointer-events: auto;
-            max-height: calc(100% - 3rem);
-            border-radius: 0.5rem;
-            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
-          }
-        `)
+        // added to the document once, not for each renderer
+        if (!document.querySelector('style[data-uiconfig-tweakpane]')) {
+            createStyles(css`
+              :root{
+                --tweakpane-ui-container-width: 300px;
+              }
+              @media only screen and (min-width: 1500px) {
+                :root{
+                  --tweakpane-ui-container-width: 300px;
+                }
+              }
+              @media only screen and (min-width: 2500px) {
+                :root{
+                  --tweakpane-ui-container-width: 500px;
+                }
+              }
+              #tweakpaneUiContainer {
+                position: fixed;
+                top: 1rem;
+                padding-right: 4px;
+                padding-bottom: 20px;
+                right: 1rem;
+                width: var(--tweakpane-ui-container-width);
+                height: auto;
+                overflow-y: scroll;
+                z-index: 100;
+                pointer-events: auto;
+                max-height: calc(100% - 3rem);
+                border-radius: 0.5rem;
+                font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+              }
+            `).dataset.uiconfigTweakpane = 'container'
+        }
 
+        this._container = container
         this._root = new Pane({title: 'Configuration', container})
         this._root.registerPlugin(TextareaPlugin)
         return container

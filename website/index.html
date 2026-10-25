@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>uiconfig.js: UI panels from config objects</title>
+    <meta name="description" content="Describe a UI as plain config objects or TypeScript decorators bound to your data, and render it as a live panel with Tweakpane, Blueprint or your own renderer.">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <script>
+        // color scheme before the first paint: the visitor's choice in "Tweak this page", else the system setting
+        (function () {
+            var scheme = 'auto'
+            try { scheme = JSON.parse(localStorage.getItem('uiconfig-site:design') || '{}').scheme || 'auto' } catch (e) {}
+            var dark = scheme === 'auto' ? matchMedia('(prefers-color-scheme: dark)').matches : scheme === 'dark'
+            document.documentElement.dataset.scheme = dark ? 'dark' : 'light'
+        })()
+    </script>
+    <script type="module" src="./src/main.ts"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+    <div class="wrap topbar-inner">
+        <a class="brand" href="./" aria-label="uiconfig.js home">uiconfig<span class="brand-dot">.js</span></a>
+        <nav aria-label="Site">
+            <ul class="nav-list">
+                <li><a href="#playground">Playground</a></li>
+                <li><a href="./docs/">API docs</a></li>
+                <li><a href="./examples/index.html">Examples</a></li>
+                <li><a href="https://github.com/repalash/uiconfig.js">GitHub</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+
+    <section class="hero" aria-labelledby="wordmark">
+        <div class="wrap">
+            <div class="hero-grid">
+                <h1 id="wordmark" class="wordmark" aria-label="uiconfig.js">uiconfig.js</h1>
+                <figure class="iso-card hero-fig">
+                    <div class="iso-card-top"><span>Fig. 1</span><span>Inside the hero panel</span></div>
+                    <svg data-figure="hero"></svg>
+                    <div class="iso-card-bottom"><span>Move a slider in the panel</span><span class="fig-readout" id="fig-hero-readout" aria-hidden="true"></span></div>
+                </figure>
+                <div class="hero-text">
+                    <p class="lede">Describe a UI as plain objects bound to your data. A renderer turns the description into a live panel: Tweakpane, Blueprint, or one you write.</p>
+                    <p>The config is data, so the code that defines it has no dependency. Only the page that shows the panel imports a renderer.</p>
+                    <div class="install">
+                        <pre class="install-cmd" tabindex="0" data-code="sh"><code>npm install uiconfig-tweakpane</code></pre>
+                        <button type="button" class="button-quiet" data-copy="npm install uiconfig-tweakpane">Copy</button>
+                    </div>
+                    <ul class="link-row">
+                        <li><a href="https://github.com/repalash/uiconfig.js">GitHub</a></li>
+                        <li><a href="https://www.npmjs.com/package/uiconfig.js">npm</a></li>
+                        <li><a href="./docs/">API docs</a></li>
+                        <li><a href="./examples/index.html">Examples</a></li>
+                    </ul>
+                </div>
+                <figure class="hero-panel">
+                    <div class="panel-host" id="hero-panel"></div>
+                    <figcaption>This panel edits the heading above. It is the config below, rendered by uiconfig-tweakpane.</figcaption>
+                    <div class="theme-switch">
+                        <span id="panel-theme-label">Panel theme</span>
+                        <div class="segmented segmented-small" id="panel-theme" role="group" aria-labelledby="panel-theme-label">
+                            <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+                            <button type="button" data-theme="light" aria-pressed="false">Light</button>
+                            <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+                            <button type="button" data-theme="blue" aria-pressed="false">Blue</button>
+                            <button type="button" data-theme="white" aria-pressed="false">White</button>
+                            <button type="button" data-theme="black" aria-pressed="false">Black</button>
+                        </div>
+                    </div>
+                </figure>
+            </div>
+            <details class="code-details hero-details">
+                <summary>Config of this panel</summary>
+                <pre class="code" tabindex="0"><code id="hero-code"></code></pre>
+            </details>
+        </div>
+    </section>
+
+    <section id="renderers" class="section" aria-labelledby="renderers-title" data-show="tweakpane">
+        <div class="wrap">
+            <div class="renderers-head">
+                <div>
+                    <h2 id="renderers-title">One config, any renderer</h2>
+                    <p class="intro">Renderers are separate packages, and a config does not import any of them. The same config works as a small debug panel in Tweakpane and as an app inspector in Blueprint. Both panels below edit one <code>light</code> object: change a value in one, and the other follows.</p>
+                </div>
+                <figure class="fig">
+                    <svg data-figure="binding"></svg>
+                    <figcaption>
+                        <ul class="legend" aria-label="Colors in the figure">
+                            <li class="key" style="--h: var(--c-data)">data object</li>
+                            <li class="key" style="--h: var(--c-config)">config</li>
+                            <li class="key" style="--h: var(--c-tweakpane)">uiconfig-tweakpane</li>
+                            <li class="key" style="--h: var(--c-blueprint)">uiconfig-blueprint</li>
+                        </ul>
+                        <p class="fig-note"><span>A change in one panel goes to the data object. The other renderer reads it from there.</span> <span class="fig-readout" id="fig-binding-readout" aria-hidden="true"></span></p>
+                    </figcaption>
+                </figure>
+            </div>
+
+            <div class="panel-switch" role="group" aria-label="Panel to show">
+                <button type="button" data-show="tweakpane" aria-pressed="true">Tweakpane</button>
+                <button type="button" data-show="blueprint" aria-pressed="false">Blueprint</button>
+            </div>
+            <div class="dual">
+                <figure class="dual-panel" data-panel="tweakpane">
+                    <div class="panel-host" id="dual-tweakpane"></div>
+                    <figcaption><span class="key" style="--h: var(--c-tweakpane)">uiconfig-tweakpane</span></figcaption>
+                </figure>
+                <figure class="dual-data">
+                    <pre class="code data-view" tabindex="0" aria-live="polite"><code id="dual-data"></code></pre>
+                    <figcaption><span class="key" style="--h: var(--c-data)">The data object. Both panels write to it.</span></figcaption>
+                </figure>
+                <figure class="dual-panel" data-panel="blueprint">
+                    <div class="panel-host" id="dual-blueprint"><p class="panel-loading">Loading Blueprint and React…</p></div>
+                    <figcaption><span class="key" style="--h: var(--c-blueprint)">uiconfig-blueprint</span></figcaption>
+                </figure>
+            </div>
+            <details class="code-details">
+                <summary>The config</summary>
+                <pre class="code" tabindex="0"><code id="dual-code"></code></pre>
+                <p class="note">Each panel gets its own copy, <code>createLightConfig(light)</code>, because a renderer keeps its state in the config. The <code>onChange</code> of one calls <code>uiRefresh(true)</code> on the other.</p>
+            </details>
+        </div>
+    </section>
+
+    <section id="syntax" class="section" aria-labelledby="syntax-title">
+        <div class="wrap">
+            <div class="section-head"><svg data-figure="syntax"></svg><h2 id="syntax-title">Three ways to write it</h2></div>
+            <p class="intro">Put the config next to the data in an object, build it in a class, or let TypeScript decorators generate it from the fields. Each tab shows the code that renders the panel next to it.</p>
+            <div class="tabs" role="tablist" aria-label="Syntax">
+                <button type="button" role="tab" id="tab-object" aria-controls="syntax-tabpanel" data-sample="object">Object</button>
+                <button type="button" role="tab" id="tab-class" aria-controls="syntax-tabpanel" data-sample="class">Class</button>
+                <button type="button" role="tab" id="tab-decorators" aria-controls="syntax-tabpanel" data-sample="decorators">TypeScript decorators</button>
+            </div>
+            <div class="syntax-grid" id="syntax-tabpanel" role="tabpanel" aria-labelledby="tab-object">
+                <pre class="code syntax-code" tabindex="0"><code id="syntax-code"></code></pre>
+                <div class="syntax-side">
+                    <div class="panel-host" id="syntax-panel"></div>
+                    <p class="note">Render any of them with</p>
+                    <pre class="code" tabindex="0" data-code="js"><code>// or 'uiconfig-blueprint'
+import {UI} from 'uiconfig-tweakpane'
+
+const ui = new UI()
+ui.appendChild(data.uiConfig)</code></pre>
+                    <p class="note">Decorators need <code>"experimentalDecorators": true</code> in <code>tsconfig.json</code>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="components" class="section" aria-labelledby="components-title">
+        <div class="wrap">
+            <div class="section-head"><svg data-figure="components"></svg><h2 id="components-title">Components</h2></div>
+            <p class="intro">The <code>type</code> of a config picks the component. Some types have aliases. Both renderers support the common set; Tweakpane adds a few.</p>
+            <div class="gallery">
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Component types and renderer support">
+                    <table class="types">
+                        <thead>
+                        <tr><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Tweakpane</th><th scope="col">Blueprint</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><th scope="row"><code>folder</code></th><td><code>children</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>panel</code></th><td><code>children</code></td><td class="yes">as folder</td><td class="yes">opens a page</td></tr>
+                        <tr><th scope="row"><code>input</code></th><td>string, number, boolean</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>number</code></th><td>number</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>slider</code></th><td>number, <code>bounds</code>, <code>stepSize</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>checkbox</code>, <code>toggle</code></th><td>boolean</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>dropdown</code>, <code>select</code></th><td>options in <code>children</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>button</code></th><td><code>onClick</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>color</code></th><td><code>'#rrggbb'</code>, number, <code>Color</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>vec2</code>, <code>vec3</code>, <code>vec4</code>, <code>vec</code>, <code>vector</code></th><td><code>{x, y, z, w}</code></td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>monitor</code></th><td>read-only value</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+                        <tr><th scope="row"><code>textarea</code>, <code>multiline</code></th><td>string</td><td class="yes">yes</td><td class="no">no</td></tr>
+                        <tr><th scope="row"><code>tabs</code></th><td>folders in <code>children</code></td><td class="yes">yes</td><td class="no">no</td></tr>
+                        <tr><th scope="row"><code>separator</code>, <code>divider</code></th><td>none</td><td class="yes">yes</td><td class="no">no</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="gallery-side">
+                    <div class="segmented" id="gallery-switch" role="group" aria-label="Renderer">
+                        <button type="button" data-renderer="tweakpane" aria-pressed="true">Tweakpane</button>
+                        <button type="button" data-renderer="blueprint" aria-pressed="false">Blueprint</button>
+                    </div>
+                    <div class="panel-host" id="gallery-tweakpane"></div>
+                    <p class="note gallery-note">Here Tweakpane has its default look. The other Tweakpane panels on this page use the theme in <code>uiconfig-tweakpane/theme.css</code>.</p>
+                    <div class="panel-host" id="gallery-blueprint" hidden></div>
+                </div>
+            </div>
+            <p class="note">Color and vector components create their values with the classes in <code>ui.THREE</code>: set it to three.js <code>Color</code>, <code>Vector2</code>, <code>Vector3</code> and <code>Vector4</code>, as this page does. The <code>uiImage</code> decorator has no component in these renderers yet; threepipe adds its own image and texture inputs.</p>
+        </div>
+    </section>
+
+    <section id="playground" class="section" aria-labelledby="playground-title">
+        <div class="wrap">
+            <div class="section-head"><svg data-figure="playground"></svg><h2 id="playground-title">Playground</h2></div>
+            <p class="intro">Write a config and see the panel. The code runs in this page and must <code>return</code> a config; <code>log()</code> prints under the panel. Your last code stays in this browser.</p>
+            <div class="pg-toolbar">
+                <label class="pg-preset">Start from
+                    <select id="pg-preset"></select>
+                </label>
+                <div class="segmented" id="pg-switch" role="group" aria-label="Renderer">
+                    <button type="button" data-renderer="tweakpane" aria-pressed="true">Tweakpane</button>
+                    <button type="button" data-renderer="blueprint" aria-pressed="false">Blueprint</button>
+                </div>
+            </div>
+            <div class="pg-grid">
+                <div class="pg-editor">
+                    <textarea id="pg-fallback" class="pg-fallback" spellcheck="false" aria-label="Playground code, JavaScript"></textarea>
+                </div>
+                <div class="pg-output">
+                    <p id="pg-status" class="pg-status" role="status">The panel appears here.</p>
+                    <div class="panel-host" id="pg-tweakpane"></div>
+                    <div class="panel-host" id="pg-blueprint" hidden></div>
+                    <h3 class="pg-log-title" id="pg-log-title">Log</h3>
+                    <ol id="pg-log" class="pg-log" aria-labelledby="pg-log-title"></ol>
+                </div>
+            </div>
+            <p class="note">In the editor, Tab indents. To move the focus out, press Escape and then Tab.</p>
+        </div>
+    </section>
+
+    <section id="three" class="section" aria-labelledby="three-title">
+        <div class="wrap">
+            <div class="section-head"><svg data-figure="three"></svg><h2 id="three-title">With three.js</h2></div>
+            <p class="intro">With <code>ui.THREE</code> set, the color and vector inputs edit three.js objects in place: this panel is bound to the material and the position of the mesh, and the scene renders after each change.</p>
+            <div class="three-grid">
+                <div class="three-view" id="three-view" role="img" aria-label="A torus knot rendered with three.js; the panel next to it changes its color, material, position and spin"><p class="panel-loading">Loading three.js…</p></div>
+                <div class="three-side">
+                    <div class="panel-host" id="three-panel"></div>
+                    <pre class="code three-code" tabindex="0" aria-label="The config of the panel"><code id="three-code"></code></pre>
+                </div>
+            </div>
+            <p class="three-note"><a href="https://threepipe.org">threepipe</a>, a three.js framework, builds its UI with uiconfig: the viewer, its plugins, objects and materials carry a <code>uiConfig</code>, and its editors render them with uiconfig-tweakpane or uiconfig-blueprint.</p>
+            <ul class="link-row">
+                <li><a href="https://threepipe.org/examples/#tweakpane-editor/">Tweakpane editor</a></li>
+                <li><a href="https://threepipe.org/examples/#blueprintjs-editor/">Blueprint editor</a></li>
+                <li><a href="./examples/html/threepipe_basic.html">threepipe example page</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="install" class="section" aria-labelledby="install-title">
+        <div class="wrap narrow">
+            <div class="section-head"><svg data-figure="install"></svg><h2 id="install-title">Install</h2></div>
+            <pre class="code" tabindex="0" data-code="sh"><code>npm install uiconfig-tweakpane   # Tweakpane renderer
+npm install uiconfig-blueprint   # Blueprint renderer (React)
+npm install uiconfig.js          # types and decorators, for TypeScript</code></pre>
+            <p>The packages are ES modules for a bundler such as Vite, webpack or esbuild. Their <code>dist/index.mjs</code> imports its dependencies instead of bundling them, so the app keeps one copy of uiconfig.js, Tweakpane and React. JavaScript code needs only a renderer; TypeScript code adds <code>uiconfig.js</code> for the types and decorators.</p>
+            <p>A page without a bundler can load the UMD build from a CDN. It includes every dependency and is legacy: the next major version removes it.</p>
+            <pre class="code" tabindex="0" data-code="html"><code>&lt;script src="https://unpkg.com/uiconfig-tweakpane"&gt;&lt;/script&gt;
+&lt;script&gt;
+    // uiconfig-blueprint: new bpui.UI()
+    const ui = new window['uiconfig-tweakpane'].UI()
+    ui.appendChild({
+        type: 'button',
+        label: 'Click me',
+        onClick: () =&gt; console.log('clicked'),
+    })
+&lt;/script&gt;</code></pre>
+
+            <h3>Links</h3>
+            <dl class="links">
+                <dt>API docs</dt>
+                <dd><a href="./docs/">uiconfig.js</a>, <a href="./docs/uiconfig-tweakpane/">uiconfig-tweakpane</a>, <a href="./docs/uiconfig-blueprint/">uiconfig-blueprint</a></dd>
+                <dt>Examples</dt>
+                <dd><a href="./examples/index.html">uiconfig.js</a>, <a href="./examples/uiconfig-tweakpane/index.html">uiconfig-tweakpane</a>, <a href="./examples/uiconfig-blueprint/index.html">uiconfig-blueprint</a></dd>
+                <dt>npm</dt>
+                <dd><a href="https://www.npmjs.com/package/uiconfig.js">uiconfig.js</a>, <a href="https://www.npmjs.com/package/uiconfig-tweakpane">uiconfig-tweakpane</a>, <a href="https://www.npmjs.com/package/uiconfig-blueprint">uiconfig-blueprint</a></dd>
+                <dt>Source</dt>
+                <dd><a href="https://github.com/repalash/uiconfig.js">github.com/repalash/uiconfig.js</a>, <a href="https://github.com/repalash/uiconfig.js/blob/master/packages/uiconfig.js/CHANGELOG.md">changelog</a></dd>
+            </dl>
+        </div>
+    </section>
+
+</main>
+
+<button type="button" class="design-toggle" id="design-toggle" aria-expanded="false" aria-controls="design-panel">
+    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 6h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12.5" cy="6" r="2.6" fill="var(--c-data)" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="14" r="2.6" fill="var(--c-tweakpane)" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>Tweak this page</span>
+</button>
+
+<footer class="footer">
+    <div class="wrap footer-inner">
+        <p>uiconfig.js is <a href="https://github.com/repalash/uiconfig.js/blob/master/LICENSE">MIT licensed</a>. Made by <a href="https://repalash.com">repalash</a>.</p>
+        <p><a href="https://github.com/repalash/uiconfig.js/issues">Report an issue</a></p>
+    </div>
+</footer>
+</body>
+</html>

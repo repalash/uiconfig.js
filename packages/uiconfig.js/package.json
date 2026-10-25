@@ -19,7 +19,7 @@
 
         "serve": "ws",
         "prepack": "npm run build && npm run docs",
-        "docs": "npx typedoc ./src/index.ts",
+        "docs": "typedoc ./src/index.ts",
         "lint": "eslint src examples --fix",
         "check": "tsc -p tsconfig.json --noEmit && eslint src examples",
         "prepublishOnly": "npm run test",

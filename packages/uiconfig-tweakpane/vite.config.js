@@ -5,6 +5,7 @@ import packageJson from './package.json';
 import license from 'rollup-plugin-license';
 import replace from '@rollup/plugin-replace';
 import path from 'node:path';
+import {readFileSync} from 'node:fs';
 import {fixDtsImports} from '../../scripts/fix-dts-imports.mjs';
 import {externalDeps} from '../../scripts/external-deps.mjs';
 
@@ -50,6 +51,13 @@ export default defineConfig(({mode}) => {
             },
         },
         plugins: [
+            // the opt-in theme stylesheet, as dist/theme.css (`uiconfig-tweakpane/theme.css`)
+            !umd ? {
+                name: 'theme-css',
+                generateBundle() {
+                    this.emitFile({type: 'asset', fileName: 'theme.css', source: readFileSync('src/theme.css', 'utf8')})
+                },
+            } : null,
             isProd && !umd ? dts({tsconfigPath: './tsconfig.json', afterBuild: fixDtsImports}) : null,
             replace({
                 'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),

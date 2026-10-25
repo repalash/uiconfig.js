@@ -1,0 +1,196 @@
+/*
+ * @license
+ * uiconfig-tweakpane theme
+ * Copyright 2022-2026 repalash <palash@shaders.app>
+ * MIT License
+ * From the Tweakpane theme of threepipe's Tweakpane plugin (https://github.com/repalash/threepipe,
+ * plugins/tweakpane/src/tpTheme.css), by the same author.
+ *
+ * Opt in: import 'uiconfig-tweakpane/theme.css' (or link dist/theme.css), then call
+ * `ui.setTheme('light' | 'dark' | 'blue' | 'white' | 'black')` on the renderer, or `applyTweakpaneTheme(element, mode)`
+ * on any ancestor of the panels. Both add the classes `tpTheme` and `tpTheme-<mode>`; nothing here applies without them.
+ */
+
+.tpTheme {
+    --tp-blade-unit-size: 26px;
+    --tp-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    --tp-element-border-radius: 0.25rem;
+}
+
+/* black, the default mode */
+.tpTheme, .tpTheme-black {
+    --tp-base-background-color: #0e0e0e;
+    --tp-container-background-color: rgba(32, 32, 32, 0.2);
+    --tp-container-background-color-hover: rgba(32, 32, 32, 0.3);
+    --tp-container-background-color-active: rgba(50, 50, 50, 0.8);
+    --tp-container-background-color-focus: rgba(50, 50, 50, 1.0);
+    --tp-container-border-color: rgba(50, 50, 50, 1.0);
+    --tp-container-foreground-color: hsla(0, 0%, 90%, 0.90);
+    --tp-label-foreground-color: hsla(0, 0%, 85%, 0.90);
+}
+
+.tpTheme-blue {
+    --tp-base-background-color: #28223C;
+    --tp-base-shadow-color: hsla(0, 0%, 0%, 0.2);
+    --tp-button-background-color: hsla(230, 10%, 80%, 1.00);
+    --tp-button-background-color-active: hsla(230, 10%, 95%, 1.00);
+    --tp-button-background-color-focus: hsla(230, 10%, 90%, 1.00);
+    --tp-button-background-color-hover: hsla(230, 10%, 85%, 1.00);
+    --tp-button-foreground-color: hsla(230, 20%, 11%, 1.00);
+    --tp-container-background-color: hsla(230, 25%, 16%, 0.65);
+    --tp-container-background-color-active: hsla(230, 25%, 31%, 0.65);
+    --tp-container-background-color-focus: hsla(230, 25%, 26%, 0.65);
+    --tp-container-background-color-hover: hsla(230, 25%, 21%, 0.65);
+    --tp-container-border-color: hsla(230, 36%, 25%, 1);
+    --tp-container-foreground-color: hsl(240, 10%, 92%);
+    --tp-groove-foreground-color: hsla(230, 20%, 8%, 1.00);
+    --tp-input-background-color: hsla(230, 20%, 8%, 1.00);
+    --tp-input-background-color-active: hsla(230, 28%, 23%, 1.00);
+    --tp-input-background-color-focus: hsla(230, 28%, 18%, 1.00);
+    --tp-input-background-color-hover: hsla(230, 20%, 13%, 1.00);
+    --tp-input-foreground-color: hsla(230, 10%, 80%, 1.00);
+    --tp-monitor-background-color: hsla(230, 20%, 8%, 1.00);
+    --tp-monitor-foreground-color: hsla(230, 12%, 48%, 1.00);
+    --tp-label-foreground-color: #E4E2ED;
+}
+
+.tpTheme-white {
+    --tp-base-background-color: hsla(230, 5%, 90%, 1.00);
+    --tp-base-shadow-color: hsla(0, 0%, 0%, 0.10);
+    --tp-button-background-color: hsla(230, 7%, 85%, 1.00);
+    --tp-button-background-color-active: hsla(230, 7%, 70%, 1.00);
+    --tp-button-background-color-focus: hsla(230, 7%, 75%, 1.00);
+    --tp-button-background-color-hover: hsla(230, 7%, 80%, 1.00);
+    --tp-button-foreground-color: hsla(230, 10%, 30%, 1.00);
+    --tp-container-background-color: hsla(230, 15%, 80%, 0.10);
+    --tp-container-background-color-active: hsla(230, 15%, 70%, 0.32);
+    --tp-container-background-color-focus: hsla(230, 15%, 70%, 0.28);
+    --tp-container-background-color-hover: hsla(230, 15%, 70%, 0.24);
+    --tp-container-border-color: hsla(230, 15%, 70%, 0.6);
+    --tp-container-foreground-color: hsla(230, 10%, 30%, 1.00);
+    --tp-groove-foreground-color: hsla(230, 15%, 20%, 0.10);
+    --tp-input-background-color: hsla(230, 15%, 30%, 0.10);
+    --tp-input-background-color-active: hsla(230, 15%, 50%, 0.22);
+    --tp-input-background-color-focus: hsla(230, 15%, 50%, 0.18);
+    --tp-input-background-color-hover: hsla(230, 15%, 50%, 0.14);
+    --tp-input-foreground-color: hsla(230, 10%, 20%, 1.00);
+    --tp-label-foreground-color: hsla(230, 10%, 10%, 1.00);
+    --tp-monitor-background-color: hsla(230, 15%, 30%, 0.10);
+    --tp-monitor-foreground-color: hsla(230, 10%, 30%, 0.50);
+}
+
+.tpTheme-light {
+    --tp-base-background-color: #E7EFF8;
+    --tp-base-shadow-color: rgba(0, 0, 0, 0.1);
+    --tp-button-background-color: #dae1ea;
+    --tp-button-background-color-active: #c3d4e7;
+    --tp-button-background-color-focus: #c3d4e7;
+    --tp-button-background-color-hover: #c3d4e7;
+    --tp-button-foreground-color: #1C2026;
+    --tp-container-background-color: #dae1ea22;
+    --tp-container-background-color-active: #c3d4e766;
+    --tp-container-background-color-focus: #c3d4e766;
+    --tp-container-background-color-hover: #c3d4e766;
+    --tp-container-border-color: #c3d4e799;
+    --tp-container-foreground-color: #1C2026;
+    --tp-groove-foreground-color: #6d7a8c;
+    --tp-input-background-color: #dae1ea;
+    --tp-input-background-color-active: #c3d4e7;
+    --tp-input-background-color-focus: #c3d4e7;
+    --tp-input-background-color-hover: #c3d4e7;
+    --tp-input-foreground-color: #1C2026;
+    --tp-label-foreground-color: #2b313a;
+    --tp-monitor-background-color: #dae1ea;
+    --tp-monitor-foreground-color: #6d7a8c;
+}
+
+.tpTheme-dark {
+    --tp-base-background-color: #1C2026;
+    --tp-base-shadow-color: rgba(0, 0, 0, 0.2);
+    --tp-button-background-color: #3e4550;
+    --tp-button-background-color-active: #555e6b;
+    --tp-button-background-color-focus: #555e6b;
+    --tp-button-background-color-hover: #555e6b;
+    --tp-button-foreground-color: #F6F7F9;
+    --tp-container-background-color: #3e455022;
+    --tp-container-background-color-active: #555e6b66;
+    --tp-container-background-color-focus: #555e6b66;
+    --tp-container-background-color-hover: #555e6b66;
+    --tp-container-border-color: #555e6b99;
+    --tp-container-foreground-color: #F6F7F9;
+    --tp-groove-foreground-color: #b6bfcb;
+    --tp-input-background-color: #3e4550;
+    --tp-input-background-color-active: #555e6b;
+    --tp-input-background-color-focus: #555e6b;
+    --tp-input-background-color-hover: #555e6b;
+    --tp-input-foreground-color: #F6F7F9;
+    --tp-label-foreground-color: #d2d3d5;
+    --tp-monitor-background-color: #3e4550;
+    --tp-monitor-foreground-color: #b6bfcb;
+}
+
+.tpTheme .tp-fldv {
+    background-blend-mode: luminosity;
+    position: relative;
+    border: 1px solid var(--tp-container-border-color);
+    box-sizing: border-box;
+}
+
+.tpTheme .tp-tabv_c .tp-brkv > .tp-cntv, .tpTheme .tp-fldv_c > .tp-cntv {
+    margin-left: 0;
+}
+
+.tpTheme .tp-fldv_b {
+    height: calc(var(--bld-us) * 1.5 + 4px) !important;
+    font-size: 0.9rem !important;
+    transition: background-color 0.5s ease;
+}
+
+.tpTheme .tp-fldv_b + .tp-brkv .tp-fldv_b {
+    height: calc(var(--bld-us) * 1.1 + 4px) !important;
+    font-size: 0.7rem !important;
+}
+
+.tpTheme .tp-lblv_l {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    flex-grow: 1 !important;
+    flex-basis: 20% !important;
+}
+
+.tpTheme .tp-lblv_v {
+    flex-grow: 1 !important;
+    flex-basis: 50% !important;
+}
+
+.tpTheme .tp-txtv_i {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+.tpTheme .tp-fldv_t {
+    font-weight: 500 !important;
+    padding-left: 1.5rem !important;
+}
+
+.tpTheme .tp-fldv_m {
+    right: auto !important;
+    left: 0.75rem;
+    opacity: 1.0 !important;
+}
+
+.tpTheme .tp-sldv_k::after {
+    background-color: var(--tp-input-foreground-color, hsl(230, 7%, 75%));
+}
+
+.tpTheme .tp-btnv_b {
+    height: calc(var(--tp-blade-unit-size) * 1.15);
+}
+
+.tpTheme .tp-p2dv_b, .tpTheme .tp-btnv_b, .tpTheme .tp-lstv_s {
+    font-weight: 500 !important;
+}
+
+.tpTheme .tp-rotv {
+    font-size: 13px !important;
+}

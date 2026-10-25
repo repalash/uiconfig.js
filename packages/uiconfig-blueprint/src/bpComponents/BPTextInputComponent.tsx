@@ -21,9 +21,20 @@ export class BPTextInputComponent extends BPInputComponent<string> {
         }
     }
 
+    private _edited = false
     private _onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         this._iv+=1
+        this._edited = true
         this.setValue(e.target.value, false); // todo: set loading while this promise is happening.
+    }
+
+    // after an edit, blur sets the value once more with `last: true`: the change event marks the end of the edit and
+    // the undo manager closes the step that merged the keystrokes
+    private _onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (!this._edited) return
+        this._edited = false
+        this._iv+=1
+        this.setValue(e.target.value, true);
     }
 
     renderInput() {
@@ -42,7 +53,8 @@ export class BPTextInputComponent extends BPInputComponent<string> {
                     rows={config.rows}
                     cols={config.cols}
                     autoResize={config.autoResize}
-                    onChange={this._onChange as any}/>
+                    onChange={this._onChange as any}
+                    onBlur={this._onBlur}/>
             )
         }
 
@@ -54,7 +66,8 @@ export class BPTextInputComponent extends BPInputComponent<string> {
                 readOnly={this.state.readOnly}
                 key={this.props.config.uuid}
                 fill={true}
-                onChange={this._onChange}/>
+                onChange={this._onChange}
+                onBlur={this._onBlur}/>
         )
     }
 }

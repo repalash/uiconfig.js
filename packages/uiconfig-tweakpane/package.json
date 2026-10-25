@@ -8,18 +8,22 @@
   "browser": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "compile:esm:watch": "tsc -p ./src  --watch",
     "compile:esm": "tsc -p ./src && node ../../scripts/fix-dts-imports.mjs lib/esm",
 
     "build": "vite build && vite build --mode umd && npm run compile:esm",
     "start": "vite",
+    "examples:dev": "vite --config vite.examples.config.js",
+    "examples:build": "vite build --config vite.examples.config.js",
     "dev": "NODE_ENV=development vite build --watch",
     "test": "npm run check",
 
     "prepack": "npm run build && npm run docs",
-    "docs": "npx typedoc ./src/index.ts",
+    "docs": "typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
     "serve": "ws",
     "lint": "eslint src --fix",
@@ -33,6 +37,7 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./theme.css": "./dist/theme.css",
     "./dist/": {
       "import": "./dist/",
       "require": "./dist/"
