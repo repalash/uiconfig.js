@@ -36,7 +36,7 @@ export const examplePagePaths = ['examples/index.html', ...examples.map(e => `ex
  * The setup code above an example: the renderer, its container and what the example gets (log, view).
  * The Tweakpane theme mode is a placeholder that the page replaces with the mode it uses.
  */
-function setupCode(example, renderer) {
+export function setupCode(example, renderer) {
     const lines = [`import {UI} from 'uiconfig-${renderer}'`]
     if (renderer === 'tweakpane') lines.push(`import 'uiconfig-tweakpane/theme.css'`)
     if (example.three) lines.push(`import {Color, Vector2, Vector3, Vector4} from 'three'`)

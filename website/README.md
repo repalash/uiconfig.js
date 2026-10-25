@@ -13,7 +13,7 @@ npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
 npm run dev -w uiconfig-website       # dev server
 npm run build -w uiconfig-website     # type check and static build in website/dist
 npm run preview -w uiconfig-website   # serves website/dist
-npm run docs -w uiconfig-website      # API docs in website/dist-docs
+npm run docs -w uiconfig-website      # API docs in website/dist-docs (Markdown in website/dist-docs-md)
 ```
 
 The dev server serves the example pages too: `/examples/`.
@@ -32,6 +32,8 @@ workflow [docs-pages.yml](../.github/workflows/docs-pages.yml) does:
 | `/docs/` | API docs of uiconfig.js, uiconfig-tweakpane and uiconfig-blueprint, one TypeDoc site (`website/dist-docs`) |
 | `/dist/` | the built uiconfig.js package |
 | `/README.md`, `/LICENSE` | of uiconfig.js |
+| `/llms.txt`, `/llms-full.txt`, `/md/`, `/examples/<slug>.md` | Markdown for AI agents ([llmstxt.org](https://llmstxt.org)) |
+| `/sitemap.xml`, `/robots.txt`, `/og.png` | for search engines and link previews |
 
 Older URLs keep working: [scripts/assemble-pages.mjs](scripts/assemble-pages.mjs) writes a redirect page at each
 old path, to the page that replaced it.
@@ -49,6 +51,30 @@ All URLs are relative (`base: './'` in [vite.config.js](vite.config.js)), so the
 
 To check the result locally, serve `website/_site` with any static server, for example
 `python3 -m http.server -d website/_site`.
+
+## Search engines, link previews and AI agents
+
+`SITE_URL` is the address of the published site (default `https://repalash.com/uiconfig.js/`, set in
+[scripts/site.mjs](scripts/site.mjs) and in the workflow). It is used only for absolute URLs: the canonical link and
+the Open Graph tags of every page, the JSON-LD of the landing page, `sitemap.xml`, `robots.txt` and the links in
+`llms.txt`. Every link and asset on the pages is relative, so a move to a domain of its own is one value:
+`SITE_URL=https://uiconfig.example/ npm run pages`.
+
+- Open Graph and Twitter card tags: the landing page and the example pages get them from their `<title>` and
+  description at build time ([vite.config.js](vite.config.js)); the docs pages in
+  [scripts/docs-finish.mjs](scripts/docs-finish.mjs), which also gives each docs page a description of its own.
+- The social card `public/og.png` (1200×630) is made by [scripts/og-image.mjs](scripts/og-image.mjs) from an HTML
+  page in the site style, with headless Chromium: `npm run og-image -w uiconfig-website` (`CHROME_PATH`, and
+  `CHROME_ARGS=--no-sandbox` in a container). Run it after a design change and commit the image; the Pages build
+  does not render it.
+- `sitemap.xml` lists every page except the redirect pages. `robots.txt` allows everything and names the sitemap, but
+  crawlers read robots.txt only at the root of a host: while the site is a GitHub Pages project site under
+  `repalash.com/uiconfig.js/`, the file that counts is `repalash.com/robots.txt`, in the repository of that site.
+  This one starts to count when the site has a domain of its own.
+- [scripts/llms.mjs](scripts/llms.mjs) writes the agent docs from the sources at build time: `llms.txt` (summary, the
+  facts an agent needs first, links), `llms-full.txt` (the guide, the renderer READMEs, every example with its code,
+  and the API reference), `/md/` (the guide, the READMEs, and the API reference made by typedoc-plugin-markdown from
+  [typedoc.markdown.json](typedoc.markdown.json)) and `examples/<slug>.md` next to each example page.
 
 ## Example pages
 
@@ -73,7 +99,7 @@ a redirect in `scripts/assemble-pages.mjs`.
 
 [typedoc.json](typedoc.json) builds one TypeDoc site for the three packages (`entryPointStrategy: "packages"`, each
 package from its `src/index.ts`), with [src/docs/index.md](src/docs/index.md) as its home page. The look comes from the
-site: [scripts/docs-theme.mjs](scripts/docs-theme.mjs) writes `dist-docs/assets/custom.css` from the font faces, the
+site: [scripts/docs-finish.mjs](scripts/docs-finish.mjs) writes `dist-docs/assets/custom.css` from the font faces, the
 tokens and [src/docs/docs.css](src/docs/docs.css), and copies the two font files. [src/docs/docs.js](src/docs/docs.js)
 sets the color scheme from TypeDoc's theme setting, puts the site's brand and a package switcher in the top bar, and
 keeps the links to the site on the host that serves the docs. Each package also has its own `npm run docs` (TypeDoc in

@@ -12,7 +12,7 @@
         ]
     },
     "sortEntryPoints": false,
-    "name": "uiconfig.js",
+    "name": "uiconfig.js API",
     "readme": "src/docs/index.md",
     "out": "dist-docs",
     "favicon": "public/favicon.svg",
