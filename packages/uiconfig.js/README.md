@@ -119,7 +119,7 @@ It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdeli
 <!--or-->
 <script src="https://cdn.jsdelivr.net/npm/uiconfig-tweakpane"></script>
 
-<!--Then the UI can be accessed with the short-form tpui, bpui, lilui...  -->
+<!--Then the UI can be accessed with the global window['uiconfig-tweakpane'] (bpui for uiconfig-blueprint)  -->
 <script>
     const config = {
         type: "button",
@@ -129,7 +129,7 @@ It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdeli
         },
     }
 
-    const ui = new tpui.UI() // use bpui.UI() for blueprint
+    const ui = new window['uiconfig-tweakpane'].UI() // use new bpui.UI() for blueprint
     ui.appendChild(config)
 </script>
 ```

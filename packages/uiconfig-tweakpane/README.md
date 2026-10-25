@@ -54,7 +54,7 @@ The module can be imported to HTML/JS a CDN link using [unpkg](https://unpkg.com
 <script src="https://cdn.jsdelivr.net/npm/uiconfig-tweakpane"></script>
 ```
 
-The module can be accessed with the short-form `tpui`
+The module is available as the global `window['uiconfig-tweakpane']`
 ```html
 <script>
     const config = {
@@ -65,6 +65,7 @@ The module can be accessed with the short-form `tpui`
         },
     }
     
+    const tpui = window['uiconfig-tweakpane']
     const ui = new tpui.UI()
     ui.appendChild(config)
 </script>
