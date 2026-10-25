@@ -90,6 +90,10 @@ export function mountThreeDemo(view: HTMLElement, panelHost: HTMLElement) {
             requestRender()
         }).observe(view)
     }
+    // the first render compiles the shaders, the longest step: do it now, while the section is still below the
+    // viewport, when the browser is idle
+    const idle = window.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 1))
+    idle(() => render())
     new IntersectionObserver(entries => {
         visible = entries.some(e => e.isIntersecting)
         if (visible) requestRender()

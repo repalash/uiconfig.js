@@ -83,7 +83,9 @@ function apply(d: Design, save: boolean) {
     setPanelTheme(d.panelTheme)
     if (!save) return
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(d))
+        // the defaults need no entry: later visits show them anyway
+        if (JSON.stringify(d) === JSON.stringify(defaults)) localStorage.removeItem(STORAGE_KEY)
+        else localStorage.setItem(STORAGE_KEY, JSON.stringify(d))
     } catch { /* storage disabled */ }
 }
 
