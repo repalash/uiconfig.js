@@ -53,6 +53,11 @@ export default defineConfig(({mode}) => {
                 // },
             }
         },
+        // Vite 7 sets esbuild legalComments to 'none' by default, which drops the license banner and the license
+        // comments of the bundled code (React, normalize.css); 'inline' keeps them, as the Vite 5 build did
+        esbuild: {
+            legalComments: 'inline',
+        },
         resolve: {
             alias: [
                 {
