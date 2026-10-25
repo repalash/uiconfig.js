@@ -3,6 +3,7 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
+- Add `liveUpdate` to `UiObjectConfig`, for text inputs: set the value on each keystroke (change event with `last: false`) and once more when the input is committed (`last: true`), so the undo manager records one step for the edit.
 - `[Dev]` The repository is now a monorepo of the uiconfig packages: uiconfig.js is in `packages/uiconfig.js`, next to uiconfig-tweakpane, uiconfig-blueprint, uiconfig-react and uiconfig-shadcn.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
 - The UMD bundle `dist/index.js` (`main`, `require`, `browser`) includes `ts-browser-helpers` and works alone in a script tag. Before, it read `ts-browser-helpers` from a global of that name, which no build of that package sets. The ES module `dist/index.mjs` still imports `ts-browser-helpers`.
