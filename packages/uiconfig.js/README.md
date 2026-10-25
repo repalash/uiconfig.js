@@ -100,7 +100,7 @@ npm install uiconfig.js
 
 The package has two builds:
 - `dist/index.mjs` (`import`, `module`): ES module that imports its dependency `ts-browser-helpers`, so the bundler of the app keeps one copy of it.
-- `dist/index.js` (`main`, `require`, `browser`): UMD bundle. It also takes `ts-browser-helpers` from `require()` or from a global of that name, and does not include it. This build is legacy and will be removed in the next major version.
+- `dist/index.js` (`main`, `require`, `browser`): UMD bundle with `ts-browser-helpers` included, for a `<script>` tag (global `uiconfig.js`, read as `window.uiconfig.js`) or `require()`. This build is legacy and will be removed in the next major version.
 
 #### Renderer packages
 
