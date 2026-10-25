@@ -74,16 +74,29 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
      * This is called by the ui component when the value is changed and from uiRefresh from the config
      * @param state - optional state to refresh from, if not provided, the current state is used
      */
+    private _refreshAgain = false
+
     async refreshConfigState(state?: TState) {
         if (!this.props.config) return;
-        if (this._refreshing) return;
+        if (this._refreshing) {
+            // a refresh asked for while one runs: run once more after it, so that the latest value shows
+            this._refreshAgain = true
+            return;
+        }
         this._refreshing = true
-        const s = this.getUpdatedState(state || this.state)
-        // console.log('set state', s)
-        await this.setStatePromise(s)
-        // todo debug refresh frequency etc
-        // console.log('refreshing', this.props.config.label, this.props.config.type, this.state)
-        this._refreshing = false
+        try {
+            const s = this.getUpdatedState(state || this.state)
+            // console.log('set state', s)
+            await this.setStatePromise(s)
+        } finally {
+            // todo debug refresh frequency etc
+            // console.log('refreshing', this.props.config.label, this.props.config.type, this.state)
+            this._refreshing = false
+        }
+        if (this._refreshAgain) {
+            this._refreshAgain = false
+            await this.refreshConfigState()
+        }
     }
 
     /**
