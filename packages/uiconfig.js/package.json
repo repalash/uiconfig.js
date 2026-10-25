@@ -59,21 +59,29 @@
         "directory": "packages/uiconfig.js"
     },
     "keywords": [
-        "javascript",
-        "typescript",
-        "json",
         "ui",
+        "gui",
+        "config",
+        "configuration",
+        "panel",
+        "controls",
+        "inspector",
+        "decorators",
+        "typescript",
+        "javascript",
+        "json",
         "three.js",
-        "html",
-        "interfaces",
-        "library"
+        "tweakpane",
+        "blueprint",
+        "dat.gui",
+        "lil-gui"
     ],
     "author": "repalash <palash@shaders.app>",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/repalash/uiconfig.js/issues"
     },
-    "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig.js#readme",
+    "homepage": "https://repalash.com/uiconfig.js/",
     "devDependencies": {
         "@rollup/plugin-json": "^6.1.0",
         "clean-package": "^2.2.0",

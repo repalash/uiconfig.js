@@ -1,6 +1,8 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+- `homepage` in `package.json` is the website, https://repalash.com/uiconfig.js/, and the `keywords` describe the package.
+- `[Dev]` The example pages of the package moved to the website (https://repalash.com/uiconfig.js/examples/), where each example runs in both renderers; the package has no example build anymore.
 - `sideEffects` lists the CSS files, so bundlers keep `import 'uiconfig-tweakpane/theme.css'` (it was `false`).
 - The renderer adds its container stylesheet to the document once, for the first renderer, instead of once for each renderer.
 - Add an opt-in theme with the color modes `light`, `dark`, `blue`, `white` and `black`, from threepipe's Tweakpane plugin: the stylesheet `uiconfig-tweakpane/theme.css` (`dist/theme.css`), `UiConfigRendererTweakpane.setTheme(mode)` and `applyTweakpaneTheme(element, mode)`. The theme applies only inside an element with its classes, so pages that do not use it do not change.
