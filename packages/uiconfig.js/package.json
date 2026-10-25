@@ -10,7 +10,7 @@
     "sideEffects": false,
     "type": "module",
     "scripts": {
-        "build": "rimraf dist ; tsc && vite build",
+        "build": "rimraf dist ; tsc && vite build && vite build --mode umd",
         "dev": "NODE_ENV=development vite build --watch",
         "serve-docs": "ws -d docs -p 8080",
         "build-examples": "NODE_ENV=production rollup --config examples/rollup.config.js",

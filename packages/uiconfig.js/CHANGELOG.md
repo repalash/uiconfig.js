@@ -5,7 +5,8 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 ## [Unreleased]
 - `[Dev]` The repository is now a monorepo of the uiconfig packages: uiconfig.js is in `packages/uiconfig.js`, next to uiconfig-tweakpane, uiconfig-blueprint, uiconfig-react and uiconfig-shadcn.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
-- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) is deprecated and will be removed in the next major version. Use the ES module `dist/index.mjs`, which imports `ts-browser-helpers` (unchanged).
+- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) includes `ts-browser-helpers` and works alone in a script tag. Before, it read `ts-browser-helpers` from a global of that name, which no build of that package sets. The ES module `dist/index.mjs` still imports `ts-browser-helpers`.
+- The UMD bundle is deprecated and will be removed in the next major version.
 
 ## v0.4.0
 - **Breaking Changes**
