@@ -27,8 +27,22 @@ export default function example(ui, {log}) {
                     }
                 },
             },
-            {type: 'button', label: 'Undo', onClick: () => ui.undoManager.undo()},
-            {type: 'button', label: 'Redo', onClick: () => ui.undoManager.redo()},
+            // braces: these return nothing (a returned object with an undo
+            // method would be recorded as an undoable action)
+            {
+                type: 'button',
+                label: 'Undo',
+                onClick: () => {
+                    ui.undoManager.undo()
+                },
+            },
+            {
+                type: 'button',
+                label: 'Redo',
+                onClick: () => {
+                    ui.undoManager.redo()
+                },
+            },
         ],
         onChange: (ev) => {
             config.uiRefresh(true)
