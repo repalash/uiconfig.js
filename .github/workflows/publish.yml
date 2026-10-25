@@ -1,0 +1,34 @@
+# .github/workflows/publish.yml of an npm workspaces repository (packages/*).
+# Each public package whose version is not on npm is published, dependencies first. Each needs a
+# CHANGELOG.md section for its version. The build step builds uiconfig.js, the workspace package
+# that the others build against, also when it is not released this time. clean-package mode then
+# runs each released package's prepack (build, examples, docs) before it strips the scripts.
+# Tags: <name>-<version>.
+name: Publish packages to npm
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Queue runs instead of replacing them: a run can publish several packages.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  release:
+    permissions:
+      contents: write # tags
+      id-token: write # npm trusted publishing
+    uses: repalash/release-tools/.github/workflows/npm-release.yml@v1
+    with:
+      packages: packages/*
+      build: npm ci && npm run build -w uiconfig.js
+      clean-package: true
+      require-changelog: true
+      tag-format: '{name}-{version}'
+    secrets: inherit

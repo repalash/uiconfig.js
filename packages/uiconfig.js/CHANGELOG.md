@@ -2,6 +2,10 @@
 
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
+## [Unreleased]
+- `[Dev]` The repository is now a monorepo of the uiconfig packages: uiconfig.js is in `packages/uiconfig.js`, next to uiconfig-tweakpane, uiconfig-blueprint, uiconfig-react and uiconfig-shadcn.
+- Fix: relative imports in the declaration files (`dist/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
+
 ## v0.4.0
 - **Breaking Changes**
   - Set default dispatch mode to `immediate` in `UiConfigMethods`, previously it was `postFrame`

@@ -1,0 +1,38 @@
+import {BPValueComponent, BPValueComponentState} from "./BPValueComponent";
+import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
+import {ReactNode} from "react";
+import {FormGroupComponent} from "../components/FormGroupComponent";
+import {PrimitiveVal} from "uiconfig.js";
+
+export abstract class BPInputComponent<
+    TStateValue extends PrimitiveVal, TState extends BPValueComponentState<TStateValue> = BPValueComponentState<TStateValue>>
+    extends BPValueComponent<TStateValue, TState, TStateValue> {
+
+    protected constructor(props: BPComponentProps<TStateValue>, context: UiConfigRendererContextType, state: TState) {
+        super(props, context, state);
+    }
+
+    convertValueToState(value: TStateValue, state: TState): TState {
+        return {...state, value}
+    }
+
+    async convertStateToValue(state: TState): Promise<TStateValue> {
+        return state.value;
+    }
+
+    abstract renderInput(): ReactNode;
+
+    protected flexBasis = "100%"
+
+    render() {
+        return !this.state.hidden ? (
+            <FormGroupComponent disabled={this.state.disabled}
+                                label={this.state.label}
+                                flexBasis={this.state.baseWidth ?? this.flexBasis}
+                                key={this.props.config.uuid}
+            >
+                {this.renderInput()}
+            </FormGroupComponent>
+        ) : null
+    }
+}

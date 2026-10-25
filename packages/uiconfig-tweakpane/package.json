@@ -1,0 +1,137 @@
+{
+  "name": "uiconfig-tweakpane",
+  "name:umd": "tpui",
+  "version": "1.0.1",
+  "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "browser": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "sideEffects": false,
+  "scripts": {
+    "compile:esm:watch": "tsc -p ./src  --watch",
+    "compile:esm": "tsc -p ./src && node ../../scripts/fix-dts-imports.mjs lib/esm",
+
+    "build": "vite build && npm run compile:esm",
+    "start": "vite",
+    "dev": "NODE_ENV=development vite build --watch",
+    "test": "npm run check",
+
+    "prepack": "npm run build && npm run docs",
+    "docs": "npx typedoc ./src/index.ts",
+    "serve-docs": "ws -d docs -p 8080",
+    "serve": "ws",
+    "lint": "eslint src --fix",
+    "check": "tsc -p tsconfig.json --noEmit && eslint src",
+
+    "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./dist/": {
+      "import": "./dist/",
+      "require": "./dist/"
+    },
+    "./lib/esm": {
+      "types": "./lib/esm/index.d.ts",
+      "import": "./lib/esm/index.js"
+    },
+    "./lib/esm/*": {
+      "types": "./lib/esm/*.d.ts",
+      "import": "./lib/esm/*.js"
+    }
+  },
+  "clean-package": {
+    "remove": [
+      "clean-package",
+      "scripts",
+      "devDependencies",
+      "optionalDependencies"
+    ]
+  },
+  "files": [
+    "lib",
+    "dist",
+    "src",
+    "docs",
+    "tsconfig.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/repalash/uiconfig.js.git",
+    "directory": "packages/uiconfig-tweakpane"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "json",
+    "ui",
+    "three.js",
+    "html",
+    "tweakpane",
+    "library"
+  ],
+  "author": "repalash <palash@shaders.app>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/repalash/uiconfig.js/issues"
+  },
+  "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-tweakpane#readme",
+  "devDependencies": {
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-replace": "^6.0.2",
+    "@tweakpane/core": "1.1.9",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "clean-package": "^2.2.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-deprecation": "^3.0.0",
+    "eslint-plugin-html": "^8.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "local-web-server": "^5.3.0",
+    "rimraf": "^5.0.1",
+    "rollup-plugin-license": "^3.0.1",
+    "tslib": "^2.5.0",
+    "tweakpane": "3.1.10",
+    "typedoc": "^0.27.5",
+    "typescript": "^5.7.2",
+    "vite": "^7.0.4",
+    "vite-plugin-dts": "^4.4.0",
+    "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
+  },
+  "dependencies": {
+    "uiconfig.js": ">=0.2.1",
+    "ts-browser-helpers": ">=0.19.3"
+  },
+  "peerDependencies": {
+    "@tweakpane/core": "1.1.9",
+    "tweakpane": "3.1.10",
+    "@types/three": ">=0.152.1",
+    "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
+  },
+  "peerDependenciesMeta": {
+    "@tweakpane/core": {
+      "optional": true
+    },
+    "tweakpane": {
+      "optional": true
+    },
+    "@types/three": {
+      "optional": true
+    },
+    "@pangenerator/tweakpane-textarea-plugin": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
+    "win-node-env": "^0.6.1"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "type": "module"
+}

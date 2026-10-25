@@ -1,0 +1,83 @@
+import {createDiv, createStyles, css, JSUndoManager} from "ts-browser-helpers";
+import {UiConfigRenderer, UiObjectConfig} from "uiconfig.js";
+import React from 'react'
+import {createRoot, Root} from 'react-dom/client'
+import {ConfigurationPanelComponent} from './components/ConfigurationPanelComponent'
+import {BPComponent, UiConfigRendererContext} from './bpComponents/BPComponent'
+// @ts-ignore
+import rendererCss from './renderer.scss?inline' // for rollup build remove ?inline
+import {FocusStyleManager} from '@blueprintjs/core'
+import {THREE} from "./threejs";
+
+export class UiConfigRendererBlueprint extends UiConfigRenderer {
+    constructor(container: HTMLElement = document.body, {autoPostFrame = true} = {}, undoManager?: JSUndoManager|false) {
+        super(container, autoPostFrame, undefined, undoManager);
+        // this._root.expanded = expanded
+    }
+
+    protected _root: Root
+
+    protected _createUiContainer(): HTMLDivElement {
+        FocusStyleManager.onlyShowFocusOnTabs();
+
+        const container = createDiv({id: 'blueprintUiContainer', addToBody: false})
+        createStyles(css`
+            :root {
+                --blueprint-ui-container-width: 300px;
+            }
+
+            @media only screen and (min-width: 1500px) {
+                :root {
+                    --blueprint-ui-container-width: 400px;
+                }
+            }
+            @media only screen and (min-width: 2500px) {
+                :root {
+                    --blueprint-ui-container-width: 500px;
+                }
+            }
+
+            @media only screen and (min-width: 600px) {
+                #blueprintUiContainer {
+                    min-width: var(--blueprint-ui-container-width);
+                    min-height: 200px;
+                    max-height: 100%;
+                    max-width: 100%;
+                    resize: both;
+                }
+            }
+        `)
+        createStyles(rendererCss)
+
+        this._root = createRoot(container, {
+            identifierPrefix: 'bpUi',
+            onRecoverableError: (error) => {
+                console.warn(error)
+            }
+        })
+        this._root.render(
+            <React.StrictMode>
+            <UiConfigRendererContext.Provider value={this}>
+                <ConfigurationPanelComponent config={this.config}/>
+            </UiConfigRendererContext.Provider>
+            </React.StrictMode>
+        )
+        return container
+    }
+
+    protected _refreshUiConfigObject(config: UiObjectConfig): void {
+        (config.uiRef as BPComponent<any, any>)?.refreshConfigState()
+    }
+
+    renderUiConfig(_: UiObjectConfig): void {
+        return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    THREE: THREE|undefined = (window as any).THREE
+
+    unmount() {
+        this._root?.unmount()
+    }
+
+}

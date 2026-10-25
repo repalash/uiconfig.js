@@ -1,0 +1,13 @@
+
+.bpButtonComponent {
+  //width: 100%;
+  display: flex;
+  flex: 1 1;
+  justify-content: center;
+  //min-width: 50%;
+  margin: 2px 0;
+  width: max-content;
+
+  height: auto;
+  align-self: stretch;
+}
