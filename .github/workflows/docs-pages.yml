@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Build docs and deploy to github pages.
+name: Build the website and docs and deploy to github pages.
 
 on:
   # Runs on pushes targeting the default branch
@@ -43,22 +43,16 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    # npm ci does not build (prepack, not prepare): build and docs of uiconfig.js, then the renderers that the
-    # example pages bundle, then the example pages (Vite, examples/dist)
-    - run: npm run prepack -w uiconfig.js
-    - run: npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
-    - run: npm run examples:build -w uiconfig.js
-    # site layout: docs/ (typedoc), docs/dist, docs/examples/index.html, docs/examples/html/<page>.html
-    - run: |
-        mv -t docs dist README.md LICENSE
-        mv examples/dist docs/examples
-      working-directory: packages/uiconfig.js
+    # npm ci does not build (prepack, not prepare). `npm run pages` builds uiconfig.js and its docs, the renderers
+    # and their docs, the example pages of the three packages and the landing page (website/), then assembles
+    # website/_site: the landing page at the root, docs/ (with docs/uiconfig-tweakpane/ and docs/uiconfig-blueprint/),
+    # examples/ (with examples/uiconfig-tweakpane/ and examples/uiconfig-blueprint/), dist/, and redirect pages at
+    # the old TypeDoc paths. See website/README.md.
+    - run: npm run pages
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: 'packages/uiconfig.js/docs'
+        path: 'website/_site'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-    - run: rm -rf packages/uiconfig.js/docs
-
