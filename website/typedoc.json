@@ -1,0 +1,42 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPointStrategy": "packages",
+    "entryPoints": [
+        "../packages/uiconfig.js",
+        "../packages/uiconfig-tweakpane",
+        "../packages/uiconfig-blueprint"
+    ],
+    "packageOptions": {
+        "entryPoints": [
+            "src/index.ts"
+        ]
+    },
+    "sortEntryPoints": false,
+    "name": "uiconfig.js",
+    "readme": "src/docs/index.md",
+    "out": "dist-docs",
+    "favicon": "public/favicon.svg",
+    "navigationLinks": {
+        "Home": "https://repalash.com/uiconfig.js/",
+        "Examples": "https://repalash.com/uiconfig.js/examples/",
+        "GitHub": "https://github.com/repalash/uiconfig.js"
+    },
+    "customCss": "src/docs/docs.css",
+    "customJs": "src/docs/docs.js",
+    "highlightLanguages": [
+        "bash",
+        "console",
+        "css",
+        "html",
+        "javascript",
+        "json",
+        "jsonc",
+        "json5",
+        "scss",
+        "sh",
+        "shell",
+        "tsx",
+        "jsx",
+        "typescript"
+    ]
+}
