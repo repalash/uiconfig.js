@@ -14,9 +14,33 @@ import {
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
 
+/** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
+export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
+export type TweakpaneThemeMode = typeof tweakpaneThemeModes[number]
+
+/**
+ * Applies a color mode of the theme in `uiconfig-tweakpane/theme.css` to an element and the Tweakpane panels in it,
+ * by setting the classes `tpTheme` and `tpTheme-<mode>`. Import the stylesheet once. `null` removes the theme.
+ * @param element - the panel's container, or any ancestor of the panels
+ * @param mode - the color mode, or null for the default Tweakpane look
+ */
+export function applyTweakpaneTheme(element: HTMLElement, mode: TweakpaneThemeMode | null) {
+    element.classList.remove('tpTheme', ...tweakpaneThemeModes.map(m => 'tpTheme-' + m))
+    if (mode) element.classList.add('tpTheme', 'tpTheme-' + mode)
+}
+
 export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
     protected _root?: Pane
+    protected _container?: HTMLDivElement
+
+    /**
+     * Applies a color mode of the theme in `uiconfig-tweakpane/theme.css` to this renderer's panel; `null` removes it.
+     * Import the stylesheet once (`import 'uiconfig-tweakpane/theme.css'`).
+     */
+    setTheme(mode: TweakpaneThemeMode | null) {
+        if (this._container) applyTweakpaneTheme(this._container, mode)
+    }
 
     unmount() {
         this._root?.dispose()
@@ -61,6 +85,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
           }
         `)
 
+        this._container = container
         this._root = new Pane({title: 'Configuration', container})
         this._root.registerPlugin(TextareaPlugin)
         return container

@@ -97,6 +97,23 @@ Check the documentation at [uiconfig.js](https://github.com/repalash/uiconfig.js
 8. `color` - A color picker for colors.
 9. `vector/vec2/vec3/vec4` - Multiple number input fields in a row for vectors.
 
+## Theme
+
+An optional theme with five color modes (`light`, `dark`, `blue`, `white`, `black`): larger rows, folder borders and
+adjusted type, from threepipe's Tweakpane plugin. Import the stylesheet once and pick a mode for a renderer:
+
+```typescript
+import 'uiconfig-tweakpane/theme.css' // or <link rel="stylesheet" href="https://unpkg.com/uiconfig-tweakpane/dist/theme.css">
+import { UI } from 'uiconfig-tweakpane';
+
+const ui = new UI();
+ui.setTheme('dark'); // null for the default Tweakpane look
+```
+
+The mode is a class on the renderer's container (`tpTheme tpTheme-<mode>`), so panels on the same page can use
+different modes. `applyTweakpaneTheme(element, mode)` sets the classes on any other element, for example `document.body`.
+Without the classes, the stylesheet changes nothing.
+
 ## Three.js integration
 
 Set the three.js classes for Color, Vector2, Vector3, Vector4 in the renderer and the color and vector components will automatically use them.

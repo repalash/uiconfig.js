@@ -35,6 +35,7 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./theme.css": "./dist/theme.css",
     "./dist/": {
       "import": "./dist/",
       "require": "./dist/"
