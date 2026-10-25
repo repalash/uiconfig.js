@@ -1,6 +1,7 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
+- License: MIT from this release (releases up to 0.1.0-dev.15 stay under Apache 2.0).
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-blueprint`. The npm package name stays `uiconfig-blueprint`.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
 - Depend on `uiconfig.js` `^0.4.0` (was `^0.3.1`).

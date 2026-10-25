@@ -1,8 +1,6 @@
 # uiconfig.js - a 0kb UI framework
 
-[![NPM Package](https://img.shields.io/npm/v/ts-browser-helpers.svg)](https://www.npmjs.com/package/ts-browser-helpers)
-
-[![License: Apache 2.0](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/license/mit/)
+[![NPM Package](https://img.shields.io/npm/v/uiconfig.js.svg)](https://www.npmjs.com/package/uiconfig.js)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 

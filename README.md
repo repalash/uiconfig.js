@@ -6,9 +6,9 @@
 |---|---|---|---|
 | `uiconfig.js` | [packages/uiconfig.js](packages/uiconfig.js) | [![npm](https://img.shields.io/npm/v/uiconfig.js.svg)](https://www.npmjs.com/package/uiconfig.js) | MIT |
 | `uiconfig-tweakpane` | [packages/uiconfig-tweakpane](packages/uiconfig-tweakpane) | [![npm](https://img.shields.io/npm/v/uiconfig-tweakpane.svg)](https://www.npmjs.com/package/uiconfig-tweakpane) | MIT |
-| `uiconfig-blueprint` | [packages/uiconfig-blueprint](packages/uiconfig-blueprint) | [![npm](https://img.shields.io/npm/v/uiconfig-blueprint.svg)](https://www.npmjs.com/package/uiconfig-blueprint) | Apache-2.0 |
-| `uiconfig-react` | [packages/uiconfig-react](packages/uiconfig-react) | not published (private) | |
-| `uiconfig-shadcn` | [packages/uiconfig-shadcn](packages/uiconfig-shadcn) | not published (private) | |
+| `uiconfig-blueprint` | [packages/uiconfig-blueprint](packages/uiconfig-blueprint) | [![npm](https://img.shields.io/npm/v/uiconfig-blueprint.svg)](https://www.npmjs.com/package/uiconfig-blueprint) | MIT |
+| `uiconfig-react` | [packages/uiconfig-react](packages/uiconfig-react) | not published (private) | MIT |
+| `uiconfig-shadcn` | [packages/uiconfig-shadcn](packages/uiconfig-shadcn) | not published (private) | MIT |
 
 - **uiconfig.js**: the configuration types, `UiConfigMethods`, decorators and the renderer base classes.
 - **uiconfig-tweakpane**: renderer and custom components on [Tweakpane](https://tweakpane.github.io/docs/) 3.
