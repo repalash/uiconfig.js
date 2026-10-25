@@ -1016,6 +1016,68 @@ main pre + p, main pre + h3, main pre + .link-row {
     margin: 0;
 }
 
+/* ---------- "Tweak this page" ---------- */
+
+.design-toggle {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 90;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 550;
+    box-shadow: 0 6px 20px -8px var(--shadow);
+    cursor: pointer;
+}
+
+.design-toggle svg {
+    width: 20px;
+    height: 20px;
+    color: var(--ink-2);
+}
+
+.design-toggle:hover {
+    border-color: var(--accent);
+}
+
+.design-toggle[aria-expanded='true'] {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+
+.design-panel .tp-rotv {
+    --tp-font-family: var(--font-text);
+}
+
+.design-panel[hidden] {
+    display: none;
+}
+
+/* the panel opens above the button instead of at the top right of the window */
+.design-panel #tweakpaneUiContainer {
+    top: auto;
+    right: 16px;
+    bottom: 68px;
+    max-height: calc(100vh - 140px);
+    padding: 0;
+    border-radius: var(--radius-small);
+    box-shadow: 0 12px 36px -12px var(--shadow);
+}
+
+@media print {
+    .design-toggle, .design-panel {
+        display: none;
+    }
+}
+
 /* ---------- narrow screens ---------- */
 
 @media (max-width: 900px) {

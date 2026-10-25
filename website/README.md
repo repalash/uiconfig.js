@@ -49,9 +49,11 @@ To check the result locally, serve `website/_site` with any static server, for e
   a face only when an element uses it), `src/styles/site.css` the page. Another page in the same style imports
   `fonts.css` and `tokens.css`, sets `data-scheme="light"` or `"dark"` on `<html>` (see the inline script in
   index.html) and uses the variables.
-- `?design=1` adds a design panel (built with uiconfig-tweakpane) to try fonts, sizes, accent, radius, panel density,
-  the Tweakpane theme, the color scheme and the hero figure. The parameter only switches the panel on. Choices are
-  kept in localStorage and apply only with the parameter; "Copy CSS" copies them as custom properties.
+- "Tweak this page" (the button at the bottom right) opens a design panel built with uiconfig-tweakpane, to try fonts,
+  sizes, accent, radius, panel density, the Tweakpane theme, the color scheme and the hero figure. `?design=1` in the
+  URL opens it directly; the parameter carries nothing else. The panel loads on first use. A visitor's choices are
+  saved in localStorage once they change something and apply on later visits; Reset removes them; "Copy CSS" copies
+  them as custom properties.
 - The Tweakpane panels use the theme of `uiconfig-tweakpane/theme.css` (switcher under the hero panel); the component
   list shows the plain Tweakpane look.
 - The panels stop their update loops while they are off screen, and the figures redraw only the parts that change.

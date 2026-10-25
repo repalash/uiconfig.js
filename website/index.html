@@ -7,7 +7,15 @@
     <meta name="description" content="Describe a UI as plain config objects or TypeScript decorators bound to your data, and render it as a live panel with Tweakpane, Blueprint or your own renderer.">
     <meta name="color-scheme" content="light dark">
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <script>document.documentElement.dataset.scheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'</script>
+    <script>
+        // color scheme before the first paint: the visitor's choice in "Tweak this page", else the system setting
+        (function () {
+            var scheme = 'auto'
+            try { scheme = JSON.parse(localStorage.getItem('uiconfig-site:design') || '{}').scheme || 'auto' } catch (e) {}
+            var dark = scheme === 'auto' ? matchMedia('(prefers-color-scheme: dark)').matches : scheme === 'dark'
+            document.documentElement.dataset.scheme = dark ? 'dark' : 'light'
+        })()
+    </script>
     <script type="module" src="./src/main.ts"></script>
 </head>
 <body>
@@ -272,6 +280,11 @@ npm install uiconfig.js          # types and decorators, for TypeScript</code></
     </section>
 
 </main>
+
+<button type="button" class="design-toggle" id="design-toggle" aria-expanded="false" aria-controls="design-panel">
+    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 6h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12.5" cy="6" r="2.6" fill="var(--c-data)" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="14" r="2.6" fill="var(--c-tweakpane)" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>Tweak this page</span>
+</button>
 
 <footer class="footer">
     <div class="wrap footer-inner">
