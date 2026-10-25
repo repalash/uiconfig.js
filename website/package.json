@@ -8,7 +8,8 @@
         "dev": "vite --host",
         "build": "tsc --noEmit && vite build",
         "preview": "vite preview --host",
-        "assemble": "node scripts/assemble-pages.mjs"
+        "assemble": "node scripts/assemble-pages.mjs",
+        "docs": "typedoc && node scripts/docs-theme.mjs"
     },
     "dependencies": {
         "@codemirror/autocomplete": "^6.20.4",
@@ -32,6 +33,7 @@
     },
     "devDependencies": {
         "@lezer/javascript": "^1.5.6",
+        "typedoc": "^0.28.9",
         "typescript": "^5.7.2",
         "vite": "^7.2.6"
     },
