@@ -16,7 +16,7 @@
 - **uiconfig-react**: base classes, a sample React renderer and un-styled components.
 - **uiconfig-shadcn**: components on [shadcn/ui](https://ui.shadcn.com/) for uiconfig-react.
 
-Each package has its own README and CHANGELOG.md. Docs and examples of uiconfig.js: https://repalash.com/uiconfig.js/
+Each package has its own README and CHANGELOG.md. Website, API docs and examples: https://repalash.com/uiconfig.js/ (source in [website](website), a private workspace package).
 
 ## Development
 

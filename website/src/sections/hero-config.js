@@ -1,0 +1,54 @@
+// Config of the hero panel. The page shows the part between #region and #endregion.
+
+/**
+ * @param {string} color - initial color of the heading
+ * @param {(heading: any) => void} applyToPage - writes the values to the heading element
+ */
+export function createHeadingConfig(color, applyToPage) {
+    // #region
+    const heading = {
+        text: 'uiconfig.js',
+        weight: 800,
+        mono: 0,
+        case: 'none',
+        color,
+        outline: false,
+    }
+
+    const config = {
+        type: 'folder',
+        label: 'Heading',
+        expanded: true,
+        children: [
+            {type: 'input', label: 'Text', property: [heading, 'text']},
+            {type: 'slider', label: 'Weight', bounds: [300, 1000], stepSize: 10, property: [heading, 'weight']},
+            {type: 'slider', label: 'Monospace', bounds: [0, 1], stepSize: 0.01, property: [heading, 'mono']},
+            {
+                type: 'dropdown',
+                label: 'Case',
+                property: [heading, 'case'],
+                children: [
+                    {label: 'As typed', value: 'none'},
+                    {label: 'lowercase', value: 'lowercase'},
+                    {label: 'UPPERCASE', value: 'uppercase'},
+                ],
+            },
+            {type: 'color', label: 'Color', property: [heading, 'color']},
+            {type: 'checkbox', label: 'Outline', property: [heading, 'outline']},
+            {
+                type: 'button',
+                label: 'Randomize',
+                onClick: () => {
+                    heading.weight = 300 + Math.round(Math.random() * 70) * 10
+                    heading.mono = Math.round(Math.random() * 100) / 100
+                    applyToPage(heading)
+                    config.uiRefresh(true) // show the new values in the panel
+                },
+            },
+        ],
+        // called after a change in any child
+        onChange: () => applyToPage(heading),
+    }
+    // #endregion
+    return {heading, config}
+}
