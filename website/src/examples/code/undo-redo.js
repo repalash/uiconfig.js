@@ -19,11 +19,14 @@ export default function example(ui, {log}) {
             {
                 type: 'button',
                 label: 'Add 10',
-                // the returned function undoes the click
+                // the returned function undoes the click; both refresh the panel,
+                // because undo and redo from the keyboard dispatch no onChange
                 onClick: () => {
                     box.count += 10
+                    config.uiRefresh(true)
                     return () => {
                         box.count -= 10
+                        config.uiRefresh(true)
                     }
                 },
             },
