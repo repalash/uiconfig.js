@@ -73,7 +73,7 @@ The module can be accessed with the short-form `bpui`
 
 ### Builds
 
-- `dist/index.mjs` (`import`, `module`): ES module. It imports its dependencies `uiconfig.js`, `ts-browser-helpers`, `react`, `react-dom`, `@blueprintjs/core`, `@blueprintjs/icons`, `@blueprintjs/select` and `react-colorful` instead of bundling them, so the bundler of the app keeps one copy of each. The styles, `classnames` and a few internal modules of `@blueprintjs/core` stay in the bundle. `react`, `react-dom` and `@blueprintjs/core` are peer dependencies: npm 7 and later install them, other package managers can need them in the app's `package.json`.
+- `dist/index.mjs` (`import`, `module`): ES module. It imports its dependencies `uiconfig.js`, `ts-browser-helpers`, `react`, `react-dom`, `@blueprintjs/core`, `@blueprintjs/icons`, `@blueprintjs/select`, `react-colorful` and `classnames` instead of bundling them, so the bundler of the app keeps one copy of each. The styles and a few internal modules of `@blueprintjs/core` stay in the bundle. `react`, `react-dom` and `@blueprintjs/core` are peer dependencies: npm 7 and later install them, other package managers can need them in the app's `package.json`.
 - `lib/esm`: the TypeScript output, one file per source module.
 - `dist/index.js` (`main`, `require`, `browser`, the CDN link): UMD bundle with all dependencies included, for a `<script>` tag or `require()`. This build is legacy and will be removed in the next major version.
 

@@ -1,9 +1,8 @@
 import React from "react";
-import {Button, Card, Panel, PanelStack2, Popover} from "@blueprintjs/core";
+import {Button, Card, Classes, Panel, PanelStack2, Popover} from "@blueprintjs/core";
 import {ConfigObject, ConfigProps} from "../ConfigObject";
 import {UiObjectConfig} from 'uiconfig.js'
 import {UiConfigRendererContext} from '../bpComponents/BPComponent'
-import {Classes} from '@blueprintjs/core/src/common'
 import {
     defaultVisualStyle,
     setupVisualStyle,

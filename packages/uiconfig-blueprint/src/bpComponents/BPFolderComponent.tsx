@@ -8,14 +8,14 @@ import {
     Icon,
     IconName,
     Intent,
-    MaybeElement, Menu, MenuItem, Popover
+    MaybeElement, Menu, MenuItem, Popover,
+    Classes,
 } from "@blueprintjs/core";
 import {ConfigObject} from "../ConfigObject";
 import {PanelActions} from "@blueprintjs/core/lib/esm/components/panel-stack2/panelTypes";
 import {getOrCall, safeSetProperty} from 'ts-browser-helpers'
 import {BPContainerComponent, BPContainerComponentState, BPContainerComponentProps} from './BPContainerComponent'
 import classNames from "classnames";
-import {Classes} from "@blueprintjs/core/src/common";
 import {AnimationStates} from "@blueprintjs/core/lib/esm/components/collapse/collapse";
 
 export type BPFolderComponentState = BPContainerComponentState & {
