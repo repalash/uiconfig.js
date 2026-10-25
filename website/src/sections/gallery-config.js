@@ -28,13 +28,22 @@ export function createGalleryConfig(s, renderer) {
     const children = [
         {type: 'input', label: 'input', property: [s, 'text']},
         {type: 'number', label: 'number', property: [s, 'count']},
-        {type: 'slider', label: 'slider', bounds: [0, 1], stepSize: 0.01, property: [s, 'ratio']},
+        {
+            type: 'slider',
+            label: 'slider',
+            bounds: [0, 1],
+            stepSize: 0.01,
+            property: [s, 'ratio'],
+        },
         {type: 'checkbox', label: 'checkbox', property: [s, 'enabled']},
         {
             type: 'dropdown',
             label: 'dropdown',
             property: [s, 'mode'],
-            children: ['small', 'medium', 'large'].map((v) => ({label: v, value: v})),
+            children: ['small', 'medium', 'large'].map((v) => ({
+                label: v,
+                value: v,
+            })),
         },
         {type: 'color', label: 'color', property: [s, 'color']},
         {type: 'vec2', label: 'vec2', property: [s, 'offset']},
@@ -50,25 +59,62 @@ export function createGalleryConfig(s, renderer) {
         },
         {type: 'monitor', label: 'monitor', property: [s, 'clicks']},
         {type: 'separator', only: 'tweakpane'},
-        {type: 'textarea', label: 'textarea', property: [s, 'notes'], only: 'tweakpane'},
+        {
+            type: 'textarea',
+            label: 'textarea',
+            property: [s, 'notes'],
+            only: 'tweakpane',
+        },
         {
             type: 'tabs',
             only: 'tweakpane',
             children: [
-                {type: 'folder', label: 'tab 1', children: [{type: 'input', label: 'input', property: [s, 'first']}]},
-                {type: 'folder', label: 'tab 2', children: [{type: 'input', label: 'input', property: [s, 'second']}]},
+                {
+                    type: 'folder',
+                    label: 'tab 1',
+                    children: [
+                        {type: 'input', label: 'input', property: [s, 'first']},
+                    ],
+                },
+                {
+                    type: 'folder',
+                    label: 'tab 2',
+                    children: [
+                        {
+                            type: 'input',
+                            label: 'input',
+                            property: [s, 'second'],
+                        },
+                    ],
+                },
             ],
         },
         {
             type: 'folder',
             label: 'folder',
             expanded: true,
-            children: [{type: 'slider', label: 'slider', bounds: [0, 1], stepSize: 0.01, property: [s, 'inner']}],
+            children: [
+                {
+                    type: 'slider',
+                    label: 'slider',
+                    bounds: [0, 1],
+                    stepSize: 0.01,
+                    property: [s, 'inner'],
+                },
+            ],
         },
         {
             type: 'panel',
             label: 'panel',
-            children: [{type: 'slider', label: 'slider', bounds: [0, 1], stepSize: 0.01, property: [s, 'inner']}],
+            children: [
+                {
+                    type: 'slider',
+                    label: 'slider',
+                    bounds: [0, 1],
+                    stepSize: 0.01,
+                    property: [s, 'inner'],
+                },
+            ],
         },
     ]
     const config = {

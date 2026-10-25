@@ -1,7 +1,7 @@
 /*
  * uiconfig.js landing page.
- * One typeface, Recursive (bundled, axes wght and MONO): text at MONO 0, code at MONO 1, and the heading
- * moves between the two from the hero panel.
+ * One typeface, Recursive (bundled, axes wght and MONO): the text, the headings and the panels use its
+ * proportional cut (MONO 0), code its monospace cut (MONO 1).
  * The renderers inject global styles (Blueprint: normalize.css, element rules, :root font), so the rules
  * here use classes and do not depend on element defaults.
  */
@@ -29,6 +29,17 @@
     --tk-call: #0f6a85;
     --tk-type: #835000;
     --tk-decorator: #963c09;
+    --tk-def: var(--ink);
+    --tk-punct: #555c68;
+
+    /* figure palette: one color for each part of the story */
+    --c-data: #e9a315;
+    --c-config: #3346d3;
+    --c-tweakpane: #0e9a91;
+    --c-blueprint: #c43f7f;
+    --c-paper: #f4f5f7;
+    --c-base: #ccd2db;
+    --c-base-dark: #a9b2bf;
 
     --font-text: 'Recursive Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-code: 'Recursive Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -37,7 +48,7 @@
     --gutter: clamp(20px, 4vw, 48px);
 
     /* Tweakpane theme */
-    --tp-font-family: var(--font-code);
+    --tp-font-family: var(--font-text);
     --tp-base-background-color: var(--surface);
     --tp-base-shadow-color: rgba(21, 23, 28, 0.08);
     --tp-button-background-color: #d9dde4;
@@ -87,6 +98,15 @@
         --tk-call: #72cde6;
         --tk-type: #f2c14e;
         --tk-decorator: #f5a26b;
+        --tk-punct: #a3aab6;
+
+        --c-data: #f2c14e;
+        --c-config: #7484f5;
+        --c-tweakpane: #31c3b7;
+        --c-blueprint: #e66ba8;
+        --c-paper: #c3c9d3;
+        --c-base: #444b58;
+        --c-base-dark: #343a45;
 
         --tp-base-shadow-color: rgba(0, 0, 0, 0.3);
         --tp-button-background-color: #3b414d;
@@ -219,9 +239,8 @@ main h3 {
     color: var(--ink);
     text-decoration: none;
     font-weight: 800;
-    font-size: 1.05rem;
-    font-variation-settings: 'MONO' 1;
-    letter-spacing: -0.01em;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
 }
 
 .brand-dot {
@@ -253,17 +272,15 @@ main h3 {
 }
 
 .wordmark {
-    --mono: 0;
     margin: 0 0 clamp(28px, 4vw, 52px);
     font-size: clamp(3.1rem, 12.4vw, 10.4rem);
     line-height: 0.95;
     font-weight: 800;
-    letter-spacing: -0.035em;
-    font-variation-settings: 'MONO' var(--mono);
+    letter-spacing: -0.03em;
     color: var(--accent);
     overflow-wrap: anywhere;
     min-height: 0.95em;
-    transition: font-variation-settings 160ms ease-out, font-weight 160ms ease-out, color 160ms ease-out;
+    transition: letter-spacing 160ms ease-out, font-weight 160ms ease-out, color 160ms ease-out;
 }
 
 .wordmark.is-outline {
@@ -371,8 +388,8 @@ main h3 {
     box-shadow: 0 1px 0 var(--rule), 0 8px 24px -12px var(--tp-base-shadow-color);
 }
 
-.panel-host #tweakpaneUiContainer, .panel-host #tweakpaneUiContainer :is(input, textarea, select, button) {
-    font-variation-settings: 'MONO' 1;
+.panel-host #tweakpaneUiContainer :is(input, textarea, select, button) {
+    font-variation-settings: inherit;
 }
 
 /* Blueprint: the renderer positions its container fixed at the top right of the window */
@@ -387,23 +404,30 @@ main h3 {
     resize: none;
 }
 
-/* Blueprint's panel stack places its pages absolutely, so the panel needs a height */
+/* Blueprint's panel stack places its pages absolutely, for the slide between pages; in flow, the panel takes
+   the height of its content */
 .panel-host .bpInspectorCard {
-    height: var(--bp-height, 420px);
     border-radius: 6px;
     box-shadow: 0 1px 0 var(--rule), 0 8px 24px -12px var(--tp-base-shadow-color);
 }
 
-.panel-host .inspectorPanelStack {
-    height: 100%;
+.panel-host .inspectorPanelStack, .panel-host .bp5-panel-stack2-view {
+    position: relative;
+    height: auto;
+    overflow: visible;
 }
 
-#dual-blueprint {
-    --bp-height: 300px;
+.panel-host .bp5-panel-stack2-view {
+    padding-bottom: 6px;
 }
 
-#gallery-blueprint {
-    --bp-height: 600px;
+/* the renderer adds 400px of space under the root folder (inline style), for scrolling in a full-height panel */
+.panel-host .folder-children {
+    padding-bottom: 2px !important;
+}
+
+.panel-host .bpInspectorCard {
+    overflow-y: visible;
 }
 
 .panel-loading, .panel-error {
@@ -452,7 +476,7 @@ main figcaption {
     font-size: inherit;
 }
 
-main pre + p, main pre + h3 {
+main pre + p, main pre + h3, main pre + .link-row {
     margin-top: 1.2em;
 }
 
@@ -464,6 +488,8 @@ main pre + p, main pre + h3 {
 .tk-call { color: var(--tk-call); }
 .tk-type { color: var(--tk-type); }
 .tk-decorator { color: var(--tk-decorator); }
+.tk-def { color: var(--tk-def); }
+.tk-punct { color: var(--tk-punct); }
 
 .code-details {
     margin-top: 18px;
@@ -483,6 +509,130 @@ main pre + p, main pre + h3 {
 .note {
     color: var(--ink-2);
     font-size: 0.92rem;
+}
+
+/* ---------- figures (src/figures) ---------- */
+
+.iso {
+    --t-p: 58%;
+    --r-p: 100%;
+    --l-p: 78%;
+    --edge-p: 52%;
+    display: block;
+    overflow: visible;
+}
+
+@media (prefers-color-scheme: dark) {
+    .iso {
+        --t-p: 90%;
+        --r-p: 74%;
+        --l-p: 56%;
+        --edge-p: 34%;
+    }
+}
+
+.iso .iso-t { fill: color-mix(in oklab, var(--h) var(--t-p), white); }
+.iso .iso-r { fill: color-mix(in oklab, var(--h) var(--r-p), black); }
+.iso .iso-l { fill: color-mix(in oklab, var(--h) var(--l-p), black); }
+
+.iso .iso-solid > * {
+    stroke: color-mix(in oklab, var(--h) var(--edge-p), black);
+    stroke-width: 0.6;
+    stroke-linejoin: round;
+}
+
+.iso .iso-fill { fill: var(--h); }
+.iso .iso-halo { fill: var(--ink); opacity: 0.07; }
+.iso .iso-bevel { fill: none; stroke: white; stroke-width: 0.8; opacity: 0.45; }
+.iso .iso-screw { fill: var(--c-base-dark); stroke: color-mix(in oklab, var(--c-base-dark) 60%, black); stroke-width: 0.4; }
+.iso .iso-screw-slot { fill: color-mix(in oklab, var(--c-base-dark) 45%, black); }
+.iso .iso-groove { fill: none; stroke: color-mix(in oklab, var(--c-base) 72%, black); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.iso .iso-token { fill: var(--c-data); stroke: color-mix(in oklab, var(--c-data) 55%, black); stroke-width: 0.7; }
+.iso .iso-slot, .iso .iso-handle, .iso .iso-lamp-ring { fill: #23272f; }
+.iso .iso-vent { fill: #23272f; opacity: 0.45; }
+.iso .iso-plate, .iso .iso-inlay, .iso .iso-dial, .iso .iso-sheet { fill: var(--c-paper); stroke: color-mix(in oklab, var(--c-paper) 55%, black); stroke-width: 0.5; }
+.iso .iso-drawer { fill: black; fill-opacity: 0.08; stroke: black; stroke-opacity: 0.25; stroke-width: 0.5; }
+.iso .iso-rule, .iso .iso-label { fill: #8d95a2; }
+.iso .iso-rule-line { fill: none; stroke: #8d95a2; stroke-width: 0.9; stroke-linecap: round; }
+.iso .iso-track { fill: none; stroke: #8d95a2; stroke-width: 1.6; stroke-linecap: round; }
+.iso .iso-track-fill { fill: none; stroke: var(--h); stroke-width: 1.8; stroke-linecap: round; }
+.iso .iso-knob-dot { fill: white; stroke: rgba(0, 0, 0, 0.35); stroke-width: 0.4; }
+.iso .iso-bezel { fill: var(--c-base-dark); stroke: color-mix(in oklab, var(--c-base-dark) 50%, black); stroke-width: 0.5; }
+.iso .iso-tick { fill: none; stroke: #6b7280; stroke-width: 0.6; }
+.iso .iso-tick-major { fill: none; stroke: #2b2f36; stroke-width: 0.9; }
+.iso .iso-needle { stroke: #15171c; stroke-width: 1.4; stroke-linecap: round; }
+.iso .iso-hub { fill: #15171c; }
+.iso .iso-axis { fill: none; stroke: var(--h); stroke-width: 1.6; stroke-linecap: round; }
+.iso .iso-lamp-glow { fill: var(--c-data); }
+.iso .iso-lamp { opacity: 0.2; transition: opacity 0.25s ease-out; }
+.iso .iso-lamp.is-on { opacity: 1; }
+
+.renderers-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.renderers-head .intro {
+    margin-bottom: 0 !important;
+}
+
+.fig .fig-binding {
+    width: 100%;
+    height: auto;
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+}
+
+.key::before {
+    content: '';
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-right: 0.45em;
+    border-radius: 2px;
+    background: var(--h);
+    vertical-align: -0.02em;
+}
+
+.fig-note {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 !important;
+    max-width: none !important;
+}
+
+.fig-readout {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+}
+
+.section-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 0.6rem;
+}
+
+.section-head h2 {
+    margin: 0;
+}
+
+.iso-icon {
+    flex: none;
+    width: 48px;
+    height: 48px;
 }
 
 /* ---------- sections ---------- */
@@ -599,9 +749,13 @@ main pre + p, main pre + h3 {
 
 .syntax-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
     gap: clamp(20px, 3vw, 40px);
     align-items: start;
+}
+
+.syntax-code {
+    font-size: 0.8rem;
 }
 
 .syntax-side .note {
@@ -649,6 +803,25 @@ main pre + p, main pre + h3 {
     color: var(--ink);
 }
 
+/* a colored mark in the renderer columns, in the colors of the figure */
+.types td.yes::before {
+    content: '';
+    display: inline-block;
+    width: 0.55em;
+    height: 0.55em;
+    margin-right: 0.5em;
+    border-radius: 50%;
+    background: var(--c-tweakpane);
+}
+
+.types td.yes:nth-child(4)::before {
+    background: var(--c-blueprint);
+}
+
+.types thead th:nth-child(3), .types thead th:nth-child(4) {
+    white-space: nowrap;
+}
+
 .types td.no {
     color: var(--ink-3);
 }
@@ -690,7 +863,7 @@ main pre + p, main pre + h3 {
 
 .pg-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
     gap: clamp(20px, 3vw, 40px);
     align-items: start;
 }
@@ -707,6 +880,14 @@ main pre + p, main pre + h3 {
     height: 100%;
 }
 
+.pg-editor .cm-scroller {
+    font-variation-settings: 'MONO' 1;
+}
+
+.pg-editor {
+    --code-size: 0.8rem;
+}
+
 .pg-fallback {
     box-sizing: border-box;
     width: 100%;
@@ -721,7 +902,7 @@ main pre + p, main pre + h3 {
     font-variation-settings: 'MONO' 1;
     font-size: var(--code-size);
     line-height: 1.6;
-    tab-size: 2;
+    tab-size: 4;
 }
 
 .pg-grid + .note {
@@ -745,8 +926,6 @@ main pre + p, main pre + h3 {
     background: color-mix(in srgb, #d64545 14%, var(--paper));
     color: var(--ink);
     box-shadow: inset 3px 0 0 #d64545;
-    font-family: var(--font-code);
-    font-variation-settings: 'MONO' 1;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
@@ -829,7 +1008,7 @@ main pre + p, main pre + h3 {
         order: -1;
     }
 
-    .dual {
+    .dual, .renderers-head {
         grid-template-columns: minmax(0, 1fr);
     }
 
@@ -869,7 +1048,7 @@ main pre + p, main pre + h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .wordmark {
+    .wordmark, .iso .iso-lamp {
         transition: none;
     }
 

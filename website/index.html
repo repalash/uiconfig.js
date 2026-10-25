@@ -36,7 +36,7 @@
                     <p class="lede">Describe a UI as plain objects bound to your data. A renderer turns the description into a live panel: Tweakpane, Blueprint, or one you write.</p>
                     <p>The config is data, so the code that defines it has no dependency. Only the page that shows the panel imports a renderer.</p>
                     <div class="install">
-                        <pre class="install-cmd" data-code="sh"><code>npm install uiconfig-tweakpane</code></pre>
+                        <pre class="install-cmd" tabindex="0" data-code="sh"><code>npm install uiconfig-tweakpane</code></pre>
                         <button type="button" class="button-quiet" data-copy="npm install uiconfig-tweakpane">Copy</button>
                     </div>
                     <ul class="link-row">
@@ -48,7 +48,7 @@
                 </div>
                 <figure class="hero-panel">
                     <div class="panel-host" id="hero-panel"></div>
-                    <figcaption>This panel edits the heading above. It is the config below, rendered by <code>uiconfig-tweakpane</code>.</figcaption>
+                    <figcaption>This panel edits the heading above. It is the config below, rendered by uiconfig-tweakpane.</figcaption>
                 </figure>
             </div>
             <details class="code-details hero-details">
@@ -60,8 +60,24 @@
 
     <section id="renderers" class="section" aria-labelledby="renderers-title" data-show="tweakpane">
         <div class="wrap">
-            <h2 id="renderers-title">One config, any renderer</h2>
-            <p class="intro">Renderers are separate packages, and a config does not import any of them. The same config works as a small debug panel in Tweakpane and as an app inspector in Blueprint. Both panels below edit one <code>light</code> object: change a value in one, and the other follows.</p>
+            <div class="renderers-head">
+                <div>
+                    <h2 id="renderers-title">One config, any renderer</h2>
+                    <p class="intro">Renderers are separate packages, and a config does not import any of them. The same config works as a small debug panel in Tweakpane and as an app inspector in Blueprint. Both panels below edit one <code>light</code> object: change a value in one, and the other follows.</p>
+                </div>
+                <figure class="fig">
+                    <svg data-figure="binding"></svg>
+                    <figcaption>
+                        <ul class="legend" aria-label="Colors in the figure">
+                            <li class="key" style="--h: var(--c-data)">data object</li>
+                            <li class="key" style="--h: var(--c-config)">config</li>
+                            <li class="key" style="--h: var(--c-tweakpane)">uiconfig-tweakpane</li>
+                            <li class="key" style="--h: var(--c-blueprint)">uiconfig-blueprint</li>
+                        </ul>
+                        <p class="fig-note"><span>A change in one panel goes to the data object. The other renderer reads it from there.</span> <span class="fig-readout" id="fig-binding-readout" aria-hidden="true"></span></p>
+                    </figcaption>
+                </figure>
+            </div>
 
             <div class="panel-switch" role="group" aria-label="Panel to show">
                 <button type="button" data-show="tweakpane" aria-pressed="true">Tweakpane</button>
@@ -70,15 +86,15 @@
             <div class="dual">
                 <figure class="dual-panel" data-panel="tweakpane">
                     <div class="panel-host" id="dual-tweakpane"></div>
-                    <figcaption><code>uiconfig-tweakpane</code></figcaption>
+                    <figcaption><span class="key" style="--h: var(--c-tweakpane)">uiconfig-tweakpane</span></figcaption>
                 </figure>
                 <figure class="dual-data">
-                    <pre class="code data-view" aria-live="polite"><code id="dual-data"></code></pre>
-                    <figcaption>The data object. Both panels write to it.</figcaption>
+                    <pre class="code data-view" tabindex="0" aria-live="polite"><code id="dual-data"></code></pre>
+                    <figcaption><span class="key" style="--h: var(--c-data)">The data object. Both panels write to it.</span></figcaption>
                 </figure>
                 <figure class="dual-panel" data-panel="blueprint">
                     <div class="panel-host" id="dual-blueprint"><p class="panel-loading">Loading Blueprint and React…</p></div>
-                    <figcaption><code>uiconfig-blueprint</code></figcaption>
+                    <figcaption><span class="key" style="--h: var(--c-blueprint)">uiconfig-blueprint</span></figcaption>
                 </figure>
             </div>
             <details class="code-details">
@@ -91,7 +107,7 @@
 
     <section id="syntax" class="section" aria-labelledby="syntax-title">
         <div class="wrap">
-            <h2 id="syntax-title">Three ways to write it</h2>
+            <div class="section-head"><svg data-figure="syntax"></svg><h2 id="syntax-title">Three ways to write it</h2></div>
             <p class="intro">Put the config next to the data in an object, build it in a class, or let TypeScript decorators generate it from the fields. Each tab shows the code that renders the panel next to it.</p>
             <div class="tabs" role="tablist" aria-label="Syntax">
                 <button type="button" role="tab" id="tab-object" aria-controls="syntax-tabpanel" data-sample="object">Object</button>
@@ -103,7 +119,7 @@
                 <div class="syntax-side">
                     <div class="panel-host" id="syntax-panel"></div>
                     <p class="note">Render any of them with</p>
-                    <pre class="code" data-code="js"><code>// or 'uiconfig-blueprint'
+                    <pre class="code" tabindex="0" data-code="js"><code>// or 'uiconfig-blueprint'
 import {UI} from 'uiconfig-tweakpane'
 
 const ui = new UI()
@@ -116,7 +132,7 @@ ui.appendChild(data.uiConfig)</code></pre>
 
     <section id="components" class="section" aria-labelledby="components-title">
         <div class="wrap">
-            <h2 id="components-title">Components</h2>
+            <div class="section-head"><svg data-figure="components"></svg><h2 id="components-title">Components</h2></div>
             <p class="intro">The <code>type</code> of a config picks the component. Some types have aliases. Both renderers support the common set; Tweakpane adds a few.</p>
             <div class="gallery">
                 <div class="table-scroll" tabindex="0" role="region" aria-label="Component types and renderer support">
@@ -157,7 +173,7 @@ ui.appendChild(data.uiConfig)</code></pre>
 
     <section id="playground" class="section" aria-labelledby="playground-title">
         <div class="wrap">
-            <h2 id="playground-title">Playground</h2>
+            <div class="section-head"><svg data-figure="playground"></svg><h2 id="playground-title">Playground</h2></div>
             <p class="intro">Write a config and see the panel. The code runs in this page and must <code>return</code> a config; <code>log()</code> prints under the panel. Your last code stays in this browser.</p>
             <div class="pg-toolbar">
                 <label class="pg-preset">Start from
@@ -186,13 +202,15 @@ ui.appendChild(data.uiConfig)</code></pre>
 
     <section id="three" class="section" aria-labelledby="three-title">
         <div class="wrap narrow">
-            <h2 id="three-title">With three.js</h2>
+            <div class="section-head"><svg data-figure="three"></svg><h2 id="three-title">With three.js</h2></div>
             <p class="intro"><a href="https://threepipe.org">threepipe</a>, a three.js framework, builds its UI with uiconfig. The viewer, its plugins, objects and materials carry a <code>uiConfig</code>, and the editor renders them with uiconfig-tweakpane or uiconfig-blueprint.</p>
-            <pre class="code" data-code="js"><code>import {Color, Vector2, Vector3, Vector4} from 'three'
+            <pre class="code" tabindex="0" data-code="js"><code>import {Color, Vector2, Vector3, Vector4} from 'three'
 import {UI} from 'uiconfig-tweakpane'
 
 const ui = new UI()
-ui.THREE = {Color, Vector2, Vector3, Vector4} // color and vector inputs edit these objects
+// color and vector inputs create and edit these objects
+ui.THREE = {Color, Vector2, Vector3, Vector4}
+// threepipe: the viewer and its plugins carry their own uiConfig
 viewer.uiConfig.children.forEach((child) => ui.appendChild(child))</code></pre>
             <ul class="link-row">
                 <li><a href="https://threepipe.org/examples/#tweakpane-editor/">Tweakpane editor</a></li>
@@ -204,16 +222,21 @@ viewer.uiConfig.children.forEach((child) => ui.appendChild(child))</code></pre>
 
     <section id="install" class="section" aria-labelledby="install-title">
         <div class="wrap narrow">
-            <h2 id="install-title">Install</h2>
-            <pre class="code" data-code="sh"><code>npm install uiconfig-tweakpane   # Tweakpane renderer
+            <div class="section-head"><svg data-figure="install"></svg><h2 id="install-title">Install</h2></div>
+            <pre class="code" tabindex="0" data-code="sh"><code>npm install uiconfig-tweakpane   # Tweakpane renderer
 npm install uiconfig-blueprint   # Blueprint renderer (React)
 npm install uiconfig.js          # types and decorators, for TypeScript</code></pre>
             <p>The packages are ES modules for a bundler such as Vite, webpack or esbuild. Their <code>dist/index.mjs</code> imports its dependencies instead of bundling them, so the app keeps one copy of uiconfig.js, Tweakpane and React. JavaScript code needs only a renderer; TypeScript code adds <code>uiconfig.js</code> for the types and decorators.</p>
             <p>A page without a bundler can load the UMD build from a CDN. It includes every dependency and is legacy: the next major version removes it.</p>
-            <pre class="code" data-code="html"><code>&lt;script src="https://unpkg.com/uiconfig-tweakpane"&gt;&lt;/script&gt;
+            <pre class="code" tabindex="0" data-code="html"><code>&lt;script src="https://unpkg.com/uiconfig-tweakpane"&gt;&lt;/script&gt;
 &lt;script&gt;
-  const ui = new window['uiconfig-tweakpane'].UI() // uiconfig-blueprint: new bpui.UI()
-  ui.appendChild({type: 'button', label: 'Click me', onClick: () =&gt; console.log('clicked')})
+    // uiconfig-blueprint: new bpui.UI()
+    const ui = new window['uiconfig-tweakpane'].UI()
+    ui.appendChild({
+        type: 'button',
+        label: 'Click me',
+        onClick: () =&gt; console.log('clicked'),
+    })
 &lt;/script&gt;</code></pre>
 
             <h3>Links</h3>

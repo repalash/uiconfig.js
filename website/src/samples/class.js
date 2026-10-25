@@ -20,7 +20,9 @@ class Person {
                 type: 'dropdown',
                 label: 'City',
                 property: [this, 'city'],
-                children: ['New York', 'Paris', 'London'].map((v) => ({label: v})),
+                children: ['New York', 'Paris', 'London'].map((v) => ({
+                    label: v,
+                })),
             },
             {type: 'button', label: 'Reset', onClick: () => this.reset()},
         ],

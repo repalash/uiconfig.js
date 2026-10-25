@@ -1,4 +1,12 @@
-import {IUiConfigContainer, UiObjectConfig, uiButton, uiContainer, uiDropdown, uiInput, uiSlider} from 'uiconfig.js'
+import {
+    IUiConfigContainer,
+    UiObjectConfig,
+    uiButton,
+    uiContainer,
+    uiDropdown,
+    uiInput,
+    uiSlider,
+} from 'uiconfig.js'
 
 @uiContainer('Person', {expanded: true})
 class Person implements IUiConfigContainer {

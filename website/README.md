@@ -44,6 +44,13 @@ To check the result locally, serve `website/_site` with any static server, for e
 
 ## Notes
 
+- Code samples are highlighted at build time ([scripts/highlight.mjs](scripts/highlight.mjs), called from
+  [vite.config.js](vite.config.js)) with the Lezer JavaScript grammar and the highlighter in
+  [src/code-style.js](src/code-style.js); the playground editor (CodeMirror) uses the same grammar and highlighter.
+  The samples on the page are files in `src/` (imported with `?highlight` for the HTML, `?sample` for the text), so
+  the page shows the code that runs.
+- The figures are inline SVG generated at build time from [src/figures](src/figures) (`<svg data-figure="…">` in
+  index.html); `binding-motion.ts` moves the parts of the binding figure and stops with reduced motion.
 - Tweakpane loads with the page. Blueprint (with React and its styles) and the playground editor (CodeMirror)
   load after the page, when their sections come near the viewport.
 - The playground runs the visitor's code in the page. The code comes only from the presets and from what the
