@@ -55,7 +55,7 @@
     "dist:css": "css-dist lib/css",
     "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore",
     "dev": "vite",
-    "build": "vite build && npm run compile",
+    "build": "vite build && vite build --mode umd && npm run compile",
     "build-examples": "vite build -c vite.examples.config.js",
     "docs": "npx typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
@@ -143,12 +143,13 @@
     "blueprint-styler": "^5.0.2"
   },
   "dependencies": {
-    "ts-browser-helpers": "^0.19.4",
+    "ts-browser-helpers": ">=0.19.4",
     "uiconfig.js": "^0.4.0",
     "@blueprintjs/icons": "^5.23.0",
     "@blueprintjs/select": "^5.3.21",
     "blueprint-styler": "^5.0.2",
-    "react-colorful": "^5.6.1"
+    "react-colorful": "^5.6.1",
+    "classnames": "^2.5.1"
   },
   "peerDependencies": {
     "@blueprintjs/core": "^5.19.1",
@@ -160,9 +161,6 @@
     "react-dom": "^18.2.0"
   },
   "peerDependenciesMeta": {
-    "@blueprintjs/core": {
-      "optional": true
-    },
     "@types/three": {
       "optional": true
     },
@@ -173,12 +171,6 @@
       "optional": true
     },
     "@types/react-dom": {
-      "optional": true
-    },
-    "react": {
-      "optional": true
-    },
-    "react-dom": {
       "optional": true
     }
   },

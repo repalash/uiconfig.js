@@ -98,6 +98,10 @@ For typescript projects, the package `uiconfig.js` can be installed/imported to 
 npm install uiconfig.js
 ```
 
+The package has two builds:
+- `dist/index.mjs` (`import`, `module`): ES module that imports its dependency `ts-browser-helpers`, so the bundler of the app keeps one copy of it.
+- `dist/index.js` (`main`, `require`, `browser`): UMD bundle with `ts-browser-helpers` included, for a `<script>` tag (global `uiconfig.js`, read as `window.uiconfig.js`) or `require()`. This build is legacy and will be removed in the next major version.
+
 #### Renderer packages
 
 For both javascript/typescript, renderer packages can be installed separately in the webapp where the UI is to be rendered.
@@ -115,7 +119,7 @@ It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdeli
 <!--or-->
 <script src="https://cdn.jsdelivr.net/npm/uiconfig-tweakpane"></script>
 
-<!--Then the UI can be accessed with the short-form tpui, bpui, lilui...  -->
+<!--Then the UI can be accessed with the global window['uiconfig-tweakpane'] (bpui for uiconfig-blueprint)  -->
 <script>
     const config = {
         type: "button",
@@ -125,7 +129,7 @@ It can also be added with a CDN link with [unpkg](https://unpkg.com/) or [jsdeli
         },
     }
 
-    const ui = new tpui.UI() // use bpui.UI() for blueprint
+    const ui = new window['uiconfig-tweakpane'].UI() // use new bpui.UI() for blueprint
     ui.appendChild(config)
 </script>
 ```
@@ -613,6 +617,20 @@ Vector3, Vector4 types.
 See [uiconfig-tweakpane](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-tweakpane)
 
 For viewing textures and images check the implementation in [threepipe](https://threepipe.org) under[@threepipe/plugin-tweakpane](https://github.com/repalash/threepipe/tree/main/plugins/tweakpane/src/TweakpaneUiPlugin.ts)
+
+## Examples
+
+The example pages are in [examples](./examples): `examples/index.html` links to the pages in `examples/html`, and `examples/src` has the TypeScript examples. The pages import the packages by name (`uiconfig.js`, `uiconfig-tweakpane`, `uiconfig-blueprint`). Vite bundles them from the built packages of this repository, so build those first. From the repository root:
+
+```bash
+npm install
+npm run build -w uiconfig.js
+npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
+npm run examples:dev -w uiconfig.js     # dev server; the printed URL opens the examples index
+npm run examples:build -w uiconfig.js   # static build in examples/dist
+```
+
+After a change in one of the packages, build it again. The GitHub Pages workflow runs the same build and publishes `examples/dist` as https://repalash.com/uiconfig.js/examples/index.html.
 
 ## Changelog
 
