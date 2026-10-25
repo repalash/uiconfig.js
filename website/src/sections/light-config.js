@@ -8,7 +8,12 @@ export function createLightConfig(light) {
         label: 'Light',
         expanded: true,
         children: [
-            {type: 'input', label: 'Name', property: [light, 'name']},
+            {
+                type: 'input',
+                label: 'Name',
+                property: [light, 'name'],
+                liveUpdate: true,
+            },
             {type: 'checkbox', label: 'Enabled', property: [light, 'enabled']},
             {
                 type: 'dropdown',

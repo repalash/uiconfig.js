@@ -68,3 +68,15 @@ export function viewBoxOf(points, pad = 8) {
     const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad
     return `${r1(x0)} ${r1(y0)} ${r1(Math.max(...xs) - x0 + pad)} ${r1(Math.max(...ys) - y0 + pad)}`
 }
+
+/**
+ * SVG transform that maps 2D coordinates on a plane to the screen, so that shapes, rotations and translations can be
+ * written in the plane: 'x' (the plane x = const: u along +y, v up), 'y' (y = const: u along +x, v up) or 'z'
+ * (horizontal: u along +x, v along +y). With `down`, v points down, for text.
+ */
+export function planeMatrix(plane, x, y, z, down = false) {
+    const [ox, oy] = proj(x, y, z)
+    const v = down ? 1 : -1
+    const m = plane === 'x' ? [-C, 0.5, 0, v] : plane === 'y' ? [C, 0.5, 0, v] : [C, 0.5, -C, 0.5]
+    return `matrix(${m.map(n => Math.round(n * 1000) / 1000).join(' ')} ${ox} ${oy})`
+}

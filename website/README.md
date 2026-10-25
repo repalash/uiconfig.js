@@ -44,6 +44,17 @@ To check the result locally, serve `website/_site` with any static server, for e
 
 ## Notes
 
+- Styles: `src/styles/tokens.css` holds the design tokens (colors for light and dark, fonts, sizes, radius, the figure
+  palette) as CSS custom properties, `src/styles/fonts.css` the bundled font faces (latin subset; a browser downloads
+  a face only when an element uses it), `src/styles/site.css` the page. Another page in the same style imports
+  `fonts.css` and `tokens.css`, sets `data-scheme="light"` or `"dark"` on `<html>` (see the inline script in
+  index.html) and uses the variables.
+- `?design=1` adds a design panel (built with uiconfig-tweakpane) to try fonts, sizes, accent, radius, panel density,
+  the Tweakpane theme, the color scheme and the hero figure. The parameter only switches the panel on. Choices are
+  kept in localStorage and apply only with the parameter; "Copy CSS" copies them as custom properties.
+- The Tweakpane panels use the theme of `uiconfig-tweakpane/theme.css` (switcher under the hero panel); the component
+  list shows the plain Tweakpane look.
+- The panels stop their update loops while they are off screen, and the figures redraw only the parts that change.
 - Code samples are highlighted at build time ([scripts/highlight.mjs](scripts/highlight.mjs), called from
   [vite.config.js](vite.config.js)) with the Lezer JavaScript grammar and the highlighter in
   [src/code-style.js](src/code-style.js); the playground editor (CodeMirror) uses the same grammar and highlighter.

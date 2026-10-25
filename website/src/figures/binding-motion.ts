@@ -18,6 +18,14 @@ export function setupBindingFigure() {
     const fill = (n: Name) => svg.querySelector<SVGPathElement>(`[data-fill="${n}"]`)!
     const lamp = (n: Name) => svg.querySelector<SVGGElement>(`[data-lamp="${n}"]`)!
 
+    // write only what changed: unchanged attributes cause no style, layout or paint work
+    const attr = (el: Element, name: string, value: string) => {
+        if (el.getAttribute(name) !== value) el.setAttribute(name, value)
+    }
+    const opacity = (el: SVGElement, value: string) => {
+        if (el.style.opacity !== value) el.style.opacity = value
+    }
+
     const NS = 'http://www.w3.org/2000/svg'
     const token = () => {
         const c = document.createElementNS(NS, 'circle')
@@ -37,29 +45,30 @@ export function setupBindingFigure() {
         const a = needleAngle(state.data)
         const {x, y, z, r} = {...scene.dial, x: 64}
         const [nx, ny] = proj(x, y + Math.cos(a) * (r - 3), z + Math.sin(a) * (r - 3))
-        needle.setAttribute('x2', String(nx))
-        needle.setAttribute('y2', String(ny))
+        attr(needle, 'x2', String(nx))
+        attr(needle, 'y2', String(ny))
         for (const n of ['tweakpane', 'blueprint'] as Name[]) {
             const {from, to} = scene.tracks[n]
             const p = from.map((v, i) => v + (to[i] - v) * state[n]) as [number, number, number]
             const [fx, fy] = proj(...from)
             const [px, py] = proj(...p)
-            knob(n).setAttribute('transform', `translate(${(px - fx).toFixed(1)} ${(py - fy).toFixed(1)})`)
-            fill(n).setAttribute('d', `M${fx},${fy} L${px.toFixed(1)},${py.toFixed(1)}`)
+            attr(knob(n), 'transform', `translate(${(px - fx).toFixed(1)} ${(py - fy).toFixed(1)})`)
+            attr(fill(n), 'd', `M${fx},${fy} L${px.toFixed(1)},${py.toFixed(1)}`)
         }
-        if (readout) readout.textContent = `value ${state.data.toFixed(2)}`
+        const text = `value ${state.data.toFixed(2)}`
+        if (readout && readout.textContent !== text) readout.textContent = text
     }
     const place = (c: SVGCircleElement, path: number[][], f: number | null) => {
         if (f === null || f < 0 || f > 1) {
-            c.style.opacity = '0'
+            opacity(c, '0')
             return
         }
         const [x, y] = pointAlong(path, f)
         const [sx, sy] = proj(x, y, 1)
-        c.setAttribute('cx', sx.toFixed(1))
-        c.setAttribute('cy', sy.toFixed(1))
+        attr(c, 'cx', sx.toFixed(1))
+        attr(c, 'cy', sy.toFixed(1))
         // fade in and out at the ends of the run
-        c.style.opacity = String(Math.min(1, f * 8, (1 - f) * 8))
+        opacity(c, Math.min(1, f * 8, (1 - f) * 8).toFixed(2))
     }
     draw()
 

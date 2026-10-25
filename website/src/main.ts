@@ -1,11 +1,13 @@
-import '@fontsource-variable/recursive/mono.css'
-import './styles.css'
+import './styles/fonts.css'
+import './styles/tokens.css'
+import './styles/site.css'
 import {setupHero} from './sections/hero'
 import {setupDual} from './sections/dual'
 import {setupSyntax} from './sections/syntax'
 import {setupGallery} from './sections/gallery'
 import {setupPlayground} from './playground/playground'
 import {setupBindingFigure} from './figures/binding-motion'
+import {setupHeroFigure} from './figures/hero-motion'
 
 // copy buttons: <button data-copy="text">
 document.addEventListener('click', ev => {
@@ -19,10 +21,15 @@ document.addEventListener('click', ev => {
 })
 
 // each section works on its own: an error in one does not stop the others
-for (const setup of [setupHero, setupBindingFigure, setupDual, setupSyntax, setupGallery, setupPlayground]) {
+for (const setup of [setupHeroFigure, setupHero, setupBindingFigure, setupDual, setupSyntax, setupGallery, setupPlayground]) {
     try {
         setup()
     } catch (e) {
         console.error(e)
     }
+}
+
+// the design panel: only with ?design=1 (the parameter switches the panel on and carries nothing else)
+if (new URLSearchParams(location.search).get('design') === '1') {
+    import('./design/design').then(m => m.setupDesignPanel()).catch(e => console.error(e))
 }
