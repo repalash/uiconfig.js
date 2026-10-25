@@ -165,6 +165,15 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      */
     inlinePicker?: ValOrFunc<boolean>,
 
+    /**
+     * Only for text inputs. If true, the value is set on each keystroke (with `last: false` in the change event),
+     * and once more when the input is committed with Enter or blur (with `last: true`), so the undo manager records
+     * one step for the edit. If false or not set, renderers that support it set the value only when the input is
+     * committed. uiconfig-tweakpane reads this option; uiconfig-blueprint text inputs always set the value while typing.
+     * This can be a boolean or a function that returns a boolean.
+     */
+    liveUpdate?: ValOrFunc<boolean>,
+
 
     /**
      * Extra HTMLElements to be added to the UI element. This is used for customizing the UI.

@@ -1,6 +1,7 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+- Text inputs with `liveUpdate: true` in their config set the value on each keystroke, with `last: false`, and on Enter or blur with `last: true`; the undo manager records one step for the edit. Without the option, the value is set on Enter or blur, as before.
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-tweakpane`. The npm package name stays `uiconfig-tweakpane`.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
 - The ES module `dist/index.mjs` no longer bundles its dependencies: it imports `uiconfig.js`, `ts-browser-helpers`, `tweakpane` and `@pangenerator/tweakpane-textarea-plugin`, so the bundler of the app dedupes them with the app's copy.

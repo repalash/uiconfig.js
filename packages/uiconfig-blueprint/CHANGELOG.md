@@ -1,6 +1,7 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
+- Text inputs set the value once more on blur after an edit, with `last: true`, so the change event marks the end of the edit and the undo manager closes the step. They already set the value on each keystroke, with `last: false`.
 - License: MIT from this release (releases up to 0.1.0-dev.15 stay under Apache 2.0).
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-blueprint`. The npm package name stays `uiconfig-blueprint`.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.

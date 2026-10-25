@@ -220,6 +220,7 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
                     config.dispatchMode = 'immediate' // this is required so that the value is set before the next uiRefresh.
                     renderer.methods.setValue(config, proxy.value_ ?? proxy.value, {last: ev.last ?? true}, proxy.forceOnChange || false)
                 })
+                if (input && typeof proxy.value === 'string') tpLiveTextInput(input as InputBindingApi<any, any>, config, renderer)
             }
         } catch (e: any) {
             if (e.message.startsWith('No matching controller for')) input = undefined
@@ -290,6 +291,23 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
     // console.log('refresh', input)
     // console.log(ev)
     return input
+}
+
+/**
+ * Tweakpane sets the value of a text input on Enter or blur. With `config.liveUpdate`, the value is also set on each
+ * keystroke, with `last: false`, so that the undo manager merges the keystrokes and the commit into one step.
+ */
+const tpLiveTextInput = (input: InputBindingApi<any, any>, config: UiObjectConfig, renderer: UiConfigRendererTweakpane) => {
+    const element = (input.controller_.valueController.view as TextView<any>).inputElement as HTMLInputElement | undefined
+    if (!element || element.tagName !== 'INPUT') return
+    element.addEventListener('input', () => {
+        if (!getOrCall(config.liveUpdate)) return
+        const proxy = config.__proxy
+        if (!proxy || typeof proxy.value !== 'string') return
+        proxy.value = element.value
+        config.dispatchMode = 'immediate'
+        renderer.methods.setValue(config, element.value, {last: false}, proxy.forceOnChange || false)
+    })
 }
 
 export const tpVecInputGenerator = (parent: FolderApi, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, params?: any) => {
