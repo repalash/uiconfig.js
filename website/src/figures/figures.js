@@ -167,6 +167,12 @@ export const icons = {
             .map(([x, y, len, c]) => rectTop(x, y, 4, 1.6, len, 'iso-fill', c)).join('') +
         box(23.5, 26, 4, 3, 3, 4, 'data'),
         [[0, 0, 0], [30, 0, 0], [30, 36, 0], [0, 36, 0], [0, 0, 9]]),
+    // a data block and a config card on a base plate, joined by a channel (the examples' "Binding to data" topic)
+    binding: () => icon('binding',
+        box(0, 0, 0, 36, 22, 3, 'paper') + line([[9, 11, 3], [27, 11, 3]], 'iso-track') +
+        box(3, 5, 3, 10, 12, 10, 'data') + box(22, 4, 3, 11, 14, 3, 'config') +
+        rectTop(24, 6, 6, 1.4, 10, 'iso-rule') + rectTop(27.5, 6, 6, 1.4, 7, 'iso-rule'),
+        [[0, 0, 0], [36, 0, 0], [36, 22, 0], [0, 22, 0], [3, 5, 13]]),
     three: () => icon('three',
         box(4, 4, 0, 22, 22, 22, 'config') +
         line([[2, 2, 0], [34, 2, 0]], 'iso-axis', 'blueprint') + line([[2, 2, 0], [2, 34, 0]], 'iso-axis', 'tweakpane') + line([[2, 2, 0], [2, 2, 32]], 'iso-axis', 'data') +
