@@ -5,18 +5,15 @@ import packageJson from './package.json';
 import license from 'rollup-plugin-license';
 import replace from '@rollup/plugin-replace';
 import path from 'node:path';
+import {fixDtsImports} from '../../scripts/fix-dts-imports.mjs';
 
 const isProd = process.env.NODE_ENV === 'production'
 const { name, version, author } = packageJson
-const {module, browser} = packageJson
-
-const globals = {
-    'ts-browser-helpers': 'ts-browser-helpers',
-}
+const {main, module, browser} = packageJson
 
 export default defineConfig({
     optimizeDeps: {
-        exclude: [],
+        exclude: ['uiconfig.js', 'ts-browser-helpers'],
     },
     // define: {
     //     'process.env': process.env
@@ -31,30 +28,35 @@ export default defineConfig({
         } : null,
         lib: {
             entry: 'src/index.ts',
-            formats: isProd && browser ? ['es', 'umd'] : ['es'],
+            formats: isProd ? ['es', 'umd'] : ['es'],
             name: name,
             fileName: (format) => (format === 'umd' ? browser : module).replace('dist/', ''),
         },
         outDir: 'dist',
         emptyOutDir: isProd,
         commonjsOptions: {
-            exclude: [],
+            exclude: [/[\\/]uiconfig\.js[\\/](dist|src)[\\/]/, /ts-browser-helpers/],
         },
         rollupOptions: {
             output: {
                 // inlineDynamicImports: false,
-                globals
             },
-            external: Object.keys(globals),
         },
     },
     plugins: [
-        isProd ? dts({tsconfigPath: './tsconfig.json'}) : null,
+        isProd ? dts({tsconfigPath: './tsconfig.json', afterBuild: fixDtsImports}) : null,
         replace({
             'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
             preventAssignment: true,
         }),
         json(),
+        // postcss({
+        //     modules: false,
+        //     autoModules: true,  // todo; issues with typescript import css, because inject is false
+        //     inject: false,
+        //     minimize: isProduction,
+        //     // Or with custom options for `postcss-modules`
+        // }),
         license({
             banner: `
         @license

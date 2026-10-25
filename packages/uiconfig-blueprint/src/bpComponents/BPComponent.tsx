@@ -1,0 +1,113 @@
+import React, {createContext} from "react";
+import type {UiConfigRendererBase} from 'uiconfig.js'
+import {UiObjectConfig} from 'uiconfig.js'
+import {getOrCall, ValOrFunc} from 'ts-browser-helpers'
+import {THREE} from "../threejs";
+
+export type BPComponentProps<T> = {
+    config: UiObjectConfig<T>,
+    level?: number
+    disabled?: ValOrFunc<boolean> // todo add to uiconfig-react as well
+}
+export type BPComponentState = {
+    hidden?: boolean
+    disabled?: boolean
+    readOnly?: boolean // same as disabled(for most inputs)
+    baseWidth?: string // for flexBasis, can be a number or a string like '50%' or '100px'
+}
+export interface UiConfigRendererBaseBp extends UiConfigRendererBase{
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    THREE: THREE|undefined
+}
+
+export const UiConfigRendererContext = createContext<UiConfigRendererBaseBp>(null as any)
+export type UiConfigRendererContextType = React.ContextType<typeof UiConfigRendererContext>
+export abstract class BPComponent<TValue, TState extends BPComponentState, TProps extends BPComponentProps<TValue> = BPComponentProps<TValue>> extends React.Component<TProps, TState> {
+    static contextType = UiConfigRendererContext
+    declare context: UiConfigRendererContextType
+
+    protected constructor(props: TProps, context: UiConfigRendererContextType, state: TState) {
+        super(props, context);
+        this.state = this.getUpdatedState(state)
+        // this.state = state
+        this.setState = this.setState.bind(this)
+    }
+
+    /**
+     * Set the state(and rerender), then return a promise that resolves when the state is set
+     * @param state
+     */
+    setStatePromise(state: TState) {
+        return new Promise<void>(resolve => this.setState(state, resolve))
+    }
+
+    keyVersion = 0
+
+    /**
+     * This is called to get the updated state from the config, copy any values/properties from the config to the state here
+     * @param state - the current state
+     */
+    getUpdatedState(state: TState): TState{
+        // todo use UiConfigMethods.GetBaseProps
+        const hidden = getOrCall(this.props.config.hidden) ?? false
+        const disabled = getOrCall(this.props.disabled ?? this.props.config.disabled) ?? false
+        const readOnly = getOrCall(this.props.config.readOnly) ?? false
+        const baseWidth = getOrCall(this.props.config.baseWidth) ?? undefined
+        if(hidden !== state.hidden
+            || disabled !== state.disabled
+            || readOnly !== state.readOnly
+        ) this.keyVersion++
+        return {
+            ...state,
+            hidden,
+            disabled,
+            readOnly,
+            baseWidth
+        }
+    }
+
+    private _refreshing = false;
+
+    /**
+     * Refreshes the state from the config
+     *
+     * This is called by the ui component when the value is changed and from uiRefresh from the config
+     * @param state - optional state to refresh from, if not provided, the current state is used
+     */
+    async refreshConfigState(state?: TState) {
+        if (!this.props.config) return;
+        if (this._refreshing) return;
+        this._refreshing = true
+        const s = this.getUpdatedState(state || this.state)
+        // console.log('set state', s)
+        await this.setStatePromise(s)
+        // todo debug refresh frequency etc
+        // console.log('refreshing', this.props.config.label, this.props.config.type, this.state)
+        this._refreshing = false
+    }
+
+    /**
+     * Add reference to this to uiRef and set uiRefresh to the config to refresh this component
+     *
+     * also refreshes the config once which re-renders (todo: check if this is required)
+     */
+    componentDidMount() {
+        super.componentDidMount?.();
+        this.props.config.uiRef = this
+        this.props.config.uiRefresh = (deep = false, mode = 'postFrame', delay = 0) => {
+            this.context.addToRefreshQueue(mode, this.props.config, deep, delay)
+        }
+        // console.log('mount', this.props.config.label, this.props.config.type, this.props.config)
+        this.props.config.uiRefresh()
+    }
+
+    componentWillUnmount() {
+        // console.log('unmount', this.props.config.label, this.props.config.type, this.props.config)
+        this.props.config.uiRef = undefined
+        this.props.config.uiRefresh = undefined
+        super.componentWillUnmount?.();
+    }
+
+    // abstract updateStateValue(state: TState): Promise<void>;
+
+}

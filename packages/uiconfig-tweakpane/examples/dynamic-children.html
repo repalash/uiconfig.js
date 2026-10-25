@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Path Syntax JS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background: #111;">
+
+<script type="module">
+    import {UI} from '../src/index.ts'
+    import {generateUiFolder} from "uiconfig.js";
+
+    const refreshUi = ()=>{
+        uiConfig.children = [...ch1]
+        uiConfig.children.push(...ch0)
+        uiConfigf1.uiRefresh?.(true)
+    }
+    const uiConfig1 = {
+        type: 'folder',
+        label: 'Test1',
+        // value: data,
+        expanded: true,
+        children: [{
+            type: 'input',
+            label: 'prop1',
+            value: 1,
+        }],
+    }
+    const uiConfig2 = {
+        type: 'folder',
+        label: 'Test2',
+        // value: data,
+        expanded: true,
+        children: [{
+            type: 'input',
+            label: 'prop2',
+            value: 2,
+        }],
+    }
+    const ch0 = [uiConfig1]
+    const ch1 = [
+        {
+            type: 'button',
+            label: 'Toggle',
+            value: ()=>{
+                ch0.splice(0, 1, ch0[0] === uiConfig1 ? uiConfig2 : uiConfig1)
+                ch0.push(uiConfig1)
+                refreshUi()
+            }
+        },
+        generateUiFolder('asdad', {
+            p1: 1,
+            p2: 2,
+            p3: 3,
+            p4: 4,
+        }),
+        {
+            type: 'button',
+            label: 'Refresh',
+            value: refreshUi,
+        }
+    ]
+    const uiConfig = {
+        type: 'folder',
+        label: 'Test',
+        // value: data,
+        expanded: true,
+        children: [],
+    }
+    const uiConfigf1 = {
+        type: 'folder',
+        label: 'Test',
+        // value: data,
+        expanded: true,
+        children: [{
+            type: 'folder',
+            label: 'Test',
+            // value: data,
+            expanded: true,
+            children: [{
+                type: 'folder',
+                label: 'Test',
+                // value: data,
+                expanded: true,
+                children: [uiConfig],
+            }],
+        }],
+    }
+
+    const ui = new UI();
+    ui.appendChild(uiConfigf1)
+    refreshUi()
+
+</script>
+</body>
+</html>

@@ -1,113 +1,22 @@
 {
-    "name": "uiconfig.js",
-    "version": "0.4.0",
-    "description": "A framework for building user interface layouts with JSON configuration.",
-    "main": "dist/index.js",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
-    "source": "src/index.ts",
-    "browser": "dist/index.js",
-    "sideEffects": false,
+    "name": "uiconfig-monorepo",
+    "private": true,
+    "description": "uiconfig.js and its renderers (Tweakpane, Blueprint, React, shadcn/ui) in one repository.",
     "type": "module",
-    "scripts": {
-        "build": "rimraf dist ; tsc && vite build",
-        "dev": "NODE_ENV=development vite build --watch",
-        "serve-docs": "ws -d docs -p 8080",
-        "build-examples": "NODE_ENV=production rollup --config examples/rollup.config.js",
-        "dev-examples": "rollup -w --config examples/rollup.config.js",
-        "test": "npm run check",
-
-        "serve": "ws",
-        "prepare": "npm run build && npm run build-examples && npm run docs",
-        "docs": "npx typedoc ./src/index.ts",
-        "lint": "eslint src examples --fix",
-        "check": "tsc -p tsconfig.json --noEmit && eslint src examples",
-        "prepublishOnly": "npm run test",
-
-        "new:pack": "npm run prepare && clean-package && npm pack; clean-package restore",
-        "new:publish": "git diff --exit-code --name-only HEAD * && npm run prepare && clean-package && PKG=$(npm pack) && clean-package restore && npm publish \"$PKG\" && git tag v$npm_package_version"
-    },
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.js"
-        },
-        "./dist/": {
-            "import": "./dist/",
-            "require": "./dist/"
-        },
-        "./src/": {
-            "import": "./src/",
-            "require": "./src/"
-        }
-    },
-    "clean-package": {
-        "remove": [
-            "clean-package",
-            "scripts",
-            "devDependencies",
-            "optionalDependencies"
-        ]
-    },
-    "files": [
-        "dist",
-        "src",
-        "docs",
-        "tsconfig.json"
+    "workspaces": [
+        "packages/*"
     ],
+    "scripts": {
+        "build": "npm run build -w uiconfig.js && npm run build -w uiconfig-react -w uiconfig-tweakpane -w uiconfig-blueprint -w uiconfig-shadcn",
+        "test": "npm run test --workspaces --if-present",
+        "lint": "npm run lint --workspaces --if-present"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/repalash/uiconfig.js.git"
     },
-    "keywords": [
-        "javascript",
-        "typescript",
-        "json",
-        "ui",
-        "three.js",
-        "html",
-        "interfaces",
-        "library"
-    ],
     "author": "repalash <palash@shaders.app>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/repalash/uiconfig.js/issues"
-    },
-    "homepage": "https://github.com/repalash/uiconfig.js#readme",
     "devDependencies": {
-        "@rollup/plugin-commonjs": "^26.0.1",
-        "@rollup/plugin-json": "^6.1.0",
-        "@rollup/plugin-node-resolve": "^16.0.0",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^12.1.2",
-        "clean-package": "^2.2.0",
-        "rollup-plugin-license": "^3.0.1",
-        "typedoc": "^0.28.9",
-        "rollup-plugin-delete": "^3.0.1",
-        "typescript": "^5.7.2",
-        "vite": "^7.2.6",
-        "tslib": "^2.8.1",
-        "local-web-server": "^5.4.0",
-        "vite-plugin-dts": "^4.4.0",
-        "rimraf": "^6.0.1",
-        "@rollup/plugin-replace": "^6.0.2",
-        "typedoc-plugin-markdown": "^4.8.0",
-        "@typescript-eslint/eslint-plugin": "^5.53.0",
-        "@typescript-eslint/parser": "^5.53.0",
-        "eslint": "^8.57.1",
-        "eslint-plugin-deprecation": "^3.0.0",
-        "eslint-plugin-html": "^8.1.2",
-        "eslint-plugin-import": "^2.31.0"
-    },
-    "dependencies": {
-        "ts-browser-helpers": ">=0.19.4"
-    },
-    "optionalDependencies": {
-        "win-node-env": "^0.6.1"
-    },
-    "browserslist": [
-        "defaults"
-    ]
+        "vite": "^7.2.6"
+    }
 }
