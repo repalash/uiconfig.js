@@ -1,6 +1,10 @@
 /*
- * uiconfig-tweakpane theme: the Tweakpane theme of threepipe's Tweakpane plugin
- * (https://github.com/repalash/threepipe, plugins/tweakpane/src/tpTheme.css), by the same author.
+ * @license
+ * uiconfig-tweakpane theme
+ * Copyright 2022-2026 repalash <palash@shaders.app>
+ * MIT License
+ * From the Tweakpane theme of threepipe's Tweakpane plugin (https://github.com/repalash/threepipe,
+ * plugins/tweakpane/src/tpTheme.css), by the same author.
  *
  * Opt in: import 'uiconfig-tweakpane/theme.css' (or link dist/theme.css), then call
  * `ui.setTheme('light' | 'dark' | 'blue' | 'white' | 'black')` on the renderer, or `applyTweakpaneTheme(element, mode)`
