@@ -1,0 +1,95 @@
+/*
+ * Design tokens of the uiconfig site: colors (light and dark), type, shape and the figure palette, as CSS custom
+ * properties. Shared by every page in the site style: import this file and fonts.css, set data-scheme="light" or
+ * "dark" on <html> (index.html does it before the first paint, from prefers-color-scheme), and use the variables.
+ * The design panel (?design=1) changes them at runtime.
+ */
+
+:root {
+    --paper: #edeff2;
+    --paper-sunk: #e2e5ea;
+    --surface: #f8f9fa;
+    --ink: #15171c;
+    --ink-2: #4f5661;
+    --ink-3: #5e6570;
+    --rule: #c8cdd5;
+    --shadow: rgba(21, 23, 28, 0.12);
+    --accent-base: #3346d3;
+    --accent: var(--accent-base);
+    --accent-ink: #ffffff;
+    --signal: #f2c14e;
+    --signal-wash: rgba(242, 193, 78, 0.35);
+    --line-active: color-mix(in srgb, var(--accent) 6%, transparent);
+    --selection: color-mix(in srgb, var(--accent) 18%, transparent);
+
+    --tk-comment: #5e6570;
+    --tk-string: #17683f;
+    --tk-number: #963c09;
+    --tk-keyword: var(--accent);
+    --tk-property: #8a2f8f;
+    --tk-call: #0f6a85;
+    --tk-type: #835000;
+    --tk-decorator: #963c09;
+    --tk-def: var(--ink);
+    --tk-punct: #555c68;
+
+    /* figure palette: one color for each part of the story */
+    --c-data: #e9a315;
+    --c-config: var(--accent);
+    --c-tweakpane: #0e9a91;
+    --c-blueprint: #c43f7f;
+    --c-paper: #f4f5f7;
+    --c-base: #ccd2db;
+    --c-base-dark: #a9b2bf;
+
+    /* type: 15px/1.5 Inter for text, the same face for headings, JetBrains Mono for code */
+    --font-text: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-heading: var(--font-text);
+    --font-code: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --text-size: 15px;
+    --line-height: 1.5;
+    --heading-weight: 700;
+    --code-size: 0.84rem;
+
+    /* shape */
+    --radius: 10px;
+    --radius-small: calc(var(--radius) * 0.6);
+    --wrap: 1180px;
+    --gutter: clamp(20px, 4vw, 48px);
+
+    color-scheme: light;
+}
+
+:root[data-scheme='dark'] {
+    --paper: #181b21;
+    --paper-sunk: #121419;
+    --surface: #21252d;
+    --ink: #e7e9ed;
+    --ink-2: #a3aab6;
+    --ink-3: #8f96a2;
+    --rule: #353b46;
+    --shadow: rgba(0, 0, 0, 0.4);
+    --accent: color-mix(in oklab, var(--accent-base) 58%, white);
+    --accent-ink: #10132a;
+    --signal: #f2c14e;
+    --signal-wash: rgba(242, 193, 78, 0.22);
+    --selection: color-mix(in srgb, var(--accent) 25%, transparent);
+
+    --tk-comment: #959ca8;
+    --tk-string: #7fd1a0;
+    --tk-number: #f5a26b;
+    --tk-property: #e19be6;
+    --tk-call: #72cde6;
+    --tk-type: #f2c14e;
+    --tk-decorator: #f5a26b;
+    --tk-punct: #a3aab6;
+
+    --c-data: #f2c14e;
+    --c-tweakpane: #31c3b7;
+    --c-blueprint: #e66ba8;
+    --c-paper: #c3c9d3;
+    --c-base: #444b58;
+    --c-base-dark: #343a45;
+
+    color-scheme: dark;
+}

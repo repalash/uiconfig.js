@@ -8,7 +8,7 @@ export function createHeadingConfig(color, applyToPage) {
     // #region
     const heading = {
         text: 'uiconfig.js',
-        weight: 800,
+        weight: 700,
         tracking: -0.03,
         case: 'none',
         color,
@@ -20,11 +20,16 @@ export function createHeadingConfig(color, applyToPage) {
         label: 'Heading',
         expanded: true,
         children: [
-            {type: 'input', label: 'Text', property: [heading, 'text']},
+            {
+                type: 'input',
+                label: 'Text',
+                property: [heading, 'text'],
+                liveUpdate: true, // set the value while typing
+            },
             {
                 type: 'slider',
                 label: 'Weight',
-                bounds: [300, 1000],
+                bounds: [100, 900],
                 stepSize: 10,
                 property: [heading, 'weight'],
             },
@@ -55,7 +60,7 @@ export function createHeadingConfig(color, applyToPage) {
                 type: 'button',
                 label: 'Randomize',
                 onClick: () => {
-                    heading.weight = 300 + Math.round(Math.random() * 70) * 10
+                    heading.weight = 200 + Math.round(Math.random() * 70) * 10
                     heading.tracking = Math.round(Math.random() * 20 - 8) / 100
                     applyToPage(heading)
                     config.uiRefresh(true) // show the new values in the panel

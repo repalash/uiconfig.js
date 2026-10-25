@@ -1,130 +1,8 @@
 /*
- * uiconfig.js landing page.
- * One typeface, Recursive (bundled, axes wght and MONO): the text, the headings and the panels use its
- * proportional cut (MONO 0), code its monospace cut (MONO 1).
+ * uiconfig.js landing page. The values come from tokens.css; fonts from fonts.css.
  * The renderers inject global styles (Blueprint: normalize.css, element rules, :root font), so the rules
  * here use classes and do not depend on element defaults.
  */
-
-:root {
-    --paper: #edeff2;
-    --paper-sunk: #e2e5ea;
-    --surface: #f8f9fa;
-    --ink: #15171c;
-    --ink-2: #4f5661;
-    --ink-3: #5e6570;
-    --rule: #c8cdd5;
-    --accent: #3346d3;
-    --accent-ink: #ffffff;
-    --signal: #f2c14e;
-    --signal-wash: rgba(242, 193, 78, 0.35);
-    --line-active: rgba(51, 70, 211, 0.06);
-    --selection: rgba(51, 70, 211, 0.18);
-
-    --tk-comment: #5e6570;
-    --tk-string: #17683f;
-    --tk-number: #963c09;
-    --tk-keyword: #3346d3;
-    --tk-property: #8a2f8f;
-    --tk-call: #0f6a85;
-    --tk-type: #835000;
-    --tk-decorator: #963c09;
-    --tk-def: var(--ink);
-    --tk-punct: #555c68;
-
-    /* figure palette: one color for each part of the story */
-    --c-data: #e9a315;
-    --c-config: #3346d3;
-    --c-tweakpane: #0e9a91;
-    --c-blueprint: #c43f7f;
-    --c-paper: #f4f5f7;
-    --c-base: #ccd2db;
-    --c-base-dark: #a9b2bf;
-
-    --font-text: 'Recursive Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --font-code: 'Recursive Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    --code-size: 0.84rem;
-    --wrap: 1180px;
-    --gutter: clamp(20px, 4vw, 48px);
-
-    /* Tweakpane theme */
-    --tp-font-family: var(--font-text);
-    --tp-base-background-color: var(--surface);
-    --tp-base-shadow-color: rgba(21, 23, 28, 0.08);
-    --tp-button-background-color: #d9dde4;
-    --tp-button-background-color-hover: #cfd4dc;
-    --tp-button-background-color-focus: #c6ccd6;
-    --tp-button-background-color-active: #bcc3ce;
-    --tp-button-foreground-color: var(--ink);
-    --tp-container-background-color: rgba(21, 23, 28, 0.05);
-    --tp-container-background-color-hover: rgba(21, 23, 28, 0.08);
-    --tp-container-background-color-focus: rgba(21, 23, 28, 0.11);
-    --tp-container-background-color-active: rgba(21, 23, 28, 0.14);
-    --tp-container-foreground-color: var(--ink-2);
-    --tp-groove-foreground-color: rgba(21, 23, 28, 0.12);
-    --tp-input-background-color: rgba(21, 23, 28, 0.06);
-    --tp-input-background-color-hover: rgba(21, 23, 28, 0.09);
-    --tp-input-background-color-focus: rgba(21, 23, 28, 0.12);
-    --tp-input-background-color-active: rgba(21, 23, 28, 0.15);
-    --tp-input-foreground-color: var(--ink);
-    --tp-label-foreground-color: var(--ink-2);
-    --tp-monitor-background-color: rgba(21, 23, 28, 0.04);
-    --tp-monitor-foreground-color: var(--ink-2);
-
-    color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --paper: #181b21;
-        --paper-sunk: #121419;
-        --surface: #21252d;
-        --ink: #e7e9ed;
-        --ink-2: #a3aab6;
-        --ink-3: #8f96a2;
-        --rule: #353b46;
-        --accent: #8c9bff;
-        --accent-ink: #10132a;
-        --signal: #f2c14e;
-        --signal-wash: rgba(242, 193, 78, 0.22);
-        --line-active: rgba(140, 155, 255, 0.07);
-        --selection: rgba(140, 155, 255, 0.25);
-
-        --tk-comment: #959ca8;
-        --tk-string: #7fd1a0;
-        --tk-number: #f5a26b;
-        --tk-keyword: #9eabff;
-        --tk-property: #e19be6;
-        --tk-call: #72cde6;
-        --tk-type: #f2c14e;
-        --tk-decorator: #f5a26b;
-        --tk-punct: #a3aab6;
-
-        --c-data: #f2c14e;
-        --c-config: #7484f5;
-        --c-tweakpane: #31c3b7;
-        --c-blueprint: #e66ba8;
-        --c-paper: #c3c9d3;
-        --c-base: #444b58;
-        --c-base-dark: #343a45;
-
-        --tp-base-shadow-color: rgba(0, 0, 0, 0.3);
-        --tp-button-background-color: #3b414d;
-        --tp-button-background-color-hover: #444b58;
-        --tp-button-background-color-focus: #4d5563;
-        --tp-button-background-color-active: #57606f;
-        --tp-container-background-color: rgba(231, 233, 237, 0.06);
-        --tp-container-background-color-hover: rgba(231, 233, 237, 0.09);
-        --tp-container-background-color-focus: rgba(231, 233, 237, 0.12);
-        --tp-container-background-color-active: rgba(231, 233, 237, 0.15);
-        --tp-groove-foreground-color: rgba(231, 233, 237, 0.12);
-        --tp-input-background-color: rgba(231, 233, 237, 0.07);
-        --tp-input-background-color-hover: rgba(231, 233, 237, 0.1);
-        --tp-input-background-color-focus: rgba(231, 233, 237, 0.13);
-        --tp-input-background-color-active: rgba(231, 233, 237, 0.16);
-        --tp-monitor-background-color: rgba(231, 233, 237, 0.05);
-    }
-}
 
 /* ---------- base ---------- */
 
@@ -140,10 +18,9 @@ html body {
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-text);
-    font-size: 1.0625rem;
-    line-height: 1.6;
+    font-size: var(--text-size);
+    line-height: var(--line-height);
     font-weight: 400;
-    font-variation-settings: 'MONO' 0;
     text-rendering: optimizeLegibility;
 }
 
@@ -175,7 +52,6 @@ main a:hover, .footer a:hover {
 
 main code, .footer code {
     font-family: var(--font-code);
-    font-variation-settings: 'MONO' 1;
     font-size: 0.9em;
 }
 
@@ -188,7 +64,8 @@ main h2 {
     margin: 0 0 0.6rem;
     font-size: clamp(1.75rem, 1.2rem + 2vw, 2.6rem);
     line-height: 1.1;
-    font-weight: 780;
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
     letter-spacing: -0.02em;
     color: var(--ink);
 }
@@ -196,7 +73,8 @@ main h2 {
 main h3 {
     margin: 2.2rem 0 0.6rem;
     font-size: 1.15rem;
-    font-weight: 700;
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
     line-height: 1.3;
     color: var(--ink);
 }
@@ -209,7 +87,7 @@ main h3 {
     padding: 8px 14px;
     background: var(--accent);
     color: var(--accent-ink);
-    border-radius: 6px;
+    border-radius: var(--radius-small);
 }
 
 .skip-link:focus {
@@ -222,8 +100,7 @@ main h3 {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: color-mix(in srgb, var(--paper) 88%, transparent);
-    backdrop-filter: blur(10px);
+    background: var(--paper);
     border-bottom: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
 }
 
@@ -238,7 +115,8 @@ main h3 {
 .topbar .brand {
     color: var(--ink);
     text-decoration: none;
-    font-weight: 800;
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
     font-size: 1.1rem;
     letter-spacing: -0.02em;
 }
@@ -272,10 +150,11 @@ main h3 {
 }
 
 .wordmark {
-    margin: 0 0 clamp(28px, 4vw, 52px);
-    font-size: clamp(3.1rem, 12.4vw, 10.4rem);
+    margin: 0;
+    font-size: clamp(3.1rem, 9.6vw, 7.4rem);
     line-height: 0.95;
-    font-weight: 800;
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
     letter-spacing: -0.03em;
     color: var(--accent);
     overflow-wrap: anywhere;
@@ -290,10 +169,63 @@ main h3 {
 
 .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
-    gap: clamp(32px, 6vw, 96px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+    grid-template-areas:
+        'wordmark figure'
+        'text panel';
+    gap: clamp(24px, 3vw, 40px) clamp(32px, 5vw, 80px);
     align-items: start;
 }
+
+.hero-grid .wordmark { grid-area: wordmark; align-self: center; }
+.hero-grid .hero-fig { grid-area: figure; }
+.hero-grid .hero-text { grid-area: text; }
+.hero-grid .hero-panel { grid-area: panel; }
+
+[data-hero-figure='off'] .hero-grid {
+    grid-template-areas:
+        'wordmark wordmark'
+        'text panel';
+}
+
+[data-hero-figure='off'] .wordmark {
+    font-size: clamp(3.1rem, 12.4vw, 10.4rem);
+}
+
+[data-hero-figure='off'] .hero-fig {
+    display: none;
+}
+
+/* a framed figure: number and title on top, hint and readout below */
+.iso-card {
+    margin: 0;
+    padding: 10px 14px 12px;
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-size: 0.78rem;
+    color: var(--ink-2);
+}
+
+.iso-card-top, .iso-card-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.iso-card .fig-hero {
+    width: 100%;
+    height: auto;
+    margin: 4px 0;
+    contain: layout paint;
+    will-change: transform;
+}
+
+.iso .iso-knob { fill: white; stroke: #6b7280; stroke-width: 0.6; }
+.iso .iso-textbar { fill: #8d95a2; }
+.iso .iso-swatch { fill: var(--accent); stroke: rgba(0, 0, 0, 0.3); stroke-width: 0.5; }
+.iso .iso-switch { fill: #c6ccd5; stroke: rgba(0, 0, 0, 0.2); stroke-width: 0.5; }
+
 
 .lede {
     font-size: clamp(1.2rem, 1rem + 0.8vw, 1.5rem);
@@ -315,7 +247,7 @@ main h3 {
     margin: 28px 0 22px;
     max-width: 440px;
     border: 1px solid var(--rule);
-    border-radius: 8px;
+    border-radius: var(--radius-small);
     background: var(--surface);
     overflow: hidden;
 }
@@ -325,7 +257,6 @@ main h3 {
     margin: 0;
     padding: 12px 16px;
     font-family: var(--font-code);
-    font-variation-settings: 'MONO' 1;
     font-size: 0.92rem;
     white-space: pre;
     overflow-x: auto;
@@ -384,12 +315,17 @@ main h3 {
     max-height: none;
     overflow: visible;
     padding: 0;
-    border-radius: 6px;
-    box-shadow: 0 1px 0 var(--rule), 0 8px 24px -12px var(--tp-base-shadow-color);
+    border-radius: var(--radius-small);
+    box-shadow: 0 1px 0 var(--rule), 0 8px 24px -12px var(--shadow);
 }
 
-.panel-host #tweakpaneUiContainer :is(input, textarea, select, button) {
-    font-variation-settings: inherit;
+/* Blueprint panels in the page font */
+.panel-host {
+    --pt-font-family-sans: var(--font-text);
+}
+
+.panel-host #blueprintUiContainer {
+    font-family: var(--font-text);
 }
 
 /* Blueprint: the renderer positions its container fixed at the top right of the window */
@@ -407,8 +343,8 @@ main h3 {
 /* Blueprint's panel stack places its pages absolutely, for the slide between pages; in flow, the panel takes
    the height of its content */
 .panel-host .bpInspectorCard {
-    border-radius: 6px;
-    box-shadow: 0 1px 0 var(--rule), 0 8px 24px -12px var(--tp-base-shadow-color);
+    border-radius: var(--radius-small);
+    box-shadow: 0 1px 0 var(--rule), 0 8px 24px -12px var(--shadow);
 }
 
 .panel-host .inspectorPanelStack, .panel-host .bp5-panel-stack2-view {
@@ -434,7 +370,7 @@ main h3 {
     margin: 0;
     padding: 18px;
     border: 1px dashed var(--rule);
-    border-radius: 6px;
+    border-radius: var(--radius-small);
     color: var(--ink-2);
     font-size: 0.92rem;
 }
@@ -462,9 +398,8 @@ main figcaption {
     padding: 16px 18px;
     background: var(--surface);
     border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
-    border-radius: 10px;
+    border-radius: var(--radius);
     font-family: var(--font-code);
-    font-variation-settings: 'MONO' 1;
     font-size: var(--code-size);
     line-height: 1.6;
     color: var(--ink);
@@ -480,7 +415,7 @@ main pre + p, main pre + h3, main pre + .link-row {
     margin-top: 1.2em;
 }
 
-.tk-comment { color: var(--tk-comment); font-style: italic; }
+.tk-comment { color: var(--tk-comment); }
 .tk-string { color: var(--tk-string); }
 .tk-number { color: var(--tk-number); }
 .tk-keyword { color: var(--tk-keyword); }
@@ -522,13 +457,11 @@ main pre + p, main pre + h3, main pre + .link-row {
     overflow: visible;
 }
 
-@media (prefers-color-scheme: dark) {
-    .iso {
-        --t-p: 90%;
-        --r-p: 74%;
-        --l-p: 56%;
-        --edge-p: 34%;
-    }
+[data-scheme='dark'] .iso {
+    --t-p: 90%;
+    --r-p: 74%;
+    --l-p: 56%;
+    --edge-p: 34%;
 }
 
 .iso .iso-t { fill: color-mix(in oklab, var(--h) var(--t-p), white); }
@@ -582,6 +515,9 @@ main pre + p, main pre + h3, main pre + .link-row {
 .fig .fig-binding {
     width: 100%;
     height: auto;
+    /* the moving parts repaint only this layer, not the page */
+    contain: layout paint;
+    will-change: transform;
 }
 
 .legend {
@@ -691,7 +627,7 @@ main pre + p, main pre + h3, main pre + .link-row {
 .segmented, .panel-switch {
     gap: 2px;
     padding: 3px;
-    border-radius: 8px;
+    border-radius: var(--radius-small);
     background: var(--paper-sunk);
     border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
     width: fit-content;
@@ -703,13 +639,45 @@ main pre + p, main pre + h3, main pre + .link-row {
 
 .segmented button, .panel-switch button {
     border: 0;
-    border-radius: 6px;
+    border-radius: var(--radius-small);
     padding: 6px 14px;
     background: transparent;
     color: var(--ink-2);
     font: inherit;
     font-size: 0.9rem;
     cursor: pointer;
+}
+
+.segmented-small button {
+    padding: 3px 9px;
+    font-size: 0.8rem;
+}
+
+.theme-switch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    margin-top: 14px;
+    color: var(--ink-2);
+    font-size: 0.85rem;
+}
+
+.gallery-note {
+    margin: 0 !important;
+}
+
+/* the panels use the page's text face; density from the design panel */
+.panel-host .tp-rotv {
+    --tp-font-family: var(--font-text);
+}
+
+[data-density='compact'] .panel-host .tp-rotv {
+    --tp-blade-unit-size: 20px;
+}
+
+[data-density='comfortable'] .panel-host .tp-rotv {
+    --tp-blade-unit-size: 28px;
 }
 
 .segmented button[aria-pressed='true'], .panel-switch button[aria-pressed='true'] {
@@ -857,7 +825,7 @@ main pre + p, main pre + h3, main pre + .link-row {
     color: var(--ink);
     background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 6px;
+    border-radius: var(--radius-small);
     padding: 6px 10px;
 }
 
@@ -872,7 +840,7 @@ main pre + p, main pre + h3, main pre + .link-row {
     height: 560px;
     background: var(--surface);
     border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
-    border-radius: 10px;
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
@@ -881,7 +849,6 @@ main pre + p, main pre + h3, main pre + .link-row {
 }
 
 .pg-editor .cm-scroller {
-    font-variation-settings: 'MONO' 1;
 }
 
 .pg-editor {
@@ -899,7 +866,6 @@ main pre + p, main pre + h3, main pre + .link-row {
     background: transparent;
     color: var(--ink);
     font-family: var(--font-code);
-    font-variation-settings: 'MONO' 1;
     font-size: var(--code-size);
     line-height: 1.6;
     tab-size: 4;
@@ -916,7 +882,7 @@ main pre + p, main pre + h3, main pre + .link-row {
 .pg-status {
     margin: 0 0 12px !important;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: var(--radius-small);
     background: var(--paper-sunk);
     color: var(--ink-2);
     font-size: 0.88rem;
@@ -945,9 +911,8 @@ main pre + p, main pre + h3, main pre + .link-row {
     overflow: auto;
     list-style: none;
     background: var(--paper-sunk);
-    border-radius: 6px;
+    border-radius: var(--radius-small);
     font-family: var(--font-code);
-    font-variation-settings: 'MONO' 1;
     font-size: 0.8rem;
     line-height: 1.5;
     color: var(--ink-2);
@@ -1001,6 +966,10 @@ main pre + p, main pre + h3, main pre + .link-row {
 @media (max-width: 900px) {
     .hero-grid, .syntax-grid, .gallery, .pg-grid {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hero-grid, [data-hero-figure='off'] .hero-grid {
+        grid-template-areas: 'wordmark' 'text' 'panel' 'figure';
     }
 
     .gallery-side {

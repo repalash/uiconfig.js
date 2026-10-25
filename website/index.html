@@ -7,6 +7,7 @@
     <meta name="description" content="Describe a UI as plain config objects or TypeScript decorators bound to your data, and render it as a live panel with Tweakpane, Blueprint or your own renderer.">
     <meta name="color-scheme" content="light dark">
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <script>document.documentElement.dataset.scheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'</script>
     <script type="module" src="./src/main.ts"></script>
 </head>
 <body>
@@ -30,8 +31,13 @@
 
     <section class="hero" aria-labelledby="wordmark">
         <div class="wrap">
-            <h1 id="wordmark" class="wordmark" aria-label="uiconfig.js">uiconfig.js</h1>
             <div class="hero-grid">
+                <h1 id="wordmark" class="wordmark" aria-label="uiconfig.js">uiconfig.js</h1>
+                <figure class="iso-card hero-fig">
+                    <div class="iso-card-top"><span>Fig. 1</span><span>Inside the hero panel</span></div>
+                    <svg data-figure="hero"></svg>
+                    <div class="iso-card-bottom"><span>Move a slider in the panel</span><span class="fig-readout" id="fig-hero-readout" aria-hidden="true"></span></div>
+                </figure>
                 <div class="hero-text">
                     <p class="lede">Describe a UI as plain objects bound to your data. A renderer turns the description into a live panel: Tweakpane, Blueprint, or one you write.</p>
                     <p>The config is data, so the code that defines it has no dependency. Only the page that shows the panel imports a renderer.</p>
@@ -49,6 +55,17 @@
                 <figure class="hero-panel">
                     <div class="panel-host" id="hero-panel"></div>
                     <figcaption>This panel edits the heading above. It is the config below, rendered by uiconfig-tweakpane.</figcaption>
+                    <div class="theme-switch">
+                        <span id="panel-theme-label">Panel theme</span>
+                        <div class="segmented segmented-small" id="panel-theme" role="group" aria-labelledby="panel-theme-label">
+                            <button type="button" data-theme="auto" aria-pressed="true">Auto</button>
+                            <button type="button" data-theme="light" aria-pressed="false">Light</button>
+                            <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+                            <button type="button" data-theme="blue" aria-pressed="false">Blue</button>
+                            <button type="button" data-theme="white" aria-pressed="false">White</button>
+                            <button type="button" data-theme="black" aria-pressed="false">Black</button>
+                        </div>
+                    </div>
                 </figure>
             </div>
             <details class="code-details hero-details">
@@ -164,6 +181,7 @@ ui.appendChild(data.uiConfig)</code></pre>
                         <button type="button" data-renderer="blueprint" aria-pressed="false">Blueprint</button>
                     </div>
                     <div class="panel-host" id="gallery-tweakpane"></div>
+                    <p class="note gallery-note">Here Tweakpane has its default look. The other Tweakpane panels on this page use the theme in <code>uiconfig-tweakpane/theme.css</code>.</p>
                     <div class="panel-host" id="gallery-blueprint" hidden></div>
                 </div>
             </div>

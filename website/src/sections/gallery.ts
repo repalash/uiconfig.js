@@ -22,7 +22,7 @@ export function setupGallery() {
         for (const [n, host] of Object.entries(hosts)) host.hidden = n !== name
         // the values can have changed in the other panel
         if (renderers[name]) return configs[name].uiRefresh?.(true)
-        renderers[name] = createRenderer(name, hosts[name])
+        renderers[name] = createRenderer(name, hosts[name], {theme: false}) // the plain Tweakpane look
         renderers[name]
             .then(ui => ui.appendChild(configs[name]))
             .catch(e => showPanelError(hosts[name], `The ${name} panel did not load`, e))

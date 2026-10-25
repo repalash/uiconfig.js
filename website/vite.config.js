@@ -2,6 +2,7 @@ import {defineConfig} from 'vite'
 import {readFileSync} from 'node:fs'
 import {highlightFile, highlightHtmlPage, sampleSource} from './scripts/highlight.mjs'
 import {bindingFigure, icons} from './src/figures/figures.js'
+import {heroFigure} from './src/figures/hero-figure.js'
 
 // Build-time work on the page, so that it ships neither a highlighter nor the figure geometry:
 // - `import html from './file.js?highlight'` gives the highlighted HTML of a sample file, `?sample` its text
@@ -9,7 +10,7 @@ import {bindingFigure, icons} from './src/figures/figures.js'
 // - <pre data-code="js|ts|sh|html"> blocks in index.html are highlighted;
 // - <svg data-figure="name"></svg> placeholders in index.html become the figures of src/figures.
 function site() {
-    const figures = {binding: bindingFigure, ...icons}
+    const figures = {binding: bindingFigure, hero: heroFigure, ...icons}
     const suffix = /\?(highlight|sample)$/
     return {
         name: 'uiconfig-site',
