@@ -3,7 +3,10 @@
 ## [Unreleased]
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-tweakpane`. The npm package name stays `uiconfig-tweakpane`.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
-- The bundles in `dist/` include `uiconfig.js` 0.4.0 (1.0.1 bundled 0.2.1).
+- The ES module `dist/index.mjs` no longer bundles its dependencies: it imports `uiconfig.js`, `ts-browser-helpers`, `tweakpane` and `@pangenerator/tweakpane-textarea-plugin`, so the bundler of the app dedupes them with the app's copy.
+- `tweakpane` and `@pangenerator/tweakpane-textarea-plugin` are required peer dependencies (they were optional).
+- Depend on `uiconfig.js` `^0.4.0` (was `>=0.2.1`) and `ts-browser-helpers` `>=0.19.4` (was `>=0.19.3`).
+- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) stays self-contained for script tags and `require()`, and includes `uiconfig.js` 0.4.0 (1.0.1 bundled 0.2.1). It is deprecated and will be removed in the next major version.
 
 ## [1.0.1] - 2025-10-27
 - Remove `console.log` calls.
