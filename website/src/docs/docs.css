@@ -167,9 +167,14 @@ a {
     border-radius: var(--radius);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 769px) {
     .pkg-switch .pkg-long {
         display: none;
+    }
+
+    /* TypeDoc hides the links at this width: search and menu go to the right */
+    #tsd-search-trigger {
+        margin-left: auto;
     }
 }
 
