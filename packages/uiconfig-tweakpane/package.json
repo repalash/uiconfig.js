@@ -13,7 +13,7 @@
     "compile:esm:watch": "tsc -p ./src  --watch",
     "compile:esm": "tsc -p ./src && node ../../scripts/fix-dts-imports.mjs lib/esm",
 
-    "build": "vite build && npm run compile:esm",
+    "build": "vite build && vite build --mode umd && npm run compile:esm",
     "start": "vite",
     "dev": "NODE_ENV=development vite build --watch",
     "test": "npm run check",
@@ -104,8 +104,8 @@
     "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
   },
   "dependencies": {
-    "uiconfig.js": ">=0.2.1",
-    "ts-browser-helpers": ">=0.19.3"
+    "uiconfig.js": "^0.4.0",
+    "ts-browser-helpers": ">=0.19.4"
   },
   "peerDependencies": {
     "@tweakpane/core": "1.1.9",
@@ -117,13 +117,7 @@
     "@tweakpane/core": {
       "optional": true
     },
-    "tweakpane": {
-      "optional": true
-    },
     "@types/three": {
-      "optional": true
-    },
-    "@pangenerator/tweakpane-textarea-plugin": {
       "optional": true
     }
   },

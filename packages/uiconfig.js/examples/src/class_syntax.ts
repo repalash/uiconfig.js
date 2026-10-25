@@ -1,4 +1,4 @@
-import {UiConfigContainer, UiObjectConfig} from 'uiconfig'
+import {UiConfigContainer, UiObjectConfig} from 'uiconfig.js'
 
 class SampleDataClass implements UiConfigContainer {
     name = 'John'

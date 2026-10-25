@@ -1,7 +1,6 @@
 import {createContext, Dispatch, ReactNode, SetStateAction, useCallback, useContext, useState} from 'react'
-import {Button, Dialog, DialogBody, DialogFooter, FormGroup, InputGroup} from '@blueprintjs/core'
+import {Button, Dialog, DialogBody, DialogFooter, FormGroup, InputGroup, Intent} from '@blueprintjs/core'
 import {useLoadingState} from './loadingState'
-import {Intent} from '@blueprintjs/core/src/common/intent'
 
 export type DialogStateType = {
     isOpen: boolean,

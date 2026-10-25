@@ -1,4 +1,4 @@
-import {uiButton, UiConfigContainer, uiContainer, uiDropdown, uiInput, uiNumber, UiObjectConfig} from 'uiconfig'
+import {uiButton, UiConfigContainer, uiContainer, uiDropdown, uiInput, uiNumber, UiObjectConfig} from 'uiconfig.js'
 
 @uiContainer('Person')
 class SampleDataClass implements UiConfigContainer {

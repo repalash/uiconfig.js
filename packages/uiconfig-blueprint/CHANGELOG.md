@@ -5,6 +5,10 @@
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-blueprint`. The npm package name stays `uiconfig-blueprint`.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
 - Depend on `uiconfig.js` `^0.4.0` (was `^0.3.1`).
+- The ES module `dist/index.mjs` no longer bundles its dependencies: it imports `uiconfig.js`, `ts-browser-helpers`, `react`, `react-dom`, `@blueprintjs/core`, `@blueprintjs/icons`, `@blueprintjs/select`, `react-colorful` and `classnames`, so the bundler of the app dedupes them with the app's copy. The styles and the modules that the source imports by deep path from `@blueprintjs/core` and that its root does not export stay in the bundle. The icon chunks in `dist/` are gone: the bundler of the app takes them from `@blueprintjs/icons`.
+- `@blueprintjs/core`, `react` and `react-dom` are required peer dependencies (they were optional). Depend on `classnames` `^2.5.1`, which the source imports.
+- Depend on `ts-browser-helpers` `>=0.19.4` (was `^0.19.4`), the range that `uiconfig.js` uses.
+- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) stays self-contained for script tags and `require()`. It is deprecated and will be removed in the next major version.
 - `lib/esm` no longer contains the tree components that 0.1.0-dev.14 removed from the source (0.1.0-dev.15 still shipped their old build output).
 
 ## [0.1.0-dev.15] - 2025-12-16
