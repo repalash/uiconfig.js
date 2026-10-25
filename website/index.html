@@ -219,17 +219,17 @@ ui.appendChild(data.uiConfig)</code></pre>
     </section>
 
     <section id="three" class="section" aria-labelledby="three-title">
-        <div class="wrap narrow">
+        <div class="wrap">
             <div class="section-head"><svg data-figure="three"></svg><h2 id="three-title">With three.js</h2></div>
-            <p class="intro"><a href="https://threepipe.org">threepipe</a>, a three.js framework, builds its UI with uiconfig. The viewer, its plugins, objects and materials carry a <code>uiConfig</code>, and the editor renders them with uiconfig-tweakpane or uiconfig-blueprint.</p>
-            <pre class="code" tabindex="0" data-code="js"><code>import {Color, Vector2, Vector3, Vector4} from 'three'
-import {UI} from 'uiconfig-tweakpane'
-
-const ui = new UI()
-// color and vector inputs create and edit these objects
-ui.THREE = {Color, Vector2, Vector3, Vector4}
-// threepipe: the viewer and its plugins carry their own uiConfig
-viewer.uiConfig.children.forEach((child) => ui.appendChild(child))</code></pre>
+            <p class="intro">With <code>ui.THREE</code> set, the color and vector inputs edit three.js objects in place: this panel is bound to the material and the position of the mesh, and the scene renders after each change.</p>
+            <div class="three-grid">
+                <div class="three-view" id="three-view" role="img" aria-label="A torus knot rendered with three.js; the panel next to it changes its color, material, position and spin"><p class="panel-loading">Loading three.js…</p></div>
+                <div class="three-side">
+                    <div class="panel-host" id="three-panel"></div>
+                    <pre class="code three-code" tabindex="0" aria-label="The config of the panel"><code id="three-code"></code></pre>
+                </div>
+            </div>
+            <p class="three-note"><a href="https://threepipe.org">threepipe</a>, a three.js framework, builds its UI with uiconfig: the viewer, its plugins, objects and materials carry a <code>uiConfig</code>, and its editors render them with uiconfig-tweakpane or uiconfig-blueprint.</p>
             <ul class="link-row">
                 <li><a href="https://threepipe.org/examples/#tweakpane-editor/">Tweakpane editor</a></li>
                 <li><a href="https://threepipe.org/examples/#blueprintjs-editor/">Blueprint editor</a></li>

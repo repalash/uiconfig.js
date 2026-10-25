@@ -922,6 +922,61 @@ main pre + p, main pre + h3, main pre + .link-row {
     overflow-wrap: anywhere;
 }
 
+/* three.js demo */
+
+.three-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 40px);
+    align-items: start;
+    margin-bottom: 18px;
+}
+
+.three-side {
+    display: grid;
+    gap: 16px;
+}
+
+.three-code {
+    max-height: 340px;
+    overflow: auto;
+    font-size: 0.78rem;
+}
+
+.three-view {
+    position: sticky;
+    top: 76px;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    background: radial-gradient(circle at 50% 40%, var(--surface), var(--paper-sunk));
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    overflow: hidden;
+}
+
+.three-view canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.three-view .panel-loading, .three-view.is-fallback {
+    position: absolute;
+    inset: 16px;
+    margin: 0;
+}
+
+.three-view.is-fallback {
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: var(--ink-2);
+    text-align: center;
+}
+
+.three-note {
+    margin-top: 1.5rem !important;
+}
+
 /* links */
 
 .links {
@@ -964,8 +1019,13 @@ main pre + p, main pre + h3, main pre + .link-row {
 /* ---------- narrow screens ---------- */
 
 @media (max-width: 900px) {
-    .hero-grid, .syntax-grid, .gallery, .pg-grid {
+    .hero-grid, .syntax-grid, .gallery, .pg-grid, .three-grid {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .three-view {
+        position: relative;
+        top: auto;
     }
 
     .hero-grid, [data-hero-figure='off'] .hero-grid {
