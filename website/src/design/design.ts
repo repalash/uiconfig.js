@@ -1,13 +1,12 @@
-// Design panel, shown with ?design=1 in the URL: fonts, sizes, accent, radius, panel density and theme, color scheme
-// and the hero figure, applied live through CSS custom properties. Built with uiconfig-tweakpane.
-// The URL only switches the panel on; it never carries values or code. Choices are kept in localStorage and apply
-// only while the panel is on, so the normal page always shows the defaults of tokens.css.
+// The design panel ("Tweak this page", or ?design=1 in the URL): fonts, sizes, accent, radius, panel density and theme,
+// color scheme and the hero figure, applied live through CSS custom properties. Built with uiconfig-tweakpane.
+// The URL only opens the panel; it never carries values or code. The choices are saved in localStorage once the
+// visitor changes something, and apply on later visits (main.ts); Reset removes them.
 import {UI} from 'uiconfig-tweakpane'
 import type {UiObjectConfig} from 'uiconfig.js'
 import {setPanelTheme, type PanelTheme, THREE} from '../renderers'
 import {isDark, type Scheme, setScheme} from '../scheme'
-
-const STORAGE_KEY = 'uiconfig-site:design'
+import {DESIGN_STORAGE_KEY as STORAGE_KEY} from './storage'
 
 const textFonts: Record<string, string> = {
     'Inter': '\'Inter Variable\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', sans-serif',
@@ -74,7 +73,7 @@ function variables(d: Design): Record<string, string> {
     }
 }
 
-function apply(d: Design) {
+function apply(d: Design, save: boolean) {
     const root = document.documentElement
     for (const [k, v] of Object.entries(variables(d))) root.style.setProperty(k, v)
     if (d.density === 'theme') delete root.dataset.density
@@ -82,9 +81,15 @@ function apply(d: Design) {
     root.dataset.heroFigure = d.heroFigure ? 'on' : 'off'
     setScheme(d.scheme)
     setPanelTheme(d.panelTheme)
+    if (!save) return
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(d))
     } catch { /* storage disabled */ }
+}
+
+/** Applies the saved choices of an earlier visit, without opening the panel. */
+export function applyStoredDesign() {
+    apply(load(), false)
 }
 
 function cssText(d: Design) {
@@ -96,15 +101,19 @@ function cssText(d: Design) {
 const options = (list: Record<string, string> | string[]) =>
     (Array.isArray(list) ? list : Object.keys(list)).map(label => ({label, value: label}))
 
-export function setupDesignPanel() {
+let host: HTMLElement | undefined
+let renderer: UI | undefined
+let toggle: HTMLButtonElement | null = null
+
+function createPanel() {
     const d = load()
-    apply(d)
+    apply(d, false)
 
     let copyLabel = 'Copy CSS'
     let lastAccent = d.accent
     const config: UiObjectConfig = {
         type: 'folder',
-        label: 'Design (?design=1)',
+        label: 'Tweak this page',
         expanded: true,
         children: [
             {type: 'dropdown', label: 'Text font', property: [d, 'textFont'], children: options(textFonts)},
@@ -125,7 +134,10 @@ export function setupDesignPanel() {
                 label: 'Reset',
                 onClick: () => {
                     Object.assign(d, defaults)
-                    apply(d)
+                    apply(d, false)
+                    try {
+                        localStorage.removeItem(STORAGE_KEY)
+                    } catch { /* storage disabled */ }
                     config.uiRefresh?.(true)
                 },
             },
@@ -149,16 +161,50 @@ export function setupDesignPanel() {
             },
         ],
         onChange: () => {
-            apply(d)
+            apply(d, true)
             if (d.accent !== lastAccent) config.uiRefresh?.(true) // the custom accent shows only for 'Custom'
             lastAccent = d.accent
         },
     }
 
-    const ui = new UI(document.body, {expanded: true}, false)
+    host = document.createElement('div')
+    host.id = 'design-panel'
+    host.className = 'design-panel'
+    host.setAttribute('role', 'dialog')
+    host.setAttribute('aria-label', 'Tweak this page')
+    host.addEventListener('keydown', ev => {
+        if (ev.key === 'Escape') closeDesignPanel(true)
+    })
+    document.body.append(host)
+    const ui = new UI(host, {expanded: true}, false)
     ui.THREE = THREE
     ui.setTheme(isDark() ? 'dark' : 'light')
     addEventListener('schemechange', () => ui.setTheme(isDark() ? 'dark' : 'light'))
     ui.appendChild(config)
-    document.documentElement.dataset.design = 'on'
+    renderer = ui
+}
+
+export const isDesignPanelOpen = () => !!host && !host.hidden
+
+export function openDesignPanel(button: HTMLButtonElement | null) {
+    toggle = button
+    if (!host) createPanel()
+    host!.hidden = false
+    renderer?.start()
+    toggle?.setAttribute('aria-expanded', 'true')
+    // move the focus into the panel: its first control
+    host!.querySelector<HTMLElement>('select, input, button')?.focus()
+}
+
+export function closeDesignPanel(focusButton = false) {
+    if (!host) return
+    host.hidden = true
+    renderer?.stop()
+    toggle?.setAttribute('aria-expanded', 'false')
+    if (focusButton) toggle?.focus()
+}
+
+export function toggleDesignPanel(button: HTMLButtonElement | null) {
+    if (isDesignPanelOpen()) closeDesignPanel()
+    else openDesignPanel(button)
 }
