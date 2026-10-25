@@ -70,6 +70,12 @@ The module can be accessed with the short-form `tpui`
 </script>
 ```
 
+### Builds
+
+- `dist/index.mjs` (`import`, `module`): ES module. It imports its dependencies `uiconfig.js`, `ts-browser-helpers`, `tweakpane` and `@pangenerator/tweakpane-textarea-plugin` instead of bundling them, so the bundler of the app keeps one copy of each. `tweakpane` and the textarea plugin are peer dependencies: npm 7 and later install them, other package managers can need them in the app's `package.json`.
+- `lib/esm`: the TypeScript output, one file per source module.
+- `dist/index.js` (`main`, `require`, `browser`, the CDN link): UMD bundle with all dependencies included, for a `<script>` tag or `require()`. This build is legacy and will be removed in the next major version.
+
 ## Configuration
 
 Check the documentation at [uiconfig.js](https://github.com/repalash/uiconfig.js) on how to create a configuration for the UI.
