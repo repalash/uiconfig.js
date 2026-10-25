@@ -33,7 +33,6 @@
         const title = document.querySelector('.tsd-toolbar-contents > .title')
         if (!title) return
         title.innerHTML = 'uiconfig<span class="brand-dot">.js</span><span class="docs-label">API</span>'
-        title.setAttribute('aria-label', 'uiconfig.js API docs')
         const nav = document.createElement('nav')
         nav.className = 'pkg-switch'
         nav.setAttribute('aria-label', 'Package')
