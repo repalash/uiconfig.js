@@ -9,6 +9,7 @@
 - `@blueprintjs/core`, `react` and `react-dom` are required peer dependencies (they were optional). Depend on `classnames` `^2.5.1`, which the source imports.
 - Depend on `ts-browser-helpers` `>=0.19.4` (was `^0.19.4`), the range that `uiconfig.js` uses.
 - The UMD bundle `dist/index.js` (`main`, `require`, `browser`) stays self-contained for script tags and `require()`. It is deprecated and will be removed in the next major version.
+- `[Dev]` Built with Vite 7 (was Vite 5), like the other packages: `dist/` targets the Vite 7 default browsers (`baseline-widely-available`: Chrome and Edge 107, Firefox 104, Safari 16).
 - `lib/esm` no longer contains the tree components that 0.1.0-dev.14 removed from the source (0.1.0-dev.15 still shipped their old build output).
 
 ## [0.1.0-dev.15] - 2025-12-16
