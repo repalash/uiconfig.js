@@ -2,6 +2,7 @@
 // - dist-docs/assets/custom.css becomes the site's font faces (Inter and JetBrains Mono from src/styles/fonts.css,
 //   with their files copied to assets/fonts), src/styles/tokens.css and src/docs/docs.css. TypeDoc links custom.css
 //   from every page (the customCss option) but copies only that one file, so the fonts and tokens are added here.
+// - on the module pages, the package README sits under the page's h1: its headings move one level down;
 // - every page gets a description of its own (TypeDoc writes "Documentation for …" on all of them), its canonical
 //   link and the Open Graph tags (scripts/site.mjs).
 import {copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync} from 'node:fs'
@@ -88,6 +89,10 @@ function walk(dir) {
         const title = text(html.match(/<title>([\s\S]*?)<\/title>/)[1])
         const description = describe(rel, html)
         const page = rel === 'index.html' ? 'docs/' : `docs/${rel}`
+        if (rel.startsWith('modules/')) {
+            html = html.replace(/(<section class="tsd-panel tsd-typography">)([\s\S]*?)(<\/section>)/, (_, open, body, close) =>
+                open + body.replace(/<(\/?)h([1-5])\b/g, (__, slash, n) => `<${slash}h${Number(n) + 1}`) + close)
+        }
         html = html.replace(/<meta name="description" content="[^"]*"\/?>/, `<meta name="description" content="${escapeAttr(description)}"/>`)
             .replace('</head>', socialTags({title, description, path: page}) + '</head>')
         writeFileSync(file, html)

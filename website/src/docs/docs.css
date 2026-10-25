@@ -23,6 +23,33 @@
     --dim-toolbar-contents-height: 3.5rem;
 }
 
+/* TypeDoc's kind colors are made for its lighter background: on the site's paper, a little darker keeps their contrast
+   at 4.5:1 or more */
+:root[data-scheme='light'] {
+    --color-ts-accessor: color-mix(in srgb, var(--light-color-ts-accessor) 82%, black);
+    --color-ts-call-signature: color-mix(in srgb, var(--light-color-ts-call-signature) 82%, black);
+    --color-ts-class: color-mix(in srgb, var(--light-color-ts-class) 82%, black);
+    --color-ts-constructor: color-mix(in srgb, var(--light-color-ts-constructor) 82%, black);
+    --color-ts-constructor-signature: color-mix(in srgb, var(--light-color-ts-constructor-signature) 82%, black);
+    --color-ts-enum: color-mix(in srgb, var(--light-color-ts-enum) 82%, black);
+    --color-ts-enum-member: color-mix(in srgb, var(--light-color-ts-enum-member) 82%, black);
+    --color-ts-function: color-mix(in srgb, var(--light-color-ts-function) 82%, black);
+    --color-ts-get-signature: color-mix(in srgb, var(--light-color-ts-get-signature) 82%, black);
+    --color-ts-index-signature: color-mix(in srgb, var(--light-color-ts-index-signature) 82%, black);
+    --color-ts-interface: color-mix(in srgb, var(--light-color-ts-interface) 82%, black);
+    --color-ts-method: color-mix(in srgb, var(--light-color-ts-method) 82%, black);
+    --color-ts-module: color-mix(in srgb, var(--light-color-ts-module) 82%, black);
+    --color-ts-namespace: color-mix(in srgb, var(--light-color-ts-namespace) 82%, black);
+    --color-ts-parameter: color-mix(in srgb, var(--light-color-ts-parameter) 82%, black);
+    --color-ts-project: color-mix(in srgb, var(--light-color-ts-project) 82%, black);
+    --color-ts-property: color-mix(in srgb, var(--light-color-ts-property) 82%, black);
+    --color-ts-reference: color-mix(in srgb, var(--light-color-ts-reference) 82%, black);
+    --color-ts-set-signature: color-mix(in srgb, var(--light-color-ts-set-signature) 82%, black);
+    --color-ts-type-alias: color-mix(in srgb, var(--light-color-ts-type-alias) 82%, black);
+    --color-ts-type-parameter: color-mix(in srgb, var(--light-color-ts-type-parameter) 82%, black);
+    --color-ts-variable: color-mix(in srgb, var(--light-color-ts-variable) 82%, black);
+}
+
 body {
     font-family: var(--font-text);
     font-size: var(--text-size);
