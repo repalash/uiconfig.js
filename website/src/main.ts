@@ -1,13 +1,11 @@
 import '@fontsource-variable/recursive/mono.css'
 import './styles.css'
-import {highlightStatic} from './highlight'
 import {setupHero} from './sections/hero'
 import {setupDual} from './sections/dual'
 import {setupSyntax} from './sections/syntax'
 import {setupGallery} from './sections/gallery'
 import {setupPlayground} from './playground/playground'
-
-highlightStatic()
+import {setupBindingFigure} from './figures/binding-motion'
 
 // copy buttons: <button data-copy="text">
 document.addEventListener('click', ev => {
@@ -21,7 +19,7 @@ document.addEventListener('click', ev => {
 })
 
 // each section works on its own: an error in one does not stop the others
-for (const setup of [setupHero, setupDual, setupSyntax, setupGallery, setupPlayground]) {
+for (const setup of [setupHero, setupBindingFigure, setupDual, setupSyntax, setupGallery, setupPlayground]) {
     try {
         setup()
     } catch (e) {

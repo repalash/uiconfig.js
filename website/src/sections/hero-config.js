@@ -9,7 +9,7 @@ export function createHeadingConfig(color, applyToPage) {
     const heading = {
         text: 'uiconfig.js',
         weight: 800,
-        mono: 0,
+        tracking: -0.03,
         case: 'none',
         color,
         outline: false,
@@ -21,8 +21,20 @@ export function createHeadingConfig(color, applyToPage) {
         expanded: true,
         children: [
             {type: 'input', label: 'Text', property: [heading, 'text']},
-            {type: 'slider', label: 'Weight', bounds: [300, 1000], stepSize: 10, property: [heading, 'weight']},
-            {type: 'slider', label: 'Monospace', bounds: [0, 1], stepSize: 0.01, property: [heading, 'mono']},
+            {
+                type: 'slider',
+                label: 'Weight',
+                bounds: [300, 1000],
+                stepSize: 10,
+                property: [heading, 'weight'],
+            },
+            {
+                type: 'slider',
+                label: 'Tracking',
+                bounds: [-0.08, 0.12],
+                stepSize: 0.01,
+                property: [heading, 'tracking'],
+            },
             {
                 type: 'dropdown',
                 label: 'Case',
@@ -34,13 +46,17 @@ export function createHeadingConfig(color, applyToPage) {
                 ],
             },
             {type: 'color', label: 'Color', property: [heading, 'color']},
-            {type: 'checkbox', label: 'Outline', property: [heading, 'outline']},
+            {
+                type: 'checkbox',
+                label: 'Outline',
+                property: [heading, 'outline'],
+            },
             {
                 type: 'button',
                 label: 'Randomize',
                 onClick: () => {
                     heading.weight = 300 + Math.round(Math.random() * 70) * 10
-                    heading.mono = Math.round(Math.random() * 100) / 100
+                    heading.tracking = Math.round(Math.random() * 20 - 8) / 100
                     applyToPage(heading)
                     config.uiRefresh(true) // show the new values in the panel
                 },

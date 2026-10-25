@@ -2,22 +2,20 @@
 // The code on each tab is the source of the file in src/samples that renders next to it.
 import type {UiObjectConfig} from 'uiconfig.js'
 import {createTweakpane} from '../renderers'
-import {highlight} from '../highlight'
-import {sampleSource} from '../sample-source'
 import {data as objectData} from '../samples/object.js'
-import objectSource from '../samples/object.js?raw'
+import objectCode from '../samples/object.js?highlight'
 import {data as classData} from '../samples/class.js'
-import classSource from '../samples/class.js?raw'
+import classCode from '../samples/class.js?highlight'
 import {data as decoratorData} from '../samples/decorators'
-import decoratorSource from '../samples/decorators.ts?raw'
+import decoratorCode from '../samples/decorators.ts?highlight'
 
 // object.js adds uiConfig after the object literal, which the inferred type does not see
 type WithConfig = {uiConfig: UiObjectConfig}
 
-const samples: Record<string, {config: UiObjectConfig, source: string}> = {
-    object: {config: (objectData as unknown as WithConfig).uiConfig, source: objectSource},
-    class: {config: (classData as unknown as WithConfig).uiConfig, source: classSource},
-    decorators: {config: decoratorData.uiConfig, source: decoratorSource},
+const samples: Record<string, {config: UiObjectConfig, html: string}> = {
+    object: {config: (objectData as unknown as WithConfig).uiConfig, html: objectCode},
+    class: {config: (classData as unknown as WithConfig).uiConfig, html: classCode},
+    decorators: {config: decoratorData.uiConfig, html: decoratorCode},
 }
 
 export function setupSyntax() {
@@ -36,7 +34,7 @@ export function setupSyntax() {
         if (focus) tab.focus()
         document.getElementById('syntax-tabpanel')!.setAttribute('aria-labelledby', tab.id)
         const sample = samples[tab.dataset.sample!]
-        code.innerHTML = highlight(sampleSource(sample.source))
+        code.innerHTML = sample.html
         if (current) ui.removeChild(current)
         current = sample.config
         ui.appendChild(current)

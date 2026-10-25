@@ -3,18 +3,22 @@
 // state (uiRef, uiRefresh) in the config. After a change in one panel, uiRefresh updates the other.
 import type {UiObjectConfig} from 'uiconfig.js'
 import {afterLoad, createBlueprint, createTweakpane, whenNear} from '../renderers'
-import {highlight} from '../highlight'
-import {sampleSource} from '../sample-source'
 import {createLight, createLightConfig} from './light-config.js'
-import lightSource from './light-config.js?raw'
+import lightCode from './light-config.js?highlight'
 import {showPanelError} from './panel-error'
 
 const round = (n: number) => Math.round(n * 1000) / 1000
 
+const span = (cls: string, text: string) => `<span class="tk-${cls}">${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>`
+
+/** A value as highlighted JavaScript source, with the token classes of the build-time highlighter. */
 function formatValue(v: unknown): string {
-    if (typeof v === 'string') return `'${v}'`
-    if (typeof v === 'number') return String(round(v))
-    if (v && typeof v === 'object') return `{${Object.entries(v).map(([k, x]) => `${k}: ${formatValue(x)}`).join(', ')}}`
+    if (typeof v === 'string') return span('string', `'${v}'`)
+    if (typeof v === 'number' || typeof v === 'boolean') return span('number', String(typeof v === 'number' ? round(v) : v))
+    if (v && typeof v === 'object') {
+        return span('punct', '{') + Object.entries(v).map(([k, x]) => `${span('property', k)}${span('punct', ':')} ${formatValue(x)}`)
+            .join(span('punct', ',') + ' ') + span('punct', '}')
+    }
     return String(v)
 }
 
@@ -31,17 +35,20 @@ export function setupDual() {
     const renderData = (changed: string[] = []) => {
         if (!lines.size) {
             dataView.innerHTML = ''
-            dataView.append(Object.assign(document.createElement('span'), {className: 'data-brace', textContent: 'const light = {'}))
+            const head = document.createElement('span')
+            head.className = 'data-brace'
+            head.innerHTML = `${span('keyword', 'const')} ${span('def', 'light')} = ${span('punct', '{')}`
+            dataView.append(head)
             for (const key of Object.keys(light)) {
                 const line = document.createElement('span')
                 line.className = 'data-line'
                 lines.set(key, line)
                 dataView.append(line)
             }
-            dataView.append(Object.assign(document.createElement('span'), {className: 'data-brace', textContent: '}'}))
+            dataView.append(Object.assign(document.createElement('span'), {className: 'data-brace tk-punct', textContent: '}'}))
         }
         for (const [key, line] of lines) {
-            line.innerHTML = highlight(`  ${key}: ${formatValue((light as Record<string, unknown>)[key])},`)
+            line.innerHTML = `    ${span('property', key)}${span('punct', ':')} ${formatValue((light as Record<string, unknown>)[key])}${span('punct', ',')}`
             if (changed.includes(key)) {
                 line.classList.remove('is-changed')
                 void line.offsetWidth // restart the highlight animation
@@ -71,8 +78,7 @@ export function setupDual() {
             .catch(e => showPanelError(bpHost, 'The Blueprint panel did not load', e))
     }))
 
-    const code = document.getElementById('dual-code')
-    if (code) code.innerHTML = highlight(sampleSource(lightSource))
+    document.getElementById('dual-code')!.innerHTML = lightCode
 
     // narrow screens show one panel at a time
     const switcher = section.querySelector<HTMLElement>('.panel-switch')!
