@@ -6,6 +6,7 @@ import {setupDual} from './sections/dual'
 import {setupSyntax} from './sections/syntax'
 import {setupGallery} from './sections/gallery'
 import {setupPlayground} from './playground/playground'
+import {setupThree} from './sections/three'
 import {setupBindingFigure} from './figures/binding-motion'
 import {setupHeroFigure} from './figures/hero-motion'
 
@@ -21,7 +22,7 @@ document.addEventListener('click', ev => {
 })
 
 // each section works on its own: an error in one does not stop the others
-for (const setup of [setupHeroFigure, setupHero, setupBindingFigure, setupDual, setupSyntax, setupGallery, setupPlayground]) {
+for (const setup of [setupHeroFigure, setupHero, setupBindingFigure, setupDual, setupSyntax, setupGallery, setupPlayground, setupThree]) {
     try {
         setup()
     } catch (e) {

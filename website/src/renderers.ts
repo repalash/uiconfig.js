@@ -4,7 +4,13 @@
 import {type TweakpaneThemeMode, UI as TweakpaneUI} from 'uiconfig-tweakpane'
 import 'uiconfig-tweakpane/theme.css'
 import type {UiConfigRenderer} from 'uiconfig.js'
-import {Color, Vector2, Vector3, Vector4} from 'three'
+// three.js from its source modules (here and in the three.js demo): the page bundles the math classes, and the
+// renderer goes into the demo's own chunk. Importing 'three' would put all of three.module.js, renderer included,
+// into the page's main chunk, because both import that one module.
+import {Color} from 'three/src/math/Color.js'
+import {Vector2} from 'three/src/math/Vector2.js'
+import {Vector3} from 'three/src/math/Vector3.js'
+import {Vector4} from 'three/src/math/Vector4.js'
 import {isDark} from './scheme'
 
 export type RendererName = 'tweakpane' | 'blueprint'
