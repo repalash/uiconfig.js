@@ -47,9 +47,13 @@ export default function example(ui, {log}) {
                 },
             },
         ],
-        // the labels show the data: refresh them after an edit
+        // the labels show the data: refresh them after an edit; the edited item's
+        // folder is in ev.configPath, and the list refresh does not reach it
         onChange: (ev) => {
-            if (ev.last) list.uiRefresh(true)
+            if (ev.last) {
+                for (const c of ev.configPath ?? []) if (c !== list) c.uiRefresh?.()
+                list.uiRefresh(true)
+            }
             log(JSON.stringify(todos))
         },
     }
