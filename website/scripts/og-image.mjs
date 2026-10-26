@@ -86,7 +86,7 @@ try {
         `--window-size=${ogImage.width},${ogImage.height}`, `--screenshot=${out}`, '--virtual-time-budget=2000',
         ...(process.env.CHROME_ARGS ? process.env.CHROME_ARGS.split(' ') : []),
         pathToFileURL(page).href,
-    ], {stdio: 'inherit'})
+    ], {stdio: 'inherit', cwd: dir}) // in the temporary folder: a Chromium crash writes its core dump into the working directory
     console.log(`website/public/${ogImage.path}: ${ogImage.width}×${ogImage.height}`)
 } finally {
     rmSync(dir, {recursive: true, force: true})
