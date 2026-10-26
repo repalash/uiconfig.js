@@ -1,0 +1,26 @@
+{
+    "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+    "extends": [
+        "./typedoc.json"
+    ],
+    "plugin": [
+        "typedoc-plugin-markdown"
+    ],
+    "out": "dist-docs-md",
+    "readme": "none",
+    "outputFileStrategy": "modules",
+    "entryFileName": "index",
+    "hidePageHeader": true,
+    "hideBreadcrumbs": true,
+    "useCodeBlocks": true,
+    "expandObjects": true,
+    "parametersFormat": "table",
+    "interfacePropertiesFormat": "table",
+    "classPropertiesFormat": "table",
+    "packageOptions": {
+        "entryPoints": [
+            "src/index.ts"
+        ],
+        "readme": "none"
+    }
+}

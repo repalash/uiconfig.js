@@ -56,13 +56,11 @@
     "dev:lib": "run-p \"compile:esm --watch\" \"compile:css --watch\"",
     "dist:css": "css-dist lib/css",
     "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore",
-    "dev": "vite",
     "build": "vite build && vite build --mode umd && npm run compile",
-    "build-examples": "vite build -c vite.examples.config.js",
     "docs": "typedoc ./src/index.ts",
     "serve-docs": "ws -d docs -p 8080",
-    "prepack": "npm run build && npm run build-examples && npm run docs",
-    "lint": "eslint src examples --fix"
+    "prepack": "npm run build && npm run docs",
+    "lint": "eslint src --fix"
   },
   "clean-package": {
     "remove": [
@@ -92,21 +90,26 @@
     "directory": "packages/uiconfig-blueprint"
   },
   "keywords": [
-    "javascript",
-    "typescript",
-    "json",
     "ui",
-    "three.js",
-    "html",
+    "gui",
+    "panel",
+    "inspector",
+    "editor",
+    "controls",
     "blueprint",
-    "library"
+    "blueprintjs",
+    "react",
+    "config",
+    "uiconfig",
+    "three.js",
+    "typescript"
   ],
   "author": "repalash <palash@shaders.app>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/repalash/uiconfig.js/issues"
   },
-  "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-blueprint#readme",
+  "homepage": "https://repalash.com/uiconfig.js/",
   "devDependencies": {
     "@rollup/plugin-json": "^6.0.0",
     "clean-package": "^2.2.0",

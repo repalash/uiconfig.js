@@ -146,7 +146,8 @@ export class UiConfigMethods {
         if (prop === undefined && parent) {
             prop = getOrCall(config.parentProperty, config)
         }
-        if (!prop || typeof prop[0] !== 'object' || !prop[1]) {
+        // a key can be 0 (an array index), so only undefined, null and '' are invalid
+        if (!prop || typeof prop[0] !== 'object' || prop[1] === undefined || prop[1] === null || prop[1] === '') {
             // console.warn('Cannot determine property for uiConfig', config)
             return [undefined, ''] as [undefined, string]
         }

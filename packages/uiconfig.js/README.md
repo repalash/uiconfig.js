@@ -4,7 +4,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
-Examples: https://repalash.com/uiconfig.js/examples/index.html
+Website: https://repalash.com/uiconfig.js/
+
+Examples: https://repalash.com/uiconfig.js/examples/
+
+API docs: https://repalash.com/uiconfig.js/docs/
 
 Github: https://github.com/repalash/uiconfig.js
 
@@ -620,17 +624,7 @@ For viewing textures and images check the implementation in [threepipe](https://
 
 ## Examples
 
-The example pages are in [examples](./examples): `examples/index.html` links to the pages in `examples/html`, and `examples/src` has the TypeScript examples. The pages import the packages by name (`uiconfig.js`, `uiconfig-tweakpane`, `uiconfig-blueprint`). Vite bundles them from the built packages of this repository, so build those first. From the repository root:
-
-```bash
-npm install
-npm run build -w uiconfig.js
-npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
-npm run examples:dev -w uiconfig.js     # dev server; the printed URL opens the examples index
-npm run examples:build -w uiconfig.js   # static build in examples/dist
-```
-
-After a change in one of the packages, build it again. The GitHub Pages workflow runs the same build and publishes `examples/dist` as https://repalash.com/uiconfig.js/examples/index.html.
+The examples are pages of the website: https://repalash.com/uiconfig.js/examples/. Each one shows a live panel, in Tweakpane or Blueprint, and the code that makes it. Their sources are in [website/src/examples](https://github.com/repalash/uiconfig.js/tree/master/website/src/examples) (one file per example, listed in `registry.js`); [website/README.md](https://github.com/repalash/uiconfig.js/blob/master/website/README.md) explains how to run the website locally.
 
 ## Changelog
 

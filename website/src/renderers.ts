@@ -24,7 +24,7 @@ export const THREE = {Color, Vector2, Vector3, Vector4}
 export type PanelTheme = TweakpaneThemeMode | 'auto' | 'plain'
 const themed = new Set<TweakpaneUI>()
 let panelTheme: PanelTheme = 'auto'
-const themeMode = (): TweakpaneThemeMode | null =>
+export const themeMode = (): TweakpaneThemeMode | null =>
     panelTheme === 'plain' ? null : panelTheme === 'auto' ? (isDark() ? 'dark' : 'light') : panelTheme
 export function setPanelTheme(theme: PanelTheme = panelTheme) {
     panelTheme = theme
@@ -51,9 +51,19 @@ function pauseWhenHidden(ui: UiConfigRenderer, host: HTMLElement) {
     visibility.observe(host)
 }
 
-export function createTweakpane(host: HTMLElement, {theme = true} = {}): UiConfigRenderer {
-    // no undo manager: it binds Ctrl+Z on the whole document, which belongs to the editors on this page
-    const ui = new TweakpaneUI(host, {expanded: true}, false)
+/**
+ * Options of the renderers on the site's pages.
+ * theme: false gives a Tweakpane panel the plain Tweakpane look (and leaves its theme to the caller).
+ * undo: true gives the renderer its default undo manager, which binds Ctrl+Z on the whole document. The landing
+ * page has none: Ctrl+Z belongs to its editors there.
+ */
+export interface RendererOptions {
+    theme?: boolean
+    undo?: boolean
+}
+
+export function createTweakpane(host: HTMLElement, {theme = true, undo = false}: RendererOptions = {}): UiConfigRenderer {
+    const ui = new TweakpaneUI(host, {expanded: true}, undo ? undefined : false)
     ui.THREE = THREE
     if (theme) {
         themed.add(ui)
@@ -66,20 +76,20 @@ export function createTweakpane(host: HTMLElement, {theme = true} = {}): UiConfi
 let blueprintModule: Promise<typeof import('uiconfig-blueprint')> | undefined
 export const loadBlueprint = () => blueprintModule ??= import('uiconfig-blueprint')
 
-export async function createBlueprint(host: HTMLElement): Promise<UiConfigRenderer> {
+export async function createBlueprint(host: HTMLElement, {undo = false}: RendererOptions = {}): Promise<UiConfigRenderer> {
     const {UI} = await loadBlueprint()
     // The Blueprint panel reads its light or dark mode from localStorage when it mounts;
     // match it to the page.
     localStorage.setItem('bpUiDarkMode', isDark() ? 'true' : 'false')
     host.replaceChildren() // the loading message
-    const ui = new UI(host, {}, false)
+    const ui = new UI(host, {}, undo ? undefined : false)
     ui.THREE = THREE
     pauseWhenHidden(ui, host)
     return ui
 }
 
-export function createRenderer(name: RendererName, host: HTMLElement, options?: {theme?: boolean}): Promise<UiConfigRenderer> {
-    return name === 'blueprint' ? createBlueprint(host) : Promise.resolve(createTweakpane(host, options))
+export function createRenderer(name: RendererName, host: HTMLElement, options?: RendererOptions): Promise<UiConfigRenderer> {
+    return name === 'blueprint' ? createBlueprint(host, options) : Promise.resolve(createTweakpane(host, options))
 }
 
 /** Calls `fn` after the window load event, so that large optional chunks do not delay the page. */
