@@ -91,7 +91,7 @@ export const examples = [
     {
         slug: 'colors-vectors', topic: 'components', title: 'Colors and vectors', renderers: both,
         summary: '`color` edits a hex string, a number or a three.js `Color`; `vec2`, `vec3` and `vec4` edit `{x, y, z, w}` objects. Both components create their values with the classes in `ui.THREE`.',
-        preview: ['color', 'color', 'vec', 'vec'], log: true, three: true,
+        preview: ['color', 'color', 'vec', 'vec'], log: true,
     },
     {
         slug: 'folders-panels', topic: 'components', title: 'Folders and panels', renderers: both,
