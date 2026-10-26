@@ -29,7 +29,7 @@
         "@lezer/highlight": "^1.2.5",
         "three": "^0.186.1",
         "uiconfig-blueprint": "^0.1.0-dev.15",
-        "uiconfig-tweakpane": "^1.0.1",
+        "uiconfig-tweakpane": "^2.0.0",
         "uiconfig.js": "^0.4.0"
     },
     "devDependencies": {

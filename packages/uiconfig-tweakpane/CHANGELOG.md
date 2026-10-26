@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-10-26
+## [2.0.0] - 2026-10-26
+- **Breaking:** works with uiconfig.js 0.4: the ES module uses the app's `uiconfig.js` (`^0.4.0`), and the UMD bundle includes 0.4.1 (1.0.1 bundled 0.2.1). Its default dispatch mode is `immediate`: a value is set and `onChange` runs at once, not after the next frame. Set `dispatchMode: 'postFrame'` on a config for the old timing.
+- **Breaking:** `tweakpane` and `@pangenerator/tweakpane-textarea-plugin` are required peer dependencies, and the ES module imports them (and `uiconfig.js`, `ts-browser-helpers`) instead of bundling them.
 - Fix: an input whose `readOnly` changes (a function, or a value set before a refresh) switches between a monitor and an editable input. Tweakpane cannot turn one blade into the other, so the renderer makes the blade again at the same place in its folder or tab. Before, it stayed the kind it was created as.
 - `homepage` in `package.json` is the website, https://repalash.com/uiconfig.js/, and the `keywords` describe the package.
 - `[Dev]` The example pages of the package moved to the website (https://repalash.com/uiconfig.js/examples/), where each example runs in both renderers; the package has no example build anymore.
@@ -15,7 +17,7 @@
 - The ES module `dist/index.mjs` no longer bundles its dependencies: it imports `uiconfig.js`, `ts-browser-helpers`, `tweakpane` and `@pangenerator/tweakpane-textarea-plugin`, so the bundler of the app dedupes them with the app's copy.
 - `tweakpane` and `@pangenerator/tweakpane-textarea-plugin` are required peer dependencies (they were optional).
 - Depend on `uiconfig.js` `^0.4.0` (was `>=0.2.1`) and `ts-browser-helpers` `>=0.19.4` (was `>=0.19.3`).
-- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) stays self-contained for script tags and `require()`, and includes `uiconfig.js` 0.4.0 (1.0.1 bundled 0.2.1). It is deprecated and will be removed in the next major version.
+- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) stays self-contained for script tags and `require()`, and includes `uiconfig.js` 0.4.1 (1.0.1 bundled 0.2.1). It is deprecated and will be removed in the next major version.
 
 ## [1.0.1] - 2025-10-27
 - Remove `console.log` calls.
