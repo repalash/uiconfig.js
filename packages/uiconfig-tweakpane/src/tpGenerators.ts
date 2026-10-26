@@ -228,6 +228,7 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
             } else {
                 input = parent.addInput(proxy, 'value', addParams).on('change', ev => {
                     if (proxy.listedOnChange === false) return // used in tpImageInputGenerator
+                    if (proxy.liveEditing) return // a liveUpdate edit ends in tpLiveTextInput, not on a refresh
                     // console.log(ev.last ?? true)
                     config.dispatchMode = 'immediate' // this is required so that the value is set before the next uiRefresh.
                     renderer.methods.setValue(config, proxy.value_ ?? proxy.value, {last: ev.last ?? true}, proxy.forceOnChange || false)
@@ -308,7 +309,10 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
 
 /**
  * Tweakpane sets the value of a text input on Enter or blur. With `config.liveUpdate`, the value is also set on each
- * keystroke, with `last: false`, so that the undo manager merges the keystrokes and the commit into one step.
+ * keystroke, with `last: false`, and once more with `last: true` on Enter or blur, so the undo manager merges the
+ * keystrokes and the commit into one step. While such an edit runs, the binding's change events are ignored: a panel
+ * refresh in between (for example from an onChange that calls uiRefresh) makes Tweakpane read the typed value and
+ * emit a change with `last: true`, and then Enter emits nothing, because Tweakpane's value already equals the text.
  */
 const tpLiveTextInput = (input: InputBindingApi<any, any>, config: UiObjectConfig, renderer: UiConfigRendererTweakpane) => {
     const element = (input.controller_.valueController.view as TextView<any>).inputElement as HTMLInputElement | undefined
@@ -317,9 +321,19 @@ const tpLiveTextInput = (input: InputBindingApi<any, any>, config: UiObjectConfi
         if (!getOrCall(config.liveUpdate)) return
         const proxy = config.__proxy
         if (!proxy || typeof proxy.value !== 'string') return
+        proxy.liveEditing = true
         proxy.value = element.value
         config.dispatchMode = 'immediate'
         renderer.methods.setValue(config, element.value, {last: false}, proxy.forceOnChange || false)
+    })
+    // The native change event fires on Enter and on blur after the text changed, after Tweakpane's own listener.
+    element.addEventListener('change', () => {
+        const proxy = config.__proxy
+        if (!proxy?.liveEditing) return
+        proxy.liveEditing = false
+        proxy.value = element.value
+        config.dispatchMode = 'immediate'
+        renderer.methods.setValue(config, element.value, {last: true}, proxy.forceOnChange || false)
     })
 }
 
