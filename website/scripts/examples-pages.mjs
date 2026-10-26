@@ -33,17 +33,30 @@ export function exampleFile(slug) {
 export const examplePagePaths = ['examples/index.html', ...examples.map(e => `examples/${e.slug}.html`)]
 
 /**
+ * Whether an example's code needs `ui.THREE` from the setup: color and vector components create their values with
+ * those classes (Blueprint throws without them, Tweakpane leaves the color out). True when the code has such a
+ * component (a color or vector type, a uiColor or uiVector decorator, or an {x: …} or {r: …} value that
+ * generateUiFolder turns into one) and does not set ui.THREE itself. The copied-code check of the example pages runs
+ * the setup and the code without the site's renderer defaults, so an example that this misses fails there.
+ */
+export function needsThree(source) {
+    if (/\bui\.THREE\s*=/.test(source)) return false
+    return /type:\s*'(color|vec|vec2|vec3|vec4|vector)'|@ui(Color|Vector)\b|\{\s*[xr]\s*:/.test(source)
+}
+
+/**
  * The setup code above an example: the renderer, its container and what the example gets (log, view).
  * The Tweakpane theme mode is a placeholder that the page replaces with the mode it uses.
  */
 export function setupCode(example, renderer) {
+    const three = needsThree(readFileSync(exampleFile(example.slug), 'utf8'))
     const lines = [`import {UI} from 'uiconfig-${renderer}'`]
     if (renderer === 'tweakpane') lines.push(`import 'uiconfig-tweakpane/theme.css'`)
-    if (example.three) lines.push(`import {Color, Vector2, Vector3, Vector4} from 'three'`)
+    if (three) lines.push(`import {Color, Vector2, Vector3, Vector4} from 'three'`)
     lines.push('', '// the panel goes into this element (without one, it floats at the top right)')
     lines.push(`const ui = new UI(document.getElementById('panel'))`)
     if (renderer === 'tweakpane' && example.theme !== false) lines.push(`ui.setTheme('light') // a mode of theme.css`)
-    if (example.three) lines.push('ui.THREE = {Color, Vector2, Vector3, Vector4}')
+    if (three) lines.push('ui.THREE = {Color, Vector2, Vector3, Vector4} // for the color and vector components')
     if (example.log) lines.push('', '// this page prints the log under the panel', 'const log = console.log')
     if (example.view) lines.push('', '// the element for the canvas', `const view = document.getElementById('view')`)
     return lines.join('\n')

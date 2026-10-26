@@ -2,14 +2,12 @@ export default function example(ui, {log}) {
     // #region
     // ui.THREE holds three.js's Color, Vector2, Vector3 and Vector4
     // (see the setup code); the components create their values with them
-    const {Color, Vector3} = ui.THREE
-
     const style = {
         background: '#1d2433', // hex string
         accent: 0x3346d3, // number
-        tint: new Color(1, 0.6, 0.2), // three.js Color, edited in place
+        tint: new ui.THREE.Color(1, 0.6, 0.2), // three.js Color, edited in place
         offset: {x: 0, y: 0.5},
-        position: new Vector3(1, 2, 3),
+        position: new ui.THREE.Vector3(1, 2, 3),
         rect: {x: 0, y: 0, z: 100, w: 50},
     }
 
