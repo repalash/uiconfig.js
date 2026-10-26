@@ -1,6 +1,6 @@
 import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi, TabApi} from 'tweakpane'
 import {BladeController, TextView, View} from '@tweakpane/core'
-import {setupPropertyForwarding, tweakPaneMoveToParentIndex} from './tpUtils'
+import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
 import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
@@ -207,14 +207,26 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
         const n = renderer.methods.getValue(config, proxy.value || undefined)
         proxy.value = n
     }
+    // A read-only value is a monitor blade, an editable one an input blade, and Tweakpane cannot turn one into the
+    // other: when readOnly (a value or a function) changes, the blade is made again at the same place in the parent.
+    // Its dispose handler (renderUiObject) clears config.uiRef and uiRefresh; renderUiObject sets them for the new one.
+    const monitor = !inputParams.view && !!getOrCall(config.readOnly)
+    let index: number | undefined
+    if (input && config.__tpMonitor !== undefined && config.__tpMonitor !== monitor) {
+        index = tweakpaneChildIndex(input, parent)
+        parent.remove(input)
+        input.dispose()
+        input = undefined
+    }
     if (!input) {
         // Create input in parent and bind to property
+        const addParams = index === undefined ? inputParams : {...inputParams, index}
         try {
-            if (!inputParams.view && getOrCall(config.readOnly)) {
+            if (monitor) {
                 const [tar, key] = renderer.methods.getBinding(config)
-                input = tar ? parent.addMonitor(tar, key, inputParams) : undefined
+                input = tar ? parent.addMonitor(tar, key, addParams) : undefined
             } else {
-                input = parent.addInput(proxy, 'value', inputParams).on('change', ev => {
+                input = parent.addInput(proxy, 'value', addParams).on('change', ev => {
                     if (proxy.listedOnChange === false) return // used in tpImageInputGenerator
                     // console.log(ev.last ?? true)
                     config.dispatchMode = 'immediate' // this is required so that the value is set before the next uiRefresh.
@@ -222,6 +234,7 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
                 })
                 if (input && typeof proxy.value === 'string') tpLiveTextInput(input as InputBindingApi<any, any>, config, renderer)
             }
+            config.__tpMonitor = monitor
         } catch (e: any) {
             if (e.message.startsWith('No matching controller for')) input = undefined
             else throw e
