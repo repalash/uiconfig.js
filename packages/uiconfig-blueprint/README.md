@@ -11,9 +11,9 @@ The UI components are bound to javascript/typescript    objects and properties t
 
 ### Examples
 
-Basic Examples: https://repalash.com/uiconfig.js/examples/uiconfig-blueprint/index.html
+Examples: https://repalash.com/uiconfig.js/examples/ (pick Blueprint on an example page)
 
-API docs: https://repalash.com/uiconfig.js/docs/uiconfig-blueprint/
+API docs: https://repalash.com/uiconfig.js/docs/modules/uiconfig-blueprint.html
 
 Threepipe Basic UI: https://threepipe.org/examples/#blueprintjs-ui-plugin/
 
@@ -120,11 +120,13 @@ npm install
 npm run build -w uiconfig.js
 ```
 
-Run the development server.
+The examples are pages of the website ([website/README.md](https://github.com/repalash/uiconfig.js/blob/master/website/README.md)), which uses the built `dist` of this
+package: build it, then run the website's dev server and open its examples.
 ```bash
-npm run dev -w uiconfig-blueprint
+npm run build -w uiconfig-blueprint
+npm run dev -w uiconfig-website
 ```
-Navigate to the given URL to view the examples. Make changes in the `src` folder and the page will automatically reload.
+After a change in `src`, build the package again.
 
 Build the project.
 ```bash

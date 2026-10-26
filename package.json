@@ -11,7 +11,7 @@
         "build": "npm run build -w uiconfig.js && npm run build -w uiconfig-react -w uiconfig-tweakpane -w uiconfig-blueprint -w uiconfig-shadcn",
         "test": "npm run test --workspaces --if-present",
         "lint": "npm run lint --workspaces --if-present",
-        "pages": "npm run prepack -w uiconfig.js && npm run build -w uiconfig-tweakpane -w uiconfig-blueprint && npm run docs -w uiconfig-tweakpane -w uiconfig-blueprint && npm run examples:build -w uiconfig.js -w uiconfig-tweakpane && npm run build-examples -w uiconfig-blueprint && npm run build -w uiconfig-website && npm run assemble -w uiconfig-website"
+        "pages": "npm run build -w uiconfig.js && npm run build -w uiconfig-tweakpane -w uiconfig-blueprint && npm run build -w uiconfig-website && npm run docs -w uiconfig-website && npm run assemble -w uiconfig-website"
     },
     "repository": {
         "type": "git",

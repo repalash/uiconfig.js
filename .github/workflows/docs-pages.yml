@@ -43,12 +43,15 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    # npm ci does not build (prepack, not prepare). `npm run pages` builds uiconfig.js and its docs, the renderers
-    # and their docs, the example pages of the three packages and the landing page (website/), then assembles
-    # website/_site: the landing page at the root, docs/ (with docs/uiconfig-tweakpane/ and docs/uiconfig-blueprint/),
-    # examples/ (with examples/uiconfig-tweakpane/ and examples/uiconfig-blueprint/), dist/, and redirect pages at
-    # the old TypeDoc paths. See website/README.md.
+    # npm ci does not build (prepack, not prepare). `npm run pages` builds uiconfig.js and the renderers, the website
+    # (landing page and example pages) and the API docs of the three packages (one TypeDoc site), then assembles
+    # website/_site: the landing page at the root, examples/, docs/, dist/, and redirect pages at the old docs and
+    # example paths. See website/README.md.
+    # SITE_URL: the address of the published site, used only for absolute URLs (canonical links, Open Graph,
+    # sitemap.xml, robots.txt, llms.txt); every link on the pages is relative. On a domain of its own, change it here.
     - run: npm run pages
+      env:
+        SITE_URL: https://repalash.com/uiconfig.js/
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:

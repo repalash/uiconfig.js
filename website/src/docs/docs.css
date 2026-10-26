@@ -1,0 +1,213 @@
+/*
+ * The API docs (TypeDoc) in the site style. scripts/docs-theme.mjs writes dist-docs/assets/custom.css from the font
+ * faces of fonts.css, tokens.css and this file. docs.js sets data-scheme on <html> from TypeDoc's theme setting, so
+ * the tokens give the light or dark colors. TypeDoc's own styles are in the layer `typedoc`: these rules, outside any
+ * layer, win over them.
+ */
+
+:root {
+    --color-background: var(--paper);
+    --color-background-secondary: var(--surface);
+    --color-background-active: var(--paper-sunk);
+    --color-background-warning: var(--signal-wash);
+    --color-warning-text: var(--ink);
+    --color-accent: color-mix(in srgb, var(--rule) 80%, transparent);
+    --color-active-menu-item: color-mix(in srgb, var(--accent) 12%, var(--paper));
+    --color-text: var(--ink);
+    --color-contrast-text: var(--ink);
+    --color-text-aside: var(--ink-2);
+    --color-link: var(--accent);
+    --color-focus-outline: var(--accent);
+    --color-icon-background: var(--paper);
+    --color-ts-keyword: var(--tk-keyword);
+    --dim-toolbar-contents-height: 3.5rem;
+}
+
+/* TypeDoc's kind colors are made for its lighter background: on the site's paper, a little darker keeps their contrast
+   at 4.5:1 or more */
+:root[data-scheme='light'] {
+    --color-ts-accessor: color-mix(in srgb, var(--light-color-ts-accessor) 82%, black);
+    --color-ts-call-signature: color-mix(in srgb, var(--light-color-ts-call-signature) 82%, black);
+    --color-ts-class: color-mix(in srgb, var(--light-color-ts-class) 82%, black);
+    --color-ts-constructor: color-mix(in srgb, var(--light-color-ts-constructor) 82%, black);
+    --color-ts-constructor-signature: color-mix(in srgb, var(--light-color-ts-constructor-signature) 82%, black);
+    --color-ts-enum: color-mix(in srgb, var(--light-color-ts-enum) 82%, black);
+    --color-ts-enum-member: color-mix(in srgb, var(--light-color-ts-enum-member) 82%, black);
+    --color-ts-function: color-mix(in srgb, var(--light-color-ts-function) 82%, black);
+    --color-ts-get-signature: color-mix(in srgb, var(--light-color-ts-get-signature) 82%, black);
+    --color-ts-index-signature: color-mix(in srgb, var(--light-color-ts-index-signature) 82%, black);
+    --color-ts-interface: color-mix(in srgb, var(--light-color-ts-interface) 82%, black);
+    --color-ts-method: color-mix(in srgb, var(--light-color-ts-method) 82%, black);
+    --color-ts-module: color-mix(in srgb, var(--light-color-ts-module) 82%, black);
+    --color-ts-namespace: color-mix(in srgb, var(--light-color-ts-namespace) 82%, black);
+    --color-ts-parameter: color-mix(in srgb, var(--light-color-ts-parameter) 82%, black);
+    --color-ts-project: color-mix(in srgb, var(--light-color-ts-project) 82%, black);
+    --color-ts-property: color-mix(in srgb, var(--light-color-ts-property) 82%, black);
+    --color-ts-reference: color-mix(in srgb, var(--light-color-ts-reference) 82%, black);
+    --color-ts-set-signature: color-mix(in srgb, var(--light-color-ts-set-signature) 82%, black);
+    --color-ts-type-alias: color-mix(in srgb, var(--light-color-ts-type-alias) 82%, black);
+    --color-ts-type-parameter: color-mix(in srgb, var(--light-color-ts-type-parameter) 82%, black);
+    --color-ts-variable: color-mix(in srgb, var(--light-color-ts-variable) 82%, black);
+}
+
+body {
+    font-family: var(--font-text);
+    font-size: var(--text-size);
+    line-height: var(--line-height);
+    text-rendering: optimizeLegibility;
+}
+
+code, pre, .tsd-signature {
+    font-family: var(--font-code);
+    font-variant-ligatures: none;
+    font-feature-settings: 'liga' 0, 'calt' 0;
+}
+
+code, .tsd-signature {
+    font-size: 0.86em;
+}
+
+pre {
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    border-radius: var(--radius);
+    background: var(--surface);
+}
+
+h1, h2, h3, h4, .tsd-page-title h1 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.015em;
+}
+
+.tsd-page-title h1 {
+    font-weight: var(--heading-weight);
+    letter-spacing: -0.02em;
+}
+
+a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+}
+
+/* ---------- top bar: as on the landing page ---------- */
+
+.tsd-page-toolbar {
+    background: var(--paper);
+    border-bottom-color: color-mix(in srgb, var(--rule) 60%, transparent);
+}
+
+.tsd-toolbar-contents {
+    gap: 12px;
+}
+
+.tsd-toolbar-contents > .title {
+    margin-right: 0;
+    color: var(--ink);
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.tsd-page-toolbar .brand-dot {
+    color: var(--accent);
+}
+
+.tsd-page-toolbar .docs-label {
+    margin-left: 6px;
+    color: var(--ink-3);
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0;
+}
+
+#tsd-toolbar-links {
+    margin-left: auto;
+    gap: clamp(12px, 2.4vw, 28px);
+    font-size: 0.94rem;
+}
+
+.tsd-page-toolbar #tsd-toolbar-links a {
+    color: var(--ink-2);
+    text-decoration: none;
+}
+
+.tsd-page-toolbar #tsd-toolbar-links a:hover {
+    color: var(--ink);
+}
+
+/* the package switcher (docs.js) */
+.pkg-switch {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: var(--radius-small);
+    background: var(--paper-sunk);
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    font-size: 0.82rem;
+}
+
+.tsd-page-toolbar .pkg-switch a {
+    padding: 3px 10px;
+    border-radius: var(--radius-small);
+    color: var(--ink-2);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.tsd-page-toolbar .pkg-switch a:hover {
+    color: var(--ink);
+}
+
+.tsd-page-toolbar .pkg-switch a[aria-current='true'] {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.pkg-switch a .key::before {
+    content: '';
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    margin-right: 0.4em;
+    border-radius: 2px;
+    background: var(--h);
+}
+
+/* ---------- content ---------- */
+
+.tsd-panel, .tsd-accordion-summary, .tsd-navigation, .tsd-page-navigation {
+    font-size: 0.94rem;
+}
+
+.tsd-signature {
+    border-radius: var(--radius-small);
+}
+
+.tsd-typography table {
+    border-collapse: collapse;
+}
+
+#tsd-search {
+    border-radius: var(--radius);
+}
+
+@media (max-width: 769px) {
+    .pkg-switch .pkg-long {
+        display: none;
+    }
+
+    /* TypeDoc hides the links at this width: search and menu go to the right */
+    #tsd-search-trigger {
+        margin-left: auto;
+    }
+}
+
+/* on a phone the menu (the button at the right) lists the packages */
+@media (max-width: 560px) {
+    .pkg-switch {
+        display: none;
+    }
+}

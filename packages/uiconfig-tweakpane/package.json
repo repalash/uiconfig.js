@@ -16,9 +16,6 @@
     "compile:esm": "tsc -p ./src && node ../../scripts/fix-dts-imports.mjs lib/esm",
 
     "build": "vite build && vite build --mode umd && npm run compile:esm",
-    "start": "vite",
-    "examples:dev": "vite --config vite.examples.config.js",
-    "examples:build": "vite build --config vite.examples.config.js",
     "dev": "NODE_ENV=development vite build --watch",
     "test": "npm run check",
 
@@ -72,21 +69,26 @@
     "directory": "packages/uiconfig-tweakpane"
   },
   "keywords": [
-    "javascript",
-    "typescript",
-    "json",
     "ui",
-    "three.js",
-    "html",
+    "gui",
+    "panel",
+    "controls",
     "tweakpane",
-    "library"
+    "config",
+    "debug",
+    "uiconfig",
+    "three.js",
+    "dat.gui",
+    "lil-gui",
+    "typescript",
+    "javascript"
   ],
   "author": "repalash <palash@shaders.app>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/repalash/uiconfig.js/issues"
   },
-  "homepage": "https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig-tweakpane#readme",
+  "homepage": "https://repalash.com/uiconfig.js/",
   "devDependencies": {
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-replace": "^6.0.2",

@@ -1,6 +1,8 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
+- `homepage` in `package.json` is the website, https://repalash.com/uiconfig.js/, and the `keywords` describe the package.
+- `[Dev]` The example pages of the package moved to the website (https://repalash.com/uiconfig.js/examples/), where each example runs in both renderers; the package has no example build anymore.
 - `sideEffects` lists the CSS files, so bundlers keep imports of `uiconfig-blueprint/lib/css/*` (it was `false`).
 - Fix: a refresh asked for while a component was refreshing was dropped, so the component could keep an old value (seen when text typed fast in another panel bound to the same object). The component now refreshes once more after the running refresh.
 - The renderer adds its stylesheet (about 3 MB) to the document once, for the first renderer, instead of once for each renderer: a page with several Blueprint panels parses and matches one copy of the rules.

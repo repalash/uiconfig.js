@@ -1,0 +1,517 @@
+/*
+ * The example pages (examples/index.html, examples/<slug>.html), on top of site.css: the same tokens, top bar,
+ * panels and code blocks as the landing page.
+ */
+
+.ex-main {
+    padding-block: clamp(28px, 4vw, 56px) clamp(56px, 7vw, 96px);
+}
+
+.ex-main h1 {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.2rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+}
+
+.topbar .nav-list a[aria-current='page'] {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* ---------- index ---------- */
+
+.ex-index-head {
+    margin-bottom: clamp(24px, 4vw, 48px);
+}
+
+.ex-index-head h1 {
+    color: var(--accent);
+    font-size: clamp(2.6rem, 1.6rem + 4vw, 4.6rem);
+}
+
+.ex-index-head .lede {
+    max-width: 52ch;
+    margin-bottom: 1.4rem;
+}
+
+.ex-toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ex-toc a {
+    display: inline-block;
+    padding: 5px 12px;
+    border: 1px solid color-mix(in srgb, var(--rule) 80%, transparent);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: 0.88rem;
+    text-decoration: none;
+}
+
+.ex-toc a:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+}
+
+.ex-topic {
+    padding-block: clamp(32px, 4vw, 56px);
+    border-top: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
+    scroll-margin-top: 64px;
+}
+
+.ex-topic h2 {
+    font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem) !important;
+}
+
+.ex-topic .intro {
+    margin-bottom: 1.4rem !important;
+}
+
+.ex-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ex-cards > li {
+    display: flex;
+}
+
+main a.ex-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    padding: 14px;
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color 120ms ease-out, box-shadow 120ms ease-out, transform 120ms ease-out;
+}
+
+main a.ex-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 28px -16px var(--shadow);
+    transform: translateY(-1px);
+}
+
+.ex-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.ex-card-title {
+    font-weight: 650;
+    font-size: 1.02rem;
+    letter-spacing: -0.01em;
+}
+
+.ex-card-summary {
+    color: var(--ink-2);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    flex: 1;
+}
+
+.ex-card-summary code, .ex-summary code, .ex-note code, .ex-topic .intro code {
+    font-family: var(--font-code);
+    font-size: 0.86em;
+}
+
+.ex-renderers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 4px;
+    color: var(--ink-2);
+    font-size: 0.78rem;
+}
+
+/* the drawing of a panel on a card: a title bar and one row per component type */
+.mini {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 10px 12px 12px;
+    border-radius: var(--radius-small);
+    background: var(--paper-sunk);
+    --mini-ink: color-mix(in srgb, var(--ink-3) 55%, transparent);
+}
+
+.mini-title {
+    width: 38%;
+    height: 6px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+    background: var(--ink-3);
+    opacity: 0.7;
+}
+
+.mini-row {
+    display: grid;
+    grid-template-columns: 34% 1fr;
+    align-items: center;
+    gap: 10px;
+    height: 14px;
+}
+
+.mini-label {
+    height: 5px;
+    width: 80%;
+    border-radius: 3px;
+    background: var(--mini-ink);
+}
+
+.mini-control {
+    position: relative;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rule) 80%, transparent);
+}
+
+.mini-row[data-type='slider'] .mini-control {
+    height: 3px;
+    background: linear-gradient(to right, var(--accent) 0 58%, var(--mini-ink) 58%);
+    box-shadow: none;
+}
+
+.mini-row[data-type='slider'] .mini-control::after {
+    content: '';
+    position: absolute;
+    left: 58%;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 0 0 1.5px var(--accent);
+    translate: -50% -50%;
+}
+
+.mini-row[data-type='checkbox'] .mini-control, .mini-row[data-type='toggle'] .mini-control {
+    width: 12px;
+    background: var(--accent);
+    box-shadow: none;
+}
+
+.mini-row[data-type='button'] {
+    grid-template-columns: 1fr;
+}
+
+.mini-row[data-type='button'] .mini-label {
+    display: none;
+}
+
+.mini-row[data-type='button'] .mini-control {
+    background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+    box-shadow: none;
+}
+
+.mini-row[data-type='dropdown'] .mini-control::after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 4px;
+    border: 3px solid transparent;
+    border-top: 4px solid var(--ink-3);
+}
+
+.mini-row[data-type='color'] .mini-control {
+    background: linear-gradient(to right, var(--c-data) 0 22%, var(--surface) 22%);
+}
+
+.mini-row[data-type='vec'] .mini-control {
+    background: linear-gradient(to right, var(--surface) 0 31%, transparent 31% 34.5%, var(--surface) 34.5% 65.5%, transparent 65.5% 69%, var(--surface) 69%);
+    box-shadow: none;
+}
+
+.mini-row[data-type='monitor'] .mini-control {
+    background: repeating-linear-gradient(to right, var(--mini-ink) 0 6px, transparent 6px 9px) left center / 50% 4px no-repeat, var(--surface);
+}
+
+.mini-row[data-type='folder'] {
+    grid-template-columns: 1fr;
+}
+
+.mini-row[data-type='folder'] .mini-label {
+    width: 55%;
+    height: 6px;
+    background: var(--ink-3);
+    opacity: 0.6;
+}
+
+.mini-row[data-type='folder'] .mini-control {
+    display: none;
+}
+
+.mini-row[data-type='textarea'] {
+    height: 26px;
+    align-items: stretch;
+}
+
+.mini-row[data-type='textarea'] .mini-control {
+    height: auto;
+}
+
+.mini-row[data-type='separator'] {
+    grid-template-columns: 1fr;
+    height: 6px;
+}
+
+.mini-row[data-type='separator'] .mini-label {
+    display: none;
+}
+
+.mini-row[data-type='separator'] .mini-control {
+    height: 1px;
+    background: var(--rule);
+    box-shadow: none;
+}
+
+.mini-row[data-type='tabs'] {
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+}
+
+.mini-row[data-type='tabs'] .mini-label {
+    width: 100%;
+    height: 12px;
+    background: var(--surface);
+}
+
+.mini-row[data-type='graph'] {
+    height: 28px;
+    align-items: stretch;
+}
+
+.mini-row[data-type='graph'] .mini-control {
+    height: auto;
+    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q12.5 0 25 10 T50 10 T75 10 T100 10' fill='none' stroke='%230e9a91' stroke-width='2' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 70% no-repeat;
+}
+
+/* ---------- example page ---------- */
+
+.ex-crumbs {
+    margin-bottom: 14px;
+    color: var(--ink-3);
+    font-size: 0.9rem;
+}
+
+main .ex-crumbs a {
+    color: var(--ink-2);
+    text-decoration: none;
+}
+
+main .ex-crumbs a:hover {
+    color: var(--accent);
+}
+
+.ex-head {
+    margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.ex-summary {
+    max-width: 72ch !important;
+    color: var(--ink-2);
+    font-size: 1.05rem;
+    margin-bottom: 1.2rem !important;
+}
+
+.ex-only {
+    margin: 0 !important;
+    color: var(--ink-2);
+    font-size: 0.9rem;
+}
+
+.ex-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(20px, 3vw, 40px);
+    align-items: start;
+}
+
+.ex-live {
+    position: sticky;
+    top: 76px;
+    display: grid;
+    gap: 16px;
+}
+
+.ex-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+.ex-panel .pg-log-title {
+    margin: 6px 0 0 !important;
+}
+
+.ex-note {
+    margin: 0 !important;
+}
+
+/* a page with a view: the view and the panel side by side, the code below */
+.ex-grid.has-view {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.ex-grid.has-view .ex-live {
+    position: static;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: start;
+}
+
+.ex-view {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    background: radial-gradient(circle at 50% 40%, var(--surface), var(--paper-sunk));
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    overflow: hidden;
+}
+
+.ex-view .panel-loading {
+    position: absolute;
+    inset: 16px;
+}
+
+.ex-view-part {
+    position: absolute;
+    inset: 0;
+}
+
+.ex-view-part[hidden] {
+    display: none;
+}
+
+.ex-view-part canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.ex-code {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    min-width: 0;
+}
+
+.ex-setup[hidden] {
+    display: none;
+}
+
+.code-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 32px;
+    margin-bottom: 6px;
+    color: var(--ink-2);
+    font-family: var(--font-code);
+    font-size: 0.8rem;
+}
+
+main .code-head a {
+    color: var(--ink-2);
+    text-decoration: none;
+}
+
+main .code-head a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.code-head .button-quiet {
+    border: 1px solid color-mix(in srgb, var(--rule) 80%, transparent);
+    border-radius: var(--radius-small);
+    padding: 4px 12px;
+    min-width: 0;
+    font-family: var(--font-text);
+    font-size: 0.8rem;
+}
+
+.ex-code .code {
+    font-size: 0.8rem;
+}
+
+.ex-setup .code {
+    background: var(--paper-sunk);
+}
+
+.ex-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: clamp(40px, 5vw, 64px);
+    padding-top: 24px;
+    border-top: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
+}
+
+main .ex-pager a {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px;
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+main .ex-pager a:hover {
+    border-color: var(--accent);
+}
+
+.ex-pager a span {
+    color: var(--ink-3);
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.ex-next {
+    text-align: right;
+    grid-column: 2;
+}
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 900px) {
+    .ex-grid, .ex-grid.has-view .ex-live {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* the panel first, then the code */
+    .ex-live {
+        position: static;
+        order: -1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    main a.ex-card {
+        transition: none;
+    }
+}

@@ -62,8 +62,6 @@ typings/
 
 lib
 dist
-examples/dist
 docs
 
 temp
-dist-examples
