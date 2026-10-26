@@ -1,4 +1,4 @@
-import {BladeApi, FolderApi} from 'tweakpane'
+import {BladeApi, FolderApi, TabPageApi} from 'tweakpane'
 import {BladeController, View} from '@tweakpane/core'
 import {UiObjectConfig} from 'uiconfig.js'
 
@@ -9,6 +9,16 @@ import {UiObjectConfig} from 'uiconfig.js'
  */
 export const tweakpaneCheckParent = (child: BladeApi<BladeController<View>>, parent: FolderApi) => {
     return parent.controller_.rackController.rack === child.controller_.parent
+}
+/**
+ * Index of a blade among the children of its parent (a folder or a tab page), or undefined.
+ * @param child
+ * @param parent
+ */
+export const tweakpaneChildIndex = (child: BladeApi<BladeController<View>>, parent: FolderApi | TabPageApi): number | undefined => {
+    const rack = parent instanceof TabPageApi ? parent.controller_.contentController.rack : parent.controller_.rackController.rack
+    const index = rack.children.indexOf(child.controller_)
+    return index >= 0 ? index : undefined
 }
 /**
  * Move to a new parent or change index in the same parent.
