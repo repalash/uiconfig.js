@@ -1,6 +1,8 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-10-26
 - Fix: an input whose `readOnly` changes (a function, or a value set before a refresh) switches between a monitor and an editable input. Tweakpane cannot turn one blade into the other, so the renderer makes the blade again at the same place in its folder or tab. Before, it stayed the kind it was created as.
 - `homepage` in `package.json` is the website, https://repalash.com/uiconfig.js/, and the `keywords` describe the package.
 - `[Dev]` The example pages of the package moved to the website (https://repalash.com/uiconfig.js/examples/), where each example runs in both renderers; the package has no example build anymore.

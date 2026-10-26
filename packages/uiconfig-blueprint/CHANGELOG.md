@@ -1,6 +1,8 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
+
+## [0.1.0-dev.16] - 2026-10-26
 - `homepage` in `package.json` is the website, https://repalash.com/uiconfig.js/, and the `keywords` describe the package.
 - `[Dev]` The example pages of the package moved to the website (https://repalash.com/uiconfig.js/examples/), where each example runs in both renderers; the package has no example build anymore.
 - `sideEffects` lists the CSS files, so bundlers keep imports of `uiconfig-blueprint/lib/css/*` (it was `false`).
