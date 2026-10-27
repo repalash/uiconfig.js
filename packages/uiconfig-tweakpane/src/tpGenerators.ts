@@ -326,15 +326,18 @@ const tpLiveTextInput = (input: InputBindingApi<any, any>, config: UiObjectConfi
         config.dispatchMode = 'immediate'
         renderer.methods.setValue(config, element.value, {last: false}, proxy.forceOnChange || false)
     })
-    // The native change event fires on Enter and on blur after the text changed, after Tweakpane's own listener.
-    element.addEventListener('change', () => {
+    const finish = () => {
         const proxy = config.__proxy
         if (!proxy?.liveEditing) return
         proxy.liveEditing = false
         proxy.value = element.value
         config.dispatchMode = 'immediate'
         renderer.methods.setValue(config, element.value, {last: true}, proxy.forceOnChange || false)
-    })
+    }
+    // The native change event fires on Enter and on blur after the text changed, after Tweakpane's own listener.
+    element.addEventListener('change', finish)
+    // An edit that ends on the starting text fires no change event; blur ends it (a no-op after change)
+    element.addEventListener('blur', finish)
 }
 
 export const tpVecInputGenerator = (parent: FolderApi, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, params?: any) => {
