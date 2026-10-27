@@ -14,7 +14,9 @@ const { name, version, author } = packageJson
 const {main, module, browser} = packageJson
 
 // `vite build`: the ESM bundle (dist/index.mjs) with the dependencies external, and the declarations.
-// `vite build --mode umd`: the self-contained UMD bundle (dist/index.js), added to dist.
+// `vite build --mode umd`: the self-contained bundles, added to dist: UMD (dist/index.js) for script tags and CDN links,
+// CommonJS (dist/index.cjs) for require(). A .js file in this "type": "module" package loads as ESM in Node and
+// bundlers, where the UMD wrapper finds no `module` and returns nothing.
 export default defineConfig(({mode}) => {
     const umd = mode === 'umd'
     return {
@@ -34,9 +36,9 @@ export default defineConfig(({mode}) => {
             } : null,
             lib: {
                 entry: 'src/index.ts',
-                formats: umd ? ['umd'] : ['es'],
+                formats: umd ? ['umd', 'cjs'] : ['es'],
                 name: name,
-                fileName: (format) => (format === 'umd' ? browser : module).replace('dist/', ''),
+                fileName: (format) => ({umd: browser, cjs: main}[format] ?? module).replace('dist/', ''),
             },
             outDir: 'dist',
             emptyOutDir: isProd && !umd,

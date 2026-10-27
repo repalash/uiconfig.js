@@ -13,11 +13,13 @@
 - Text inputs set the value once more on blur after an edit, with `last: true`, so the change event marks the end of the edit and the undo manager closes the step. They already set the value on each keystroke, with `last: false`.
 - `[Dev]` Moved into the uiconfig monorepo: https://github.com/repalash/uiconfig.js, folder `packages/uiconfig-blueprint`. The npm package name stays `uiconfig-blueprint`.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`, `lib/esm/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
-- Depend on `uiconfig.js` `^0.4.0` (was `^0.3.1`).
+- Depend on `uiconfig.js` `^0.4.1` (was `^0.3.1`).
 - The ES module `dist/index.mjs` no longer bundles its dependencies: it imports `uiconfig.js`, `ts-browser-helpers`, `react`, `react-dom`, `@blueprintjs/core`, `@blueprintjs/icons`, `@blueprintjs/select`, `react-colorful` and `classnames`, so the bundler of the app dedupes them with the app's copy. The styles and the modules that the source imports by deep path from `@blueprintjs/core` and that its root does not export stay in the bundle. The icon chunks in `dist/` are gone: the bundler of the app takes them from `@blueprintjs/icons`.
 - `@blueprintjs/core`, `react` and `react-dom` are required peer dependencies (they were optional). Depend on `classnames` `^2.5.1`, which the source imports.
 - Depend on `ts-browser-helpers` `>=0.19.4` (was `^0.19.4`), the range that `uiconfig.js` uses.
-- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) stays self-contained for script tags and `require()`. It is deprecated and will be removed in the next major version.
+- The UMD bundle `dist/index.js` (`browser`) stays self-contained for script tags.
+- Fix: `require('uiconfig-blueprint')` returns the exports. `main` and the `require` export point to the new CommonJS bundle `dist/index.cjs`. Before, they pointed to the UMD bundle `dist/index.js`, which Node and bundlers load as an ES module in this `"type": "module"` package, so `require()` returned an empty object (or failed with `ERR_REQUIRE_ESM` on Node before 22.12).
+- The UMD bundle and the CommonJS bundle are deprecated and will be removed in the next major version.
 - `[Dev]` Built with Vite 7 (was Vite 5), like the other packages: `dist/` targets the Vite 7 default browsers (`baseline-widely-available`: Chrome and Edge 107, Firefox 104, Safari 16).
 - `lib/esm` no longer contains the tree components that 0.1.0-dev.14 removed from the source (0.1.0-dev.15 still shipped their old build output).
 

@@ -9,8 +9,9 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 - Add `liveUpdate` to `UiObjectConfig`, for text inputs: set the value on each keystroke (change event with `last: false`) and once more when the input is committed (`last: true`), so the undo manager records one step for the edit.
 - `[Dev]` The repository is now a monorepo of the uiconfig packages: uiconfig.js is in `packages/uiconfig.js`, next to uiconfig-tweakpane, uiconfig-blueprint, uiconfig-react and uiconfig-shadcn.
 - Fix: relative imports in the declaration files (`dist/*.d.ts`) end in `.js`, so TypeScript with `moduleResolution: node16` or `nodenext` resolves every export.
-- The UMD bundle `dist/index.js` (`main`, `require`, `browser`) includes `ts-browser-helpers` and works alone in a script tag. Before, it read `ts-browser-helpers` from a global of that name, which no build of that package sets. The ES module `dist/index.mjs` still imports `ts-browser-helpers`.
-- The UMD bundle is deprecated and will be removed in the next major version.
+- Fix: `require('uiconfig.js')` returns the exports. `main` and the `require` export point to the new CommonJS bundle `dist/index.cjs`. Before, they pointed to the UMD bundle `dist/index.js`, which Node and bundlers load as an ES module in this `"type": "module"` package, so `require()` returned an empty object (or failed with `ERR_REQUIRE_ESM` on Node before 22.12).
+- The UMD bundle `dist/index.js` (`browser`) includes `ts-browser-helpers` and works alone in a script tag. Before, it read `ts-browser-helpers` from a global of that name, which no build of that package sets. The ES module `dist/index.mjs` still imports `ts-browser-helpers`.
+- The UMD bundle and the CommonJS bundle are deprecated and will be removed in the next major version.
 - `[Dev]` The examples are pages of the website (https://repalash.com/uiconfig.js/examples/, sources in `website/src/examples`), each in Tweakpane and Blueprint; the package has no example pages or example build anymore. The API docs of the three packages are one site: https://repalash.com/uiconfig.js/docs/.
 - `homepage` in `package.json` is the website, https://repalash.com/uiconfig.js/, and the `keywords` describe the package.
 
