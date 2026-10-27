@@ -1,7 +1,7 @@
 # UiConfig Blueprint.js
 
 [![NPM Package](https://img.shields.io/npm/v/uiconfig-blueprint.svg)](https://www.npmjs.com/package/uiconfig-blueprint)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](./LICENSE)
 
 Blueprint.js theme/wrapper library for [uiconfig.js](https://github.com/repalash/uiconfig.js): A UI renderer framework to dynamically generate website/configuration UIs from a JSON-like configurations and/or typescript decorators. 
 
@@ -139,7 +139,7 @@ npm run build -w uiconfig-blueprint
 Releases are published to npm from GitHub Actions: see the root README.
 
 ## License
-MIT, see [LICENSE](LICENSE). Releases up to 0.1.0-dev.15 were licensed under Apache 2.0.
+Apache 2.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). 0.1.0-dev.16 was published with an MIT license field; it contains the same Apache 2.0 code.
 
 ## Library usage in react
 
