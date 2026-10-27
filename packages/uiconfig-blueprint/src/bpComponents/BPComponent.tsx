@@ -68,14 +68,14 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
 
     private _refreshing = false;
 
+    private _refreshAgain = false
+
     /**
      * Refreshes the state from the config
      *
      * This is called by the ui component when the value is changed and from uiRefresh from the config
      * @param state - optional state to refresh from, if not provided, the current state is used
      */
-    private _refreshAgain = false
-
     async refreshConfigState(state?: TState) {
         if (!this.props.config) return;
         if (this._refreshing) {

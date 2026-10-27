@@ -226,13 +226,15 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
                 const [tar, key] = renderer.methods.getBinding(config)
                 input = tar ? parent.addMonitor(tar, key, addParams) : undefined
             } else {
+                const live = {editing: false} // per blade: a blade made again (for example another view) starts clean
                 input = parent.addInput(proxy, 'value', addParams).on('change', ev => {
                     if (proxy.listedOnChange === false) return // used in tpImageInputGenerator
+                    if (live.editing) return // a liveUpdate edit ends in tpLiveTextInput, not on a refresh
                     // console.log(ev.last ?? true)
                     config.dispatchMode = 'immediate' // this is required so that the value is set before the next uiRefresh.
                     renderer.methods.setValue(config, proxy.value_ ?? proxy.value, {last: ev.last ?? true}, proxy.forceOnChange || false)
                 })
-                if (input && typeof proxy.value === 'string') tpLiveTextInput(input as InputBindingApi<any, any>, config, renderer)
+                if (input && typeof proxy.value === 'string') tpLiveTextInput(input as InputBindingApi<any, any>, config, renderer, live)
             }
             config.__tpMonitor = monitor
         } catch (e: any) {
@@ -308,19 +310,35 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
 
 /**
  * Tweakpane sets the value of a text input on Enter or blur. With `config.liveUpdate`, the value is also set on each
- * keystroke, with `last: false`, so that the undo manager merges the keystrokes and the commit into one step.
+ * keystroke, with `last: false`, and once more with `last: true` on Enter or blur, so the undo manager merges the
+ * keystrokes and the commit into one step. While such an edit runs, the binding's change events are ignored: a panel
+ * refresh in between (for example from an onChange that calls uiRefresh) makes Tweakpane read the typed value and
+ * emit a change with `last: true`, and then Enter emits nothing, because Tweakpane's value already equals the text.
  */
-const tpLiveTextInput = (input: InputBindingApi<any, any>, config: UiObjectConfig, renderer: UiConfigRendererTweakpane) => {
+const tpLiveTextInput = (input: InputBindingApi<any, any>, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, live: {editing: boolean}) => {
     const element = (input.controller_.valueController.view as TextView<any>).inputElement as HTMLInputElement | undefined
     if (!element || element.tagName !== 'INPUT') return
     element.addEventListener('input', () => {
         if (!getOrCall(config.liveUpdate)) return
         const proxy = config.__proxy
         if (!proxy || typeof proxy.value !== 'string') return
+        live.editing = true
         proxy.value = element.value
         config.dispatchMode = 'immediate'
         renderer.methods.setValue(config, element.value, {last: false}, proxy.forceOnChange || false)
     })
+    const finish = () => {
+        const proxy = config.__proxy
+        if (!live.editing || !proxy) return
+        live.editing = false
+        proxy.value = element.value
+        config.dispatchMode = 'immediate'
+        renderer.methods.setValue(config, element.value, {last: true}, proxy.forceOnChange || false)
+    }
+    // The native change event fires on Enter and on blur after the text changed, after Tweakpane's own listener.
+    element.addEventListener('change', finish)
+    // An edit that ends on the starting text fires no change event; blur ends it (a no-op after change)
+    element.addEventListener('blur', finish)
 }
 
 export const tpVecInputGenerator = (parent: FolderApi, config: UiObjectConfig, renderer: UiConfigRendererTweakpane, params?: any) => {
