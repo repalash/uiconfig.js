@@ -5,6 +5,7 @@ import dts from 'vite-plugin-dts'
 import packageJson from "./package.json";
 import license from 'rollup-plugin-license';
 import replace from '@rollup/plugin-replace';
+import path from 'node:path';
 import {fixDtsImports} from '../../scripts/fix-dts-imports.mjs';
 import {externalDeps} from '../../scripts/external-deps.mjs';
 
@@ -134,7 +135,12 @@ export default defineConfig(({mode}) => {
         ${name} v${version}
         Copyright 2022<%= moment().format('YYYY') > 2022 ? '-' + moment().format('YYYY') : null %> ${author}
         ${packageJson.license} License
-      `
+        See ./dependencies.txt for bundled third-party dependencies and licenses.
+      `,
+                thirdParty: {
+                    output: path.join(__dirname, 'dist', 'dependencies.txt'),
+                    includePrivate: true, // Default is false.
+                },
             })
         ]
     }

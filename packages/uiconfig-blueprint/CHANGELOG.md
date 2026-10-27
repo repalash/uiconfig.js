@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.0-dev.17] - 2026-10-27
+- The license is Apache 2.0 again, as up to 0.1.0-dev.15: the package contains Apache 2.0 code from Blueprint (Palantir), in `src/components/NumericInput.tsx`, `src/components/ExtendedNumericInput.tsx` and the bundles. 0.1.0-dev.16 said MIT. `LICENSE` and `NOTICE` are back in the package.
+- `dist/dependencies.txt` lists the third-party packages in the bundles and their licenses, as in uiconfig.js and uiconfig-tweakpane.
+
 ## [0.1.0-dev.16] - 2026-10-26
 - **Breaking:** `@blueprintjs/core`, `react` and `react-dom` are required peer dependencies, and the ES module imports its dependencies instead of bundling them (details below).
 - **Breaking:** the license is MIT from this release; releases up to 0.1.0-dev.15 stay under Apache 2.0.
