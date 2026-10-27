@@ -3,7 +3,7 @@
   "name:umd": "tpui",
   "version": "2.0.0",
   "description": "Tweakpane wrapper and custom components for web controls UI. To be used with uiconfig.js",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "browser": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./theme.css": "./dist/theme.css",
     "./dist/": {
@@ -111,7 +111,7 @@
     "@pangenerator/tweakpane-textarea-plugin": "^1.0.4"
   },
   "dependencies": {
-    "uiconfig.js": "^0.4.0",
+    "uiconfig.js": "^0.4.1",
     "ts-browser-helpers": ">=0.19.4"
   },
   "peerDependencies": {

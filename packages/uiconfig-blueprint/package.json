@@ -6,7 +6,7 @@
     "tag": "latest"
   },
   "description": "Blueprint.js wrapper and custom components for web controls UI. To be used with uiconfig.",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "browser": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "browser": "./dist/index.js"
     },
     "./dist/": {
@@ -70,7 +70,7 @@
       "optionalDependencies"
     ],
     "replace": {
-      "main": "dist/index.js",
+      "main": "dist/index.cjs",
       "module": "dist/index.mjs",
       "browser": "dist/index.js",
       "types": "dist/index.d.ts"
@@ -141,7 +141,7 @@
   },
   "dependencies": {
     "ts-browser-helpers": ">=0.19.4",
-    "uiconfig.js": "^0.4.0",
+    "uiconfig.js": "^0.4.1",
     "@blueprintjs/icons": "^5.23.0",
     "@blueprintjs/select": "^5.3.21",
     "blueprint-styler": "^5.0.2",

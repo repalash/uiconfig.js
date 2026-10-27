@@ -77,7 +77,10 @@ The module is available as the global `window['uiconfig-tweakpane']`
 
 - `dist/index.mjs` (`import`, `module`): ES module. It imports its dependencies `uiconfig.js`, `ts-browser-helpers`, `tweakpane` and `@pangenerator/tweakpane-textarea-plugin` instead of bundling them, so the bundler of the app keeps one copy of each. `tweakpane` and the textarea plugin are peer dependencies: npm 7 and later install them, other package managers can need them in the app's `package.json`.
 - `lib/esm`: the TypeScript output, one file per source module.
-- `dist/index.js` (`main`, `require`, `browser`, the CDN link): UMD bundle with all dependencies included, for a `<script>` tag or `require()`. This build is legacy and will be removed in the next major version.
+- `dist/index.js` (`browser`, the CDN link): UMD bundle with all dependencies included, for a `<script>` tag.
+- `dist/index.cjs` (`main`, `require`): the same bundle as CommonJS, for `require()`.
+
+The UMD and CommonJS builds are legacy and will be removed in the next major version.
 
 ## Configuration
 

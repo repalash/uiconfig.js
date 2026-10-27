@@ -2,7 +2,7 @@
     "name": "uiconfig.js",
     "version": "0.4.1",
     "description": "A framework for building user interface layouts with JSON configuration.",
-    "main": "dist/index.js",
+    "main": "dist/index.cjs",
     "module": "dist/index.mjs",
     "types": "dist/index.d.ts",
     "source": "src/index.ts",
@@ -28,7 +28,7 @@
         ".": {
             "types": "./dist/index.d.ts",
             "import": "./dist/index.mjs",
-            "require": "./dist/index.js"
+            "require": "./dist/index.cjs"
         },
         "./dist/": {
             "import": "./dist/",
