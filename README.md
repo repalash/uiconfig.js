@@ -102,4 +102,4 @@ Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) explain
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE), except uiconfig-blueprint: [Apache 2.0](packages/uiconfig-blueprint/LICENSE).

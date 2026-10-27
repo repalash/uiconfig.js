@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.16",
+  "version": "0.1.0-dev.17",
   "publishConfig": {
     "tag": "latest"
   },
@@ -82,7 +82,8 @@
     "src",
     "docs",
     "tsconfig.json",
-    "README.md"
+    "README.md",
+    "NOTICE"
   ],
   "repository": {
     "type": "git",
@@ -105,7 +106,7 @@
     "typescript"
   ],
   "author": "repalash <palash@shaders.app>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/repalash/uiconfig.js/issues"
   },
