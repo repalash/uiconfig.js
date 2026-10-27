@@ -24,7 +24,7 @@ jobs:
     permissions:
       contents: write # tags
       id-token: write # npm trusted publishing
-    uses: repalash/release-tools/.github/workflows/npm-release.yml@v1
+    uses: repalash/release-tools/.github/workflows/npm-release.yml@88b8bf258410968d4acf127b31c4c4ca81666962 # v1
     with:
       packages: packages/*
       build: npm ci && npm run build -w uiconfig.js

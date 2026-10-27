@@ -5,7 +5,7 @@ import dts from 'vite-plugin-dts'
 import packageJson from "./package.json";
 import license from 'rollup-plugin-license';
 import replace from '@rollup/plugin-replace';
-import {fixDtsImports} from '../../scripts/fix-dts-imports.mjs';
+import {fixDtsImports} from 'dts-js-extensions';
 import {externalDeps} from '../../scripts/external-deps.mjs';
 
 const { name, version, author } = packageJson

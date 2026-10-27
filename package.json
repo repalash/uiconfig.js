@@ -19,6 +19,7 @@
     },
     "author": "repalash <palash@shaders.app>",
     "devDependencies": {
+        "dts-js-extensions": "^0.1.0",
         "vite": "^7.2.6"
     }
 }
