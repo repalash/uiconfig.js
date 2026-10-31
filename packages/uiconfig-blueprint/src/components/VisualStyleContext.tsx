@@ -26,17 +26,38 @@ const localStorageIds = {
     'darkMode': localStoragePrefix + 'DarkMode',
     'theme': localStoragePrefix + 'Theme',
 }
+/**
+ * The kept choices, in localStorage when the page has it. A sandboxed document (an opaque origin, like a page served with
+ * `CSP: sandbox`) throws a SecurityError on any access to localStorage: there the defaults apply and a choice lasts until
+ * reload.
+ */
+const visualStyleStorage = {
+    get(key: string): string | null {
+        try {
+            return localStorage.getItem(key)
+        } catch {
+            return null
+        }
+    },
+    set(key: string, value: string) {
+        try {
+            localStorage.setItem(key, value)
+        } catch {
+            // no storage on this page
+        }
+    },
+}
 export function setupVisualStyle(){
-    const [darkMode, setDarkMode] = React.useState(localStorage.getItem(localStorageIds.darkMode) !== (defaultVisualStyle.darkMode ? 'false' : 'true'))
+    const [darkMode, setDarkMode] = React.useState(visualStyleStorage.get(localStorageIds.darkMode) !== (defaultVisualStyle.darkMode ? 'false' : 'true'))
     React.useEffect(() => {
-        localStorage.setItem(localStorageIds.darkMode, darkMode ? 'true' : 'false')
+        visualStyleStorage.set(localStorageIds.darkMode, darkMode ? 'true' : 'false')
         const clas = Classes.DARK
         if(!darkMode)  document.body.classList.remove(clas)
         else document.body.classList.add(clas)
     }, [darkMode])
-    const [theme, setTheme] = React.useState(localStorage.getItem(localStorageIds.theme) || defaultVisualStyle.theme)
+    const [theme, setTheme] = React.useState(visualStyleStorage.get(localStorageIds.theme) || defaultVisualStyle.theme)
     React.useEffect(() => {
-        localStorage.setItem(localStorageIds.theme, theme)
+        visualStyleStorage.set(localStorageIds.theme, theme)
         document.documentElement.classList.remove(...Object.keys(defaultVisualStyle.themes).map(k => k))
         document.documentElement.classList.add(theme)
     }, [theme])

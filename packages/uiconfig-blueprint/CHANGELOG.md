@@ -1,6 +1,7 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
+- Fix: the renderer works in sandboxed documents (an opaque origin, like a page served with `CSP: sandbox`), where any access to `localStorage` throws: the dark mode and the theme then use the defaults, and a choice lasts until reload. It stopped on such pages before.
 
 ## [0.1.0-dev.17] - 2026-10-27
 - The license is Apache 2.0 again, as up to 0.1.0-dev.15: the package contains Apache 2.0 code from Blueprint (Palantir), in `src/components/NumericInput.tsx`, `src/components/ExtendedNumericInput.tsx` and the bundles. 0.1.0-dev.16 said MIT. `LICENSE` and `NOTICE` are back in the package.
