@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "compile:esm:watch": "tsc -p ./src  --watch",
-    "compile:esm": "tsc -p ./src && node ../../scripts/fix-dts-imports.mjs lib/esm",
+    "compile:esm": "tsc -p ./src && dts-js-extensions lib/esm",
 
     "build": "vite build && vite build --mode umd && npm run compile:esm",
     "dev": "NODE_ENV=development vite build --watch",

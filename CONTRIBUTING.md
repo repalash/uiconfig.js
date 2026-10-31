@@ -25,7 +25,7 @@ npm run build -w uiconfig-blueprint
 
 Internal dependencies (for example `uiconfig-tweakpane` on `uiconfig.js`) use version ranges that match the local version, so npm links the workspace copy instead of the published one.
 
-`scripts/fix-dts-imports.mjs` is shared by every package that emits declarations: it adds `.js` to the relative imports in the `.d.ts` files, which TypeScript needs with `moduleResolution: node16` or `nodenext`.
+Every package that emits declarations runs [dts-js-extensions](https://www.npmjs.com/package/dts-js-extensions) on them (a root dev dependency): it adds `.js` to the relative imports in the `.d.ts` files, which TypeScript needs with `moduleResolution: node16` or `nodenext`.
 
 ## Website
 
