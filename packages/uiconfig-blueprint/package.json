@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.17",
+  "version": "0.1.0-dev.18",
   "publishConfig": {
     "tag": "latest"
   },

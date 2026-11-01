@@ -1,6 +1,6 @@
 # Changelog for uiconfig-blueprint
 
-## [Unreleased]
+## [0.1.0-dev.18] - 2026-11-01
 - Fix: the renderer works in sandboxed documents (an opaque origin, like a page served with `CSP: sandbox`), where any access to `localStorage` throws: the dark mode and the theme then use the defaults, and a choice lasts until reload. It stopped on such pages before.
 
 ## [0.1.0-dev.17] - 2026-10-27
