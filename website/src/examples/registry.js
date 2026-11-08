@@ -90,7 +90,7 @@ export const examples = [
     },
     {
         slug: 'folder-menus', topic: 'components', title: 'Folder menus', renderers: both,
-        summary: 'A `button` with the tag `context-menu` goes to the menu of its folder header (⋮), not to the folder body. With the tag `inline` too, it stays in the body. `hidden` and `disabled` work in the menu.',
+        summary: 'A `button` with the tag `context-menu` goes to its folder header, not to the folder body: a small button after the title while it fits, else in the menu of the ⋮ button. Make the panel narrow to see them move. With the tag `inline` too, it stays in the body. `hidden` and `disabled` work there too.',
         preview: ['folder', 'button', 'button'], log: true,
         note: 'uiconfig-blueprint shows the menu in a ⋯ popover of the folder header. It does not read the tag `inline` yet, so "Reset" is in its menu there.',
     },

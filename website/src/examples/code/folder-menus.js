@@ -37,7 +37,7 @@ export default function example(ui, {log}) {
             {type: 'input', label: 'Name', property: [box, 'name']},
             {type: 'checkbox', label: 'Visible', property: [box, 'visible']},
             {type: 'monitor', label: 'Copies', property: [box, 'copies']},
-            // the tag 'context-menu': the button goes to the ⋮ menu of the folder header
+            // the tag 'context-menu': the button goes to the folder header (a button while it fits, else the ⋮ menu)
             {
                 type: 'button',
                 label: 'Duplicate',

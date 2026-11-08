@@ -29,15 +29,25 @@ let styles: HTMLStyleElement | undefined
 function addStyles() {
     if (styles?.isConnected) return
     styles = createStyles(css`
+      .tpfm-actions { position: absolute; z-index: 1; display: flex; align-items: center; gap: 2px; pointer-events: none; }
+      .tpfm-actions > * { pointer-events: auto; }
+      .tpfm-actions > [hidden] { display: none; }
+      .tpfm-action {
+        height: calc(100% - 6px); max-height: var(--tp-blade-unit-size, 20px); padding: 0 8px; border: 0;
+        border-radius: var(--tp-element-border-radius, 2px); background: var(--tp-button-background-color, hsl(230, 7%, 70%));
+        color: var(--tp-button-foreground-color, hsl(230, 7%, 17%)); font: inherit; font-size: 11px; line-height: 1;
+        white-space: nowrap; cursor: pointer;
+      }
+      .tpfm-action:hover:not(:disabled) { background: var(--tp-button-background-color-hover, hsl(230, 7%, 75%)); }
+      .tpfm-action:disabled { opacity: .5; cursor: default; }
       .tpfm-button {
-        position: absolute; top: 0; right: 22px; z-index: 1; width: 22px; height: var(--tp-blade-unit-size, 20px);
-        padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--tp-container-foreground-color, inherit);
+        width: 22px; height: calc(100% - 4px); max-height: var(--tp-blade-unit-size, 20px); padding: 0; border: 0;
+        border-radius: 4px; background: transparent; color: var(--tp-container-foreground-color, inherit);
         font: inherit; font-size: 14px; line-height: 1; cursor: pointer; opacity: .7;
       }
       .tpfm-button:disabled { opacity: .35; cursor: default; }
       .tpfm-button:hover:not(:disabled), .tpfm-button[aria-expanded="true"] { opacity: 1; background: var(--tp-container-background-color-hover, rgba(187, 188, 196, .15)); }
-      .tpfm-button:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
-      .tpfm-has-menu > .tp-fldv_b { padding-right: 48px; }
+      .tpfm-action:focus-visible, .tpfm-button:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
       .tpfm-menu {
         position: fixed; z-index: 10000; display: flex; flex-direction: column; min-width: 140px; max-width: calc(100vw - 16px);
         padding: 4px; border-radius: 8px; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box;
@@ -179,48 +189,149 @@ export function closeButtonMenu() {
     open?.close()
 }
 
-/** The menu buttons of each folder, for its ⋮ button (updated at each render of the folder) */
-const folderButtons = new WeakMap<HTMLElement, UiObjectConfig[]>()
+interface FolderActions {
+    update: (buttons: UiObjectConfig[]) => void
+    remove: () => void
+}
+/** The header actions of each folder (its element) */
+const folderActions = new WeakMap<HTMLElement, FolderActions>()
 
 /**
- * Adds, updates or removes the ⋮ button in the header of a folder, for its menu buttons ({@link isFolderMenuButton}).
- * Called by the folder generator at each render, with the menu buttons that it left out of the folder body.
+ * Adds, updates or removes the actions in the header of a folder, for its menu buttons ({@link isFolderMenuButton}):
+ * as many buttons as fit after the title, and a ⋮ button with a menu of the rest. Called by the folder generator at
+ * each render, with the menu buttons that it left out of the folder body.
  */
 export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: FolderApi, buttons: UiObjectConfig[]) {
     const element = folder.controller_.view.element as HTMLElement
-    let button = element.querySelector<HTMLButtonElement>(':scope > .tpfm-button')
-    const shown = buttons.some(b => !getOrCall(b.hidden))
-    element.classList.toggle('tpfm-has-menu', shown)
-    if (!shown) {
-        button?.remove()
-        folderButtons.delete(element)
+    let actions = folderActions.get(element)
+    if (!buttons.some(b => !isHidden(b))) {
+        actions?.remove()
         return
     }
-    folderButtons.set(element, buttons)
-    if (button) {
-        if (open?.anchor === button) open.update(buttons) // the open menu shows the buttons of this render
-        return
+    if (!actions) {
+        actions = createFolderActions(renderer, folder)
+        folderActions.set(element, actions)
     }
+    actions.update(buttons)
+}
+
+/**
+ * The actions in the header of a folder: a bar over the right of the header, with a button for each menu button that
+ * fits after the title and a ⋮ button for the rest. It follows the header size (a resize, a theme) and each render.
+ */
+function createFolderActions(renderer: UiConfigRendererTweakpane, folder: FolderApi): FolderActions {
     addStyles()
-    button = document.createElement('button')
-    button.type = 'button'
-    button.className = 'tpfm-button'
-    button.textContent = '⋮'
-    button.title = 'More actions'
-    button.setAttribute('aria-label', 'More actions')
-    button.setAttribute('aria-haspopup', 'menu')
-    button.setAttribute('aria-expanded', 'false')
-    const b = button
-    // off in a disabled folder, or in a folder in one, like the Tweakpane controls; a disable closes the open menu
+    const view = folder.controller_.view
+    const element = view.element as HTMLElement, header = view.buttonElement, title = view.titleElement
     const viewProps = folder.controller_.viewProps
-    viewProps.bindDisabled(b)
-    viewProps.globalDisabled.emitter.on('change', () => {
-        if (viewProps.globalDisabled.rawValue && open?.anchor === b) closeButtonMenu()
+    // over the right of the header, a sibling of it (a button can not hold buttons); its gaps let clicks through to fold
+    const bar = document.createElement('div')
+    bar.className = 'tpfm-actions'
+    const more = document.createElement('button')
+    more.type = 'button'
+    more.className = 'tpfm-button'
+    more.textContent = '⋮'
+    more.title = 'More actions'
+    more.setAttribute('aria-label', 'More actions')
+    more.setAttribute('aria-haspopup', 'menu')
+    more.setAttribute('aria-expanded', 'false')
+    viewProps.bindDisabled(more) // off in a disabled folder, or in a folder in one, like the Tweakpane controls
+    bar.appendChild(more)
+
+    const itemOf = new Map<UiObjectConfig, HTMLButtonElement>()
+    let shown: UiObjectConfig[] = []
+    let overflow: UiObjectConfig[] = []
+    const folderOff = () => viewProps.globalDisabled.rawValue
+    const setDisabled = () => {
+        for (const [b, item] of itemOf) item.disabled = folderOff() || isOff(b)
+    }
+
+    // the buttons that fit after the title, the ⋮ button for the rest; placed from the header, so that any theme fits
+    const layout = () => {
+        const items = shown.map(b => itemOf.get(b)).filter((i): i is HTMLButtonElement => !!i)
+        for (const item of items) item.hidden = false
+        more.hidden = false
+        const h = header.getBoundingClientRect(), box = element.getBoundingClientRect()
+        if (!h.width) return // not on the page: the resize observer calls this again when it shows
+        // the fold mark keeps its room when it is on the right (the Tweakpane default); a theme can put it on the left
+        const mark = header.querySelector('.tp-fldv_m')?.getBoundingClientRect()
+        const right = mark && mark.width && mark.left > h.left + h.width / 2 ? h.right - mark.left + 2 : 4
+        // from the padding box of the folder (a theme can give it a border)
+        const borderRight = element.offsetWidth - element.clientWidth - element.clientLeft
+        bar.style.top = `${h.top - box.top - element.clientTop}px`
+        bar.style.height = `${h.height}px`
+        bar.style.right = `${box.right - h.right - borderRight + right}px`
+        const range = document.createRange()
+        range.selectNodeContents(title)
+        const room = h.right - right - Math.max(range.getBoundingClientRect().right, h.left) - 8
+        const gap = 2
+        const widths = items.map(i => i.offsetWidth)
+        let count = items.length
+        if (widths.reduce((sum, w) => sum + w + gap, -gap) > room) {
+            let used = more.offsetWidth
+            count = 0
+            while (count < items.length && used + gap + widths[count] <= room) used += gap + widths[count++]
+        }
+        items.forEach((item, i) => item.hidden = i >= count)
+        more.hidden = count === items.length
+        overflow = shown.slice(count)
+        // a long title ends with … before the actions
+        header.style.paddingRight = `${right + bar.offsetWidth + 4}px`
+        if (open?.anchor === more) {
+            if (overflow.length) open.update(overflow)
+            else closeButtonMenu()
+        }
+    }
+
+    const update = (buttons: UiObjectConfig[]) => {
+        shown = buttons.filter(b => !isHidden(b))
+        for (const [b, item] of itemOf) {
+            if (shown.includes(b)) continue
+            item.remove()
+            itemOf.delete(b)
+        }
+        const items = shown.map(b => {
+            let item = itemOf.get(b)
+            if (!item) {
+                item = document.createElement('button')
+                item.type = 'button'
+                item.className = 'tpfm-action'
+                item.addEventListener('click', (e) => {
+                    if (isHidden(b) || isOff(b) || folderOff()) return
+                    renderer.methods.clickButton(b, {args: [e]})
+                })
+                itemOf.set(b, item)
+            }
+            const label = UiConfigMethods.GetLabel(b)
+            if (item.textContent !== label) item.textContent = label
+            return item
+        })
+        if ([...items, more].some((item, i) => bar.children[i] !== item)) bar.replaceChildren(...items, more)
+        setDisabled()
+        layout()
+    }
+
+    // a disable closes the open menu, and turns the buttons off
+    const onDisabled = () => {
+        setDisabled()
+        if (folderOff() && open?.anchor === more) closeButtonMenu()
+    }
+    viewProps.globalDisabled.emitter.on('change', onDisabled)
+    const observer = new ResizeObserver(() => layout())
+    observer.observe(header)
+    more.addEventListener('click', () => {
+        if (open?.anchor === more) return closeButtonMenu()
+        openButtonMenu(renderer, overflow, more)
     })
-    b.addEventListener('click', (e) => {
-        e.stopPropagation() // not a click on the folder
-        if (open && b.getAttribute('aria-expanded') === 'true') return closeButtonMenu()
-        openButtonMenu(renderer, folderButtons.get(element) ?? [], b)
-    })
-    element.appendChild(b)
+    element.appendChild(bar)
+
+    const remove = () => {
+        observer.disconnect()
+        viewProps.globalDisabled.emitter.off('change', onDisabled)
+        bar.remove()
+        header.style.paddingRight = ''
+        folderActions.delete(element)
+    }
+    viewProps.handleDispose(remove)
+    return {update, remove}
 }

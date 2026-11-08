@@ -100,9 +100,10 @@ Check the documentation at [uiconfig.js](https://github.com/repalash/uiconfig.js
 
 ## Folder menus
 
-A `button` with the tag `context-menu` is an action for a menu, like duplicate or delete. A folder shows such buttons
-(its direct children) in a menu instead of in its body: a ⋮ button in the folder header opens it. uiconfig-blueprint does
-the same in its folders. Example: https://repalash.com/uiconfig.js/examples/folder-menus.html
+A `button` with the tag `context-menu` is an action on the folder's object, like duplicate or delete. A folder shows
+such buttons (its direct children) in its header instead of in its body: as small buttons after the title while they
+fit, and the rest in a menu that a ⋮ button opens. On a narrow panel, most of them are in the menu. uiconfig-blueprint
+does the same in its folders. Example: https://repalash.com/uiconfig.js/examples/folder-menus.html
 
 ```js
 {
@@ -115,17 +116,21 @@ the same in its folders. Example: https://repalash.com/uiconfig.js/examples/fold
 ```
 
 - A button that also has the tag `inline` stays in the body.
-- A hidden button is not in the menu; a disabled or read-only one is dimmed. A folder whose menu buttons are all hidden
-  has no ⋮ button.
-- A click runs the button as a click in the body does (`methods.clickButton`, with undo).
+- A hidden button is not shown; a disabled or read-only one is dimmed. The ⋮ button shows only when a button does not
+  fit. In a disabled folder (or a folder in one) the header buttons and the ⋮ button are off.
+- The header follows its size (a resize of the panel, a theme) and each render of the folder: buttons that come and go,
+  and changes of `hidden`, `disabled` and the labels. The title keeps its place; a long title ends with … before the
+  buttons. A click on the rest of the header folds the folder, as before.
+- A click runs the button as a click in the body does (`methods.clickButton`, with undo), and the folder `onChange`
+  gets it. The button's `uiRefresh` refreshes the folder header.
 - The keys: the menu takes the focus; the arrow keys, Home and End move between the items; Enter or Space presses one;
   Escape closes the menu and gives the focus back to the ⋮ button; Tab closes it. The keys do not reach the page while
   the menu has the focus. A press outside the menu closes it.
 - The menu stays inside the window, and scrolls when it is taller (a phone in landscape). It takes the colours of the
   folder (the Tweakpane theme variables).
 - `ui.folderMenus = false` (before the folders render) shows all the buttons in the body, as before.
-- `ui.openFolderMenu(config, element)` opens the menu of a folder at another element, for a folder whose header the
-  app hides; `ui.folderMenuButtons(config)` lists the buttons of its menu. `openButtonMenu(ui, buttons, element)` opens
+- `ui.openFolderMenu(config, element)` opens a menu with all the header buttons of a folder at another element, for a
+  folder whose header the app hides; `ui.folderMenuButtons(config)` lists them. `openButtonMenu(ui, buttons, element)` opens
   such a menu for any list of buttons.
 
 ## Theme
