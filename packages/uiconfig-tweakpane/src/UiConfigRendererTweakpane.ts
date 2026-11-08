@@ -13,7 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
-import {isFolderMenuButton, openButtonMenu} from './tpFolderMenu'
+import {folderHeaderButtons, isFolderMenuButton, openButtonMenu} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -131,6 +131,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         parent = parent ?? this._root
         if (!uiConfig.type) return
         // console.log(`Render ui ${uiConfig.label} in ${parent?.title}`)
+        folderHeaderButtons.delete(uiConfig) // drawn as a control, not in a folder header
         this.methods.initUiConfig(uiConfig)
         if (uiConfig.uiRef && uiConfig.uiRefType !== uiConfig.type) {
             // console.log('Removing UI object because of type mismatch', uiConfig.uiRef)
@@ -156,6 +157,8 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
+        // a button in a folder header: its folder renders it (a deep refresh can list it before it moved from the body)
+        if (folderHeaderButtons.has(config)) return config.uiRefresh?.()
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }

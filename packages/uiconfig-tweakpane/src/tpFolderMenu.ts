@@ -16,6 +16,12 @@ const hasTag = (config: UiObjectConfig, tag: string) => {
     return Array.isArray(tags) ? tags.includes(tag) : tags === tag
 }
 
+/**
+ * The buttons that a folder shows in its header now (set by the folder generator at each render). The renderer refreshes
+ * their folder for them, not a body control: a deep refresh can still list a button that just moved from the body.
+ */
+export const folderHeaderButtons = new WeakSet<UiObjectConfig>()
+
 /** A button that a folder shows in its menu: a `button` with the `context-menu` tag, without the `inline` tag */
 export function isFolderMenuButton(config: UiObjectConfig) {
     return config.type === 'button' && hasTag(config, CONTEXT_MENU_TAG) && !hasTag(config, INLINE_TAG)

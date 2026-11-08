@@ -4,7 +4,7 @@ import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex
 import {ChangeEvent, TUiRefreshModes, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
-import {isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
+import {folderHeaderButtons, isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
 
 export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
     let folder = config.uiRef as FolderApi | undefined
@@ -45,6 +45,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     for (const child of childObjects) { // todo check comparison with uiConfig.uuid
         child.parentOnChange = onChildChange
         setupPropertyForwarding(child, config)
+        folderHeaderButtons.delete(child)
 
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
@@ -143,6 +144,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     // the menu buttons are not rendered: set up as renderUiObject does for the body controls (binding to property, the
     // change events, a refresh), after the loop above, which clears these on a button that was in the body before
     for (const b of menuButtons) {
+        folderHeaderButtons.add(b)
         UiConfigMethods.InitUiConfig(b)
         b.parentOnChange = onChildChange
         b.uiRefresh = (_deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => config.uiRefresh?.(false, mode, delay)
