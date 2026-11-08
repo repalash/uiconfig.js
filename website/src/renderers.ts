@@ -79,8 +79,8 @@ export const loadBlueprint = () => blueprintModule ??= import('uiconfig-blueprin
 export async function createBlueprint(host: HTMLElement, {undo = false}: RendererOptions = {}): Promise<UiConfigRenderer> {
     const {UI} = await loadBlueprint()
     // The Blueprint panel reads its light or dark mode from localStorage when it mounts;
-    // match it to the page.
-    localStorage.setItem('bpUiDarkMode', isDark() ? 'true' : 'false')
+    // match it to the page. A sandboxed page (opaque origin) or blocked storage throws here: the panel keeps its default.
+    try { localStorage.setItem('bpUiDarkMode', isDark() ? 'true' : 'false') } catch { /* storage disabled */ }
     host.replaceChildren() // the loading message
     const ui = new UI(host, {}, undo ? undefined : false)
     ui.THREE = THREE
