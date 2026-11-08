@@ -62,7 +62,8 @@ let open: {menu: HTMLElement, close: (focusAnchor?: boolean) => void} | undefine
  * Opens a menu of buttons at an element: a list of buttons (the labels of the configs) under the element, inside the
  * window. A click on an item runs the button through the renderer (`methods.clickButton`, with undo). The keys:
  * the arrow keys, Home and End move between the items, Enter or Space presses one, Escape or Tab closes the menu, and
- * the keys do not reach the page while the menu has the focus. A press outside the menu closes it.
+ * the keys do not reach the page while the menu has the focus. A press outside the menu closes it, and so does the
+ * removal of the element from the page (its folder is removed, or the renderer is unmounted).
  * @returns false when no button is shown (all hidden), and no menu opens
  */
 export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiObjectConfig[], anchor: HTMLElement): boolean {
@@ -110,8 +111,11 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
     const onOutside = (e: PointerEvent) => {
         if (!menu.contains(e.target as Node) && !anchor.contains(e.target as Node)) close()
     }
+    // closes when the anchor leaves the page: its folder is removed, or the renderer is unmounted
+    const observer = new MutationObserver(() => !anchor.isConnected && close())
     const close = (focusAnchor = false) => {
         menu.remove()
+        observer.disconnect()
         document.removeEventListener('pointerdown', onOutside, true)
         anchor.setAttribute('aria-expanded', 'false')
         if (open?.menu === menu) open = undefined
@@ -119,6 +123,7 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
     }
     menu.addEventListener('keydown', onKey)
     document.addEventListener('pointerdown', onOutside, true)
+    observer.observe(document, {childList: true, subtree: true})
     document.body.appendChild(menu)
     // under the anchor, its right edges aligned; inside the window, and scrolls when taller (a phone in landscape)
     const r = anchor.getBoundingClientRect()
