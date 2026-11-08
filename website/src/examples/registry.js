@@ -89,6 +89,12 @@ export const examples = [
         preview: ['button', 'button', 'monitor'], log: true,
     },
     {
+        slug: 'folder-menus', topic: 'components', title: 'Folder menus', renderers: both,
+        summary: 'A `button` with the tag `context-menu` goes to the menu of its folder header (⋮), not to the folder body. With the tag `inline` too, it stays in the body. `hidden` and `disabled` work in the menu.',
+        preview: ['folder', 'button', 'button'], log: true,
+        note: 'uiconfig-blueprint shows the menu in a ⋯ popover of the folder header. It does not read the tag `inline` yet, so "Reset" is in its menu there.',
+    },
+    {
         slug: 'colors-vectors', topic: 'components', title: 'Colors and vectors', renderers: both,
         summary: '`color` edits a hex string, a number or a three.js `Color`; `vec2`, `vec3` and `vec4` edit `{x, y, z, w}` objects. Both components create their values with the classes in `ui.THREE`.',
         preview: ['color', 'color', 'vec', 'vec'], log: true,

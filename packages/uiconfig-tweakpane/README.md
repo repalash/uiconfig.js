@@ -102,7 +102,7 @@ Check the documentation at [uiconfig.js](https://github.com/repalash/uiconfig.js
 
 A `button` with the tag `context-menu` is an action for a menu, like duplicate or delete. A folder shows such buttons
 (its direct children) in a menu instead of in its body: a ⋮ button in the folder header opens it. uiconfig-blueprint does
-the same in its folders.
+the same in its folders. Example: https://repalash.com/uiconfig.js/examples/folder-menus.html
 
 ```js
 {
