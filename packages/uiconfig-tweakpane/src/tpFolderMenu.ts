@@ -55,21 +55,24 @@ function addStyles() {
     styles.dataset.uiconfigTweakpane = 'folder-menu'
 }
 
-/** The open menu, and the function that closes it */
-let open: {menu: HTMLElement, close: (focusAnchor?: boolean) => void} | undefined
+/** The open menu: its anchor, the function that closes it, and the one that updates its items */
+let open: {menu: HTMLElement, anchor: HTMLElement, close: (focusAnchor?: boolean) => void, update: (buttons: UiObjectConfig[]) => void} | undefined
+
+const isHidden = (b: UiObjectConfig) => !!getOrCall(b.hidden)
+const isOff = (b: UiObjectConfig) => !!(getOrCall(b.disabled) || getOrCall(b.readOnly))
 
 /**
  * Opens a menu of buttons at an element: a list of buttons (the labels of the configs) under the element, inside the
- * window. A click on an item runs the button through the renderer (`methods.clickButton`, with undo). The keys:
- * the arrow keys, Home and End move between the items, Enter or Space presses one, Escape or Tab closes the menu, and
- * the keys do not reach the page while the menu has the focus. A press outside the menu closes it, and so does the
- * removal of the element from the page (its folder is removed, or the renderer is unmounted).
+ * window. A click on an item runs the button through the renderer (`methods.clickButton`, with undo), when the button
+ * is still shown and enabled. The keys: the arrow keys, Home and End move between the items, Enter or Space presses
+ * one, Escape or Tab closes the menu, and the keys do not reach the page while the menu has the focus. A press outside
+ * the menu closes it, and so does the removal of the element from the page (its folder is removed, or the renderer is
+ * unmounted). The menu of a folder (its ⋮ button) follows each render of the folder.
  * @returns false when no button is shown (all hidden), and no menu opens
  */
 export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiObjectConfig[], anchor: HTMLElement): boolean {
     closeButtonMenu()
-    const shown = buttons.filter(b => !getOrCall(b.hidden))
-    if (!shown.length) return false
+    if (!buttons.some(b => !isHidden(b))) return false
     addStyles()
     const menu = document.createElement('div')
     menu.className = 'tpfm-menu'
@@ -79,20 +82,40 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
         const value = computed.getPropertyValue(v)
         if (value) menu.style.setProperty(v, value)
     }
-    const items = shown.map(b => {
-        const item = document.createElement('button')
-        item.type = 'button'
-        item.className = 'tpfm-item'
-        item.setAttribute('role', 'menuitem')
-        item.textContent = UiConfigMethods.GetLabel(b)
-        item.disabled = !!(getOrCall(b.disabled) || getOrCall(b.readOnly))
-        item.addEventListener('click', (e) => {
-            close()
-            renderer.methods.clickButton(b, {args: [e]})
+    const itemOf = new Map<UiObjectConfig, HTMLButtonElement>()
+    let items: HTMLButtonElement[] = []
+    // the items of the shown buttons; an item is kept while its button is shown (a refresh during a click keeps the click)
+    const fill = (list: UiObjectConfig[]) => {
+        const hadFocus = menu.contains(document.activeElement)
+        const shown = list.filter(b => !isHidden(b))
+        for (const [b, item] of itemOf) {
+            if (shown.includes(b)) continue
+            item.remove()
+            itemOf.delete(b)
+        }
+        items = shown.map(b => {
+            let item = itemOf.get(b)
+            if (!item) {
+                item = document.createElement('button')
+                item.type = 'button'
+                item.className = 'tpfm-item'
+                item.setAttribute('role', 'menuitem')
+                item.addEventListener('click', (e) => {
+                    if (isHidden(b) || isOff(b)) return
+                    close()
+                    renderer.methods.clickButton(b, {args: [e]})
+                })
+                itemOf.set(b, item)
+            }
+            const label = UiConfigMethods.GetLabel(b)
+            if (item.textContent !== label) item.textContent = label
+            item.disabled = isOff(b)
+            return item
         })
-        menu.appendChild(item)
-        return item
-    })
+        if (items.some((item, i) => menu.children[i] !== item)) menu.replaceChildren(...items)
+        // the focused item went or was disabled: the focus stays in the menu, for its keys
+        if (hadFocus && !menu.contains(document.activeElement)) enabled()[0]?.focus()
+    }
     const enabled = () => items.filter(i => !i.disabled)
     const onKey = (e: KeyboardEvent) => {
         e.stopPropagation()
@@ -121,18 +144,28 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
         if (open?.menu === menu) open = undefined
         if (focusAnchor) anchor.focus()
     }
+    // under the anchor, its right edges aligned; inside the window, and scrolls when taller (a phone in landscape)
+    const place = () => {
+        const r = anchor.getBoundingClientRect()
+        menu.style.maxHeight = `${window.innerHeight - 16}px`
+        const w = menu.offsetWidth, h = menu.offsetHeight
+        menu.style.left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)) + 'px'
+        menu.style.top = Math.max(8, r.bottom + h + 4 > window.innerHeight - 8 ? r.top - h - 4 : r.bottom + 4) + 'px'
+    }
+    const update = (list: UiObjectConfig[]) => {
+        const count = items.length
+        fill(list)
+        if (!items.length) close()
+        else if (items.length !== count) place()
+    }
     menu.addEventListener('keydown', onKey)
     document.addEventListener('pointerdown', onOutside, true)
     observer.observe(document, {childList: true, subtree: true})
+    fill(buttons)
     document.body.appendChild(menu)
-    // under the anchor, its right edges aligned; inside the window, and scrolls when taller (a phone in landscape)
-    const r = anchor.getBoundingClientRect()
-    menu.style.maxHeight = `${window.innerHeight - 16}px`
-    const w = menu.offsetWidth, h = menu.offsetHeight
-    menu.style.left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)) + 'px'
-    menu.style.top = Math.max(8, r.bottom + h + 4 > window.innerHeight - 8 ? r.top - h - 4 : r.bottom + 4) + 'px'
+    place()
     anchor.setAttribute('aria-expanded', 'true')
-    open = {menu, close}
+    open = {menu, anchor, close, update}
     enabled()[0]?.focus()
     return true
 }
@@ -160,7 +193,10 @@ export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, fold
         return
     }
     folderButtons.set(element, buttons)
-    if (button) return
+    if (button) {
+        if (open?.anchor === button) open.update(buttons) // the open menu shows the buttons of this render
+        return
+    }
     addStyles()
     button = document.createElement('button')
     button.type = 'button'
