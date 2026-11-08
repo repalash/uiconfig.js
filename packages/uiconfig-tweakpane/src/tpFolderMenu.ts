@@ -37,7 +37,7 @@ function addStyles() {
     styles = createStyles(css`
       .tpfm-actions { position: absolute; z-index: 1; display: flex; align-items: center; gap: 2px; pointer-events: none; }
       .tpfm-actions > * { pointer-events: auto; }
-      .tpfm-actions > [hidden] { display: none; }
+      .tpfm-actions > [hidden] { display: none !important; } /* over the display of the icon-only buttons */
       .tpfm-action {
         height: calc(100% - 6px); max-height: var(--tp-blade-unit-size, 20px); padding: 0 8px; border: 0;
         border-radius: var(--tp-element-border-radius, 2px); background: var(--tp-button-background-color, hsl(230, 7%, 70%));
