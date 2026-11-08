@@ -1,7 +1,7 @@
 import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi, TabApi} from 'tweakpane'
 import {BladeController, TextView, View} from '@tweakpane/core'
 import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
-import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
+import {ChangeEvent, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
 import {isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
@@ -32,20 +32,23 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     folder.expanded = getOrCall(config.expanded) ?? lastExpanded ?? false // todo;;
 
     const allChildren = plugin.methods.getChildren(config)
+    for (const child of allChildren) { // todo check comparison with uiConfig.uuid
+        child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
+            plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
+        }
+        setupPropertyForwarding(child, config)
+    }
     // the buttons for a menu (the context-menu tag) go to the ⋮ button of the header, not to the body
     const menuButtons = plugin.folderMenus ? allChildren.filter(isFolderMenuButton) : []
+    // not rendered, so set up here as renderUiObject does for the body (binding to property)
+    for (const b of menuButtons) UiConfigMethods.InitUiConfig(b)
     const childObjects = menuButtons.length ? allChildren.filter(c => !menuButtons.includes(c)) : allChildren
     // console.log(childObjects)
     // if (childObjects) {
     // const children = childObjects?.map(value => value.uiRef) as BladeApi<BladeController<View>>[]
     let i = 0
     const newChildren = []
-    for (const child of childObjects) { // todo check comparison with uiConfig.uuid
-        child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
-            plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
-        }
-        setupPropertyForwarding(child, config)
-
+    for (const child of childObjects) {
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
             // check if all correct or set child.uiRef to undefined.
