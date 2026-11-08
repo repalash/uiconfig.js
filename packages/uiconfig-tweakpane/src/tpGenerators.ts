@@ -4,6 +4,7 @@ import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex
 import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
+import {isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
 
 export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
     let folder = config.uiRef as FolderApi | undefined
@@ -30,7 +31,10 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     if (!folder) return folder
     folder.expanded = getOrCall(config.expanded) ?? lastExpanded ?? false // todo;;
 
-    const childObjects = plugin.methods.getChildren(config)
+    const allChildren = plugin.methods.getChildren(config)
+    // the buttons for a menu (the context-menu tag) go to the ⋮ button of the header, not to the body
+    const menuButtons = plugin.folderMenus ? allChildren.filter(isFolderMenuButton) : []
+    const childObjects = menuButtons.length ? allChildren.filter(c => !menuButtons.includes(c)) : allChildren
     // console.log(childObjects)
     // if (childObjects) {
     // const children = childObjects?.map(value => value.uiRef) as BladeApi<BladeController<View>>[]
@@ -136,6 +140,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         folder.controller_.foldable.cleanUpTransition()
     }
 
+    updateFolderMenuButton(plugin, folder, menuButtons)
     return folder
 }
 

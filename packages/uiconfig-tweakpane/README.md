@@ -98,6 +98,36 @@ Check the documentation at [uiconfig.js](https://github.com/repalash/uiconfig.js
 8. `color` - A color picker for colors.
 9. `vector/vec2/vec3/vec4` - Multiple number input fields in a row for vectors.
 
+## Folder menus
+
+A `button` with the tag `context-menu` is an action for a menu, like duplicate or delete. A folder shows such buttons
+(its direct children) in a menu instead of in its body: a ⋮ button in the folder header opens it. uiconfig-blueprint does
+the same in its folders.
+
+```js
+{
+    type: 'folder', label: 'Box', children: [
+        {type: 'checkbox', label: 'Visible', property: [box, 'visible']},
+        {type: 'button', label: 'Duplicate', tags: ['context-menu'], value: () => duplicate(box)},
+        {type: 'button', label: 'Center', tags: ['context-menu', 'inline'], value: () => center(box)}, // stays in the body
+    ],
+}
+```
+
+- A button that also has the tag `inline` stays in the body.
+- A hidden button is not in the menu; a disabled or read-only one is dimmed. A folder whose menu buttons are all hidden
+  has no ⋮ button.
+- A click runs the button as a click in the body does (`methods.clickButton`, with undo).
+- The keys: the menu takes the focus; the arrow keys, Home and End move between the items; Enter or Space presses one;
+  Escape closes the menu and gives the focus back to the ⋮ button; Tab closes it. The keys do not reach the page while
+  the menu has the focus. A press outside the menu closes it.
+- The menu stays inside the window, and scrolls when it is taller (a phone in landscape). It takes the colours of the
+  folder (the Tweakpane theme variables).
+- `ui.folderMenus = false` (before the folders render) shows all the buttons in the body, as before.
+- `ui.openFolderMenu(config, element)` opens the menu of a folder at another element, for a folder whose header the
+  app hides; `ui.folderMenuButtons(config)` lists the buttons of its menu. `openButtonMenu(ui, buttons, element)` opens
+  such a menu for any list of buttons.
+
 ## Theme
 
 An optional theme with five color modes (`light`, `dark`, `blue`, `white`, `black`): larger rows, folder borders and

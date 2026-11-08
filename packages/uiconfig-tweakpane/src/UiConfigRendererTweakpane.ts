@@ -1,6 +1,6 @@
 import {AnyOptions, createDiv, createStyles, css, getOrCall, JSUndoManager} from 'ts-browser-helpers'
 import {BladeApi, FolderApi, Pane, TabPageApi} from 'tweakpane'
-import {TUiRefreshModes, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
+import {TUiRefreshModes, UiConfigMethods, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
 import {
     tpButtonInputGenerator,
@@ -13,6 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
+import {isFolderMenuButton, openButtonMenu} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -33,6 +34,27 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
     protected _root?: Pane
     protected _container?: HTMLDivElement
+
+    /**
+     * A folder shows its direct `button` children with the `context-menu` tag in a menu, from a ⋮ button in its header,
+     * instead of in its body, as the blueprint renderer does. A button that also has the `inline` tag stays in the body.
+     * Set `false` (before the folders render) to show all the buttons in the body.
+     */
+    folderMenus = true
+
+    /** The menu buttons of a folder config ({@link folderMenus}): its direct `context-menu` buttons; the menu leaves out the hidden ones */
+    folderMenuButtons(config: UiObjectConfig): UiObjectConfig[] {
+        return this.folderMenus ? UiConfigMethods.GetChildren(config).filter(isFolderMenuButton) : []
+    }
+
+    /**
+     * Opens the menu of a folder config at an element, like a click on the ⋮ button of its header: for a folder whose
+     * header the app hides, or another button for the same menu.
+     * @returns false when the folder has no menu button that is shown, and no menu opens
+     */
+    openFolderMenu(config: UiObjectConfig, anchor: HTMLElement): boolean {
+        return openButtonMenu(this, this.folderMenuButtons(config), anchor)
+    }
 
     /**
      * Applies a color mode of the theme in `uiconfig-tweakpane/theme.css` to this renderer's panel; `null` removes it.
