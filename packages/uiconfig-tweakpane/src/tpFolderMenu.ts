@@ -131,8 +131,8 @@ function setItemContent(item: HTMLButtonElement, config: UiObjectConfig, iconOnl
  * window. A click on an item runs the button through the renderer (`methods.clickButton`, with undo), when the button
  * is still shown and enabled. The keys: the arrow keys, Home and End move between the items, Enter or Space presses
  * one, Escape or Tab closes the menu, and the keys do not reach the page while the menu has the focus. A press outside
- * the menu closes it, and so does the removal of the element from the page (its folder is removed, or the renderer is
- * unmounted). The menu of a folder (its ⋮ button) follows each render of the folder.
+ * the menu closes it, and so does the removal or the hiding of the element (its folder, or a parent, is removed or
+ * hidden, or the renderer is unmounted). The menu of a folder (its ⋮ button) follows each render of the folder.
  * @returns false when no button is shown (all hidden), and no menu opens
  */
 export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiObjectConfig[], anchor: HTMLElement): boolean {
@@ -200,8 +200,11 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
     const onOutside = (e: PointerEvent) => {
         if (!menu.contains(e.target as Node) && !anchor.contains(e.target as Node)) close()
     }
-    // closes when the anchor leaves the page: its folder is removed, or the renderer is unmounted
-    const observer = new MutationObserver(() => !anchor.isConnected && close())
+    // closes when the anchor leaves the page or is not shown: its folder (or a parent) is removed or hidden, or the
+    // renderer is unmounted
+    const observer = new MutationObserver(() => {
+        if (!anchor.isConnected || !anchor.getClientRects().length) close()
+    })
     const close = (focusAnchor = false) => {
         menu.remove()
         observer.disconnect()
@@ -219,14 +222,13 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
         menu.style.top = Math.max(8, r.bottom + h + 4 > window.innerHeight - 8 ? r.top - h - 4 : r.bottom + 4) + 'px'
     }
     const update = (list: UiObjectConfig[]) => {
-        const count = items.length
         fill(list)
         if (!items.length) close()
-        else if (items.length !== count) place()
+        else place() // the items can change the size of the menu (labels, icons)
     }
     menu.addEventListener('keydown', onKey)
     document.addEventListener('pointerdown', onOutside, true)
-    observer.observe(document, {childList: true, subtree: true})
+    observer.observe(document, {childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden']})
     fill(buttons)
     document.body.appendChild(menu)
     place()
