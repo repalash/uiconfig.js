@@ -44,6 +44,7 @@ function addStyles() {
         box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 6px 20px rgba(0, 0, 0, .16);
         font: 400 12px/1.2 var(--tp-font-family, var(--tp-base-font-family, Roboto Mono, Source Code Pro, Menlo, Courier, monospace));
       }
+      .tpfm-menu:focus { outline: none; }
       .tpfm-item {
         border: 0; border-radius: 5px; padding: 7px 10px; background: transparent; color: inherit; font: inherit;
         text-align: left; white-space: nowrap; cursor: pointer;
@@ -77,6 +78,7 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
     const menu = document.createElement('div')
     menu.className = 'tpfm-menu'
     menu.setAttribute('role', 'menu')
+    menu.tabIndex = -1 // takes the focus, for its keys, when no item can (all disabled)
     const computed = getComputedStyle(anchor)
     for (const v of THEME_VARS) {
         const value = computed.getPropertyValue(v)
@@ -114,9 +116,10 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
         })
         if (items.some((item, i) => menu.children[i] !== item)) menu.replaceChildren(...items)
         // the focused item went or was disabled: the focus stays in the menu, for its keys
-        if (hadFocus && !menu.contains(document.activeElement)) enabled()[0]?.focus()
+        if (hadFocus && !menu.contains(document.activeElement)) focusFirst()
     }
     const enabled = () => items.filter(i => !i.disabled)
+    const focusFirst = () => (enabled()[0] ?? menu).focus()
     const onKey = (e: KeyboardEvent) => {
         e.stopPropagation()
         const list = enabled()
@@ -166,7 +169,7 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
     place()
     anchor.setAttribute('aria-expanded', 'true')
     open = {menu, anchor, close, update}
-    enabled()[0]?.focus()
+    focusFirst()
     return true
 }
 
