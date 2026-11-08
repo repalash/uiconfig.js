@@ -1,5 +1,10 @@
 # Changelog for uiconfig-blueprint
 
+## [Unreleased]
+- Folder actions: the `button` children with the tag `context-menu` show in the folder header as small buttons after the label while they fit, and the rest in the ⋯ menu (before, all were in the menu). The header follows its size. The buttons are off in a disabled folder, and a long label ends before them.
+- A `context-menu` button that also has the tag `inline` stays in the folder body, as in uiconfig-tweakpane.
+- The menu of the folder header uses the small text size of the panel (`--pt-font-size-small`); it used the size of the page.
+
 ## [0.1.0-dev.18] - 2026-11-01
 - Fix: the renderer works in sandboxed documents (an opaque origin, like a page served with `CSP: sandbox`), where any access to `localStorage` throws: the dark mode and the theme then use the defaults, and a choice lasts until reload. It stopped on such pages before.
 

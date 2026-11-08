@@ -140,3 +140,33 @@
   }
 
 }
+
+.folder-head-card, .folder-head-card-minimal {
+  position: relative;
+}
+
+// the header actions of a folder (FolderActions), at the right of its header
+.folder-head-end {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.folder-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  > .folder-action {
+    white-space: nowrap;
+    font-size: var(--pt-font-size-small); // the size of the panel's inputs
+  }
+}
+
+// the menu of the header actions, in a portal on the page: the text size of the panel, not of the page
+.folder-actions-menu {
+  font-size: var(--pt-font-size-small);
+}
