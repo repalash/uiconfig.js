@@ -34,7 +34,8 @@ function addStyles() {
         padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--tp-container-foreground-color, inherit);
         font: inherit; font-size: 14px; line-height: 1; cursor: pointer; opacity: .7;
       }
-      .tpfm-button:hover, .tpfm-button[aria-expanded="true"] { opacity: 1; background: var(--tp-container-background-color-hover, rgba(187, 188, 196, .15)); }
+      .tpfm-button:disabled { opacity: .35; cursor: default; }
+      .tpfm-button:hover:not(:disabled), .tpfm-button[aria-expanded="true"] { opacity: 1; background: var(--tp-container-background-color-hover, rgba(187, 188, 196, .15)); }
       .tpfm-button:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
       .tpfm-has-menu > .tp-fldv_b { padding-right: 48px; }
       .tpfm-menu {
@@ -210,6 +211,12 @@ export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, fold
     button.setAttribute('aria-haspopup', 'menu')
     button.setAttribute('aria-expanded', 'false')
     const b = button
+    // off in a disabled folder, or in a folder in one, like the Tweakpane controls; a disable closes the open menu
+    const viewProps = folder.controller_.viewProps
+    viewProps.bindDisabled(b)
+    viewProps.globalDisabled.emitter.on('change', () => {
+        if (viewProps.globalDisabled.rawValue && open?.anchor === b) closeButtonMenu()
+    })
     b.addEventListener('click', (e) => {
         e.stopPropagation() // not a click on the folder
         if (open && b.getAttribute('aria-expanded') === 'true') return closeButtonMenu()
