@@ -90,7 +90,7 @@ export const examples = [
     },
     {
         slug: 'folder-menus', topic: 'components', title: 'Folder menus', renderers: both,
-        summary: 'A `button` with the tag `context-menu` goes to its folder header, not to the folder body: a small button after the title while it fits, else in the menu of the ⋮ button. Make the panel narrow to see them move. With the tag `inline` too, it stays in the body. `hidden` and `disabled` work there too.',
+        summary: 'A `button` with the tag `context-menu` goes to its folder header, not to the folder body: a small button after the title while it fits, else in the menu of the ⋮ button. With an `icon` (SVG markup, an image URL or a Blueprint icon name) the header shows the icon only, and the label on hover. Make the window narrow to see more buttons move to the menu. With the tag `inline` too, a button stays in the body. `hidden` and `disabled` work there too.',
         preview: ['folder', 'button', 'button'], log: true,
     },
     {

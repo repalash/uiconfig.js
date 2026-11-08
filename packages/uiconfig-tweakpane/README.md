@@ -110,12 +110,16 @@ does the same in its folders. Example: https://repalash.com/uiconfig.js/examples
     type: 'folder', label: 'Box', children: [
         {type: 'checkbox', label: 'Visible', property: [box, 'visible']},
         {type: 'button', label: 'Duplicate', tags: ['context-menu'], value: () => duplicate(box)},
+        {type: 'button', label: 'Delete', icon: '<svg viewBox="0 0 16 16">…</svg>', tags: ['context-menu'], value: () => remove(box)},
         {type: 'button', label: 'Center', tags: ['context-menu', 'inline'], value: () => center(box)}, // stays in the body
     ],
 }
 ```
 
 - A button that also has the tag `inline` stays in the body.
+- A button with an `icon` shows the icon only in the header, with the label as its tooltip and name; the menu shows
+  the icon and the label. `icon` is SVG markup (it takes the text color; app markup only, it is inserted as HTML) or an
+  image URL. An icon name (for uiconfig-blueprint) shows the label here, since Tweakpane has no icon set.
 - A hidden button is not shown; a disabled or read-only one is dimmed. The ⋮ button shows only when a button does not
   fit. In a disabled folder (or a folder in one) the header buttons and the ⋮ button are off.
 - The header follows its size (a resize of the panel, a theme) and each render of the folder: buttons that come and go,

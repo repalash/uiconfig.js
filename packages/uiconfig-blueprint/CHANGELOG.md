@@ -1,7 +1,7 @@
 # Changelog for uiconfig-blueprint
 
 ## [Unreleased]
-- Folder actions: the `button` children with the tag `context-menu` show in the folder header as small buttons after the label while they fit, and the rest in the ⋯ menu (before, all were in the menu). The header follows its size. The buttons are off in a disabled folder, and a long label ends before them.
+- Folder actions: the `button` children with the tag `context-menu` show in the folder header as small buttons after the label while they fit, and the rest in the ⋯ menu (before, all were in the menu). The header follows its size. The buttons are off in a disabled folder, and a long label ends before them. A button with an `icon` (SVG markup, an image URL or a Blueprint icon name) shows the icon only, with the label as its tooltip; the menu shows the icon and the label.
 - A `context-menu` button that also has the tag `inline` stays in the folder body, as in uiconfig-tweakpane.
 - The menu of the folder header uses the small text size of the panel (`--pt-font-size-small`); it used the size of the page.
 

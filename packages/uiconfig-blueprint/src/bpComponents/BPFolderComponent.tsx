@@ -271,6 +271,7 @@ export const ContextMenu: React.FC<{
                         key={'ctx' + i}
                         disabled={props.disabled || props.readOnly}
                         text={context.methods.getLabel(btn)}
+                        icon={configIcon(btn)}
                         onClick={(e) => {
                             e.stopPropagation();
                             const {hidden, disabled, readOnly} = getProps()
@@ -286,6 +287,19 @@ export const ContextMenu: React.FC<{
 };
 
 const isOff = (b: UiObjectConfig) => !!(getOrCall(b.disabled) || getOrCall(b.readOnly))
+
+/**
+ * The icon of a config (`config.icon`) for a Blueprint button or menu item: SVG markup inline, an image URL as an
+ * `<img>`, any other string as a Blueprint icon name.
+ */
+export function configIcon(config: UiObjectConfig): IconName | MaybeElement {
+    const icon = getOrCall(config.icon)?.trim()
+    if (!icon) return undefined
+    // app markup, see UiObjectConfig.icon
+    if (icon.startsWith('<svg')) return <span className="folder-action-icon" dangerouslySetInnerHTML={{__html: icon}}/>
+    if (/^(https?:|data:|blob:)/.test(icon) || /[/.]/.test(icon)) return <img className="folder-action-icon" src={icon} alt=""/>
+    return icon as IconName
+}
 
 /**
  * The actions in a folder header: a button for each of `buttons` that fits after the folder label, and a ⋯ button with
@@ -352,7 +366,8 @@ export const FolderActions: React.FC<{
                     key={b.uuid ?? 'a' + i}
                     className="folder-action"
                     size="small"
-                    text={context.methods.getLabel(b)}
+                    // with an icon: the icon only, and the label as its tooltip and name
+                    {...configIcon(b) ? {icon: configIcon(b), title: context.methods.getLabel(b), 'aria-label': context.methods.getLabel(b)} : {text: context.methods.getLabel(b)}}
                     disabled={disabled || isOff(b)}
                     onClick={(e) => {
                         e.stopPropagation()

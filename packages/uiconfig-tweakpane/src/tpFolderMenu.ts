@@ -44,6 +44,10 @@ function addStyles() {
         color: var(--tp-button-foreground-color, hsl(230, 7%, 17%)); font: inherit; font-size: 11px; line-height: 1;
         white-space: nowrap; cursor: pointer;
       }
+      .tpfm-action.tpfm-icon-only { width: calc(var(--tp-blade-unit-size, 20px)); padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+      .tpfm-icon { display: inline-flex; flex: none; width: 14px; height: 14px; }
+      .tpfm-icon > svg, img.tpfm-icon { width: 14px; height: 14px; }
+      .tpfm-item { display: flex; align-items: center; gap: 8px; }
       .tpfm-action:hover:not(:disabled) { background: var(--tp-button-background-color-hover, hsl(230, 7%, 75%)); }
       .tpfm-action:disabled { opacity: .5; cursor: default; }
       .tpfm-button {
@@ -78,6 +82,49 @@ let open: {menu: HTMLElement, anchor: HTMLElement, close: (focusAnchor?: boolean
 
 const isHidden = (b: UiObjectConfig) => !!getOrCall(b.hidden)
 const isOff = (b: UiObjectConfig) => !!(getOrCall(b.disabled) || getOrCall(b.readOnly))
+
+/**
+ * The icon of a config (`config.icon`) as an element: SVG markup inline, an image URL as an `<img>`. An icon name gives
+ * none (Tweakpane has no icon set), so the label shows instead.
+ */
+export function iconElement(config: UiObjectConfig): HTMLElement | undefined {
+    const icon = getOrCall(config.icon)?.trim()
+    if (!icon) return undefined
+    if (icon.startsWith('<svg')) {
+        const span = document.createElement('span')
+        span.className = 'tpfm-icon'
+        span.innerHTML = icon // app markup, see UiObjectConfig.icon
+        return span
+    }
+    if (/^(https?:|data:|blob:)/.test(icon) || /[/.]/.test(icon)) {
+        const img = document.createElement('img')
+        img.className = 'tpfm-icon'
+        img.src = icon
+        img.alt = ''
+        return img
+    }
+    return undefined
+}
+
+/** Sets the content of an item: the icon (with the label, or alone and the label as its name), else the label */
+function setItemContent(item: HTMLButtonElement, config: UiObjectConfig, iconOnly: boolean) {
+    const label = UiConfigMethods.GetLabel(config)
+    const icon = getOrCall(config.icon) ?? ''
+    if (item.dataset.label === label && item.dataset.icon === icon) return
+    item.dataset.label = label
+    item.dataset.icon = icon
+    const el = iconElement(config)
+    if (el && iconOnly) {
+        item.replaceChildren(el)
+        item.title = label
+        item.setAttribute('aria-label', label)
+    } else {
+        item.replaceChildren(...el ? [el] : [], label)
+        item.removeAttribute('title')
+        item.removeAttribute('aria-label')
+    }
+    item.classList.toggle('tpfm-icon-only', !!el && iconOnly)
+}
 
 /**
  * Opens a menu of buttons at an element: a list of buttons (the labels of the configs) under the element, inside the
@@ -126,8 +173,7 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
                 })
                 itemOf.set(b, item)
             }
-            const label = UiConfigMethods.GetLabel(b)
-            if (item.textContent !== label) item.textContent = label
+            setItemContent(item, b, false)
             item.disabled = isOff(b)
             return item
         })
@@ -281,8 +327,10 @@ function createFolderActions(renderer: UiConfigRendererTweakpane, folder: Folder
         items.forEach((item, i) => item.hidden = i >= count)
         more.hidden = count === items.length
         overflow = shown.slice(count)
-        // a long title ends with … before the actions
-        header.style.paddingRight = `${right + bar.offsetWidth + 4}px`
+        // a long title ends with … before the actions; never wider than the folder, as a padding larger than the header
+        // makes the header wider (then the next layout would fit more, and pad more)
+        const maxPadding = element.clientWidth - parseFloat(getComputedStyle(header).paddingLeft)
+        header.style.paddingRight = `${Math.min(right + bar.offsetWidth + 4, maxPadding)}px`
         if (open?.anchor === more) {
             if (overflow.length) open.update(overflow)
             else closeButtonMenu()
@@ -308,8 +356,7 @@ function createFolderActions(renderer: UiConfigRendererTweakpane, folder: Folder
                 })
                 itemOf.set(b, item)
             }
-            const label = UiConfigMethods.GetLabel(b)
-            if (item.textContent !== label) item.textContent = label
+            setItemContent(item, b, true)
             return item
         })
         if ([...items, more].some((item, i) => bar.children[i] !== item)) bar.replaceChildren(...items, more)

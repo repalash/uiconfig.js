@@ -170,3 +170,16 @@
 .folder-actions-menu {
   font-size: var(--pt-font-size-small);
 }
+
+// an icon from SVG markup or an image URL, at the size of the Blueprint icons
+.folder-action-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex: none;
+
+  > svg {
+    width: 100%;
+    height: 100%;
+  }
+}
