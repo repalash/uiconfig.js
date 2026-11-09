@@ -1,9 +1,10 @@
 import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi, TabApi} from 'tweakpane'
 import {BladeController, TextView, View} from '@tweakpane/core'
 import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
-import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
+import {ChangeEvent, TUiRefreshModes, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
+import {folderHeaderButtons, isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
 
 export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
     let folder = config.uiRef as FolderApi | undefined
@@ -30,17 +31,21 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     if (!folder) return folder
     folder.expanded = getOrCall(config.expanded) ?? lastExpanded ?? false // todo;;
 
-    const childObjects = plugin.methods.getChildren(config)
+    const allChildren = plugin.methods.getChildren(config)
+    // there will be an issue if a child is then added to the root pane in tweakpane
+    const onChildChange = (ev: ChangeEvent, ...args: any[]) => plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
+    // the buttons for a menu (the context-menu tag) go to the ⋮ button of the header, not to the body
+    const menuButtons = plugin.folderMenus ? allChildren.filter(isFolderMenuButton) : []
+    const childObjects = menuButtons.length ? allChildren.filter(c => !menuButtons.includes(c)) : allChildren
     // console.log(childObjects)
     // if (childObjects) {
     // const children = childObjects?.map(value => value.uiRef) as BladeApi<BladeController<View>>[]
     let i = 0
     const newChildren = []
     for (const child of childObjects) { // todo check comparison with uiConfig.uuid
-        child.parentOnChange = (ev: ChangeEvent, ...args) => { // there will be an issue if this child is then added to the root pane in tweakpane
-            plugin.methods.dispatchOnChangeSync(config, {...ev}, ...args)
-        }
+        child.parentOnChange = onChildChange
         setupPropertyForwarding(child, config)
+        folderHeaderButtons.delete(child)
 
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
@@ -136,6 +141,15 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         folder.controller_.foldable.cleanUpTransition()
     }
 
+    // the menu buttons are not rendered: set up as renderUiObject does for the body controls (binding to property, the
+    // change events, a refresh), after the loop above, which clears these on a button that was in the body before
+    for (const b of menuButtons) {
+        folderHeaderButtons.add(b)
+        UiConfigMethods.InitUiConfig(b)
+        b.parentOnChange = onChildChange
+        b.uiRefresh = (_deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => config.uiRefresh?.(false, mode, delay)
+    }
+    updateFolderMenuButton(plugin, folder, menuButtons)
     return folder
 }
 

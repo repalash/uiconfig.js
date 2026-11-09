@@ -33,6 +33,19 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      * If not provided, the label will be determined automatically, by the key of the property or sets to defaults
      */
     label?: ValOrFunc<string>,
+
+    /**
+     * An icon for the object, or a function that returns one. Three forms:
+     * - SVG markup (starts with `<svg`): drawn inline, so it takes the text color (`currentColor`). It is inserted as
+     *   HTML, so it must come from the app, never from a user.
+     * - An image URL (`https:`, `http:`, `data:`, `blob:`, or a path with `/` or a file extension): drawn as an image.
+     * - Any other string: an icon name of the renderer (uiconfig-blueprint: the Blueprint icon names, like `'trash'`).
+     *   A renderer without an icon set (uiconfig-tweakpane) shows the label instead.
+     *
+     * Used by the folder header actions and their menus (buttons with the tag `context-menu`), where a button with an
+     * icon shows the icon only, and the label as its tooltip.
+     */
+    icon?: ValOrFunc<string | undefined>,
     /**
      * Children of this object. This is used for folders and dropdowns.
      * This can be an array of UiObjectConfig objects, or an array of functions that returns an array of UiObjectConfig objects.

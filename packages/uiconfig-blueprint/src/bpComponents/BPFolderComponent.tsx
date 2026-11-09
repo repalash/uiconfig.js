@@ -1,5 +1,6 @@
 import React, {ChangeEventHandler, DOMAttributes} from "react";
 import {BPComponentProps, UiConfigRendererContextType} from "./BPComponent";
+import type {UiObjectConfig} from "uiconfig.js";
 import {
     Button,
     Checkbox,
@@ -19,6 +20,8 @@ import classNames from "classnames";
 import {AnimationStates} from "@blueprintjs/core/lib/esm/components/collapse/collapse";
 
 export type BPFolderComponentState = BPContainerComponentState & {
+    /** The width of the header actions, kept free at the right of the title */
+    actionsWidth?: number
 }
 
 export type BPFolderComponentProps = BPContainerComponentProps & {
@@ -50,23 +53,20 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
         const enabledToggle = children[0] && this.context.methods.getBinding(children[0])[1] === 'enabled' ? children[0] : undefined
         if(enabledToggle) children = children.slice(1)
 
+        // the buttons with the tag context-menu (without the tag inline) go to the header: buttons while they fit, a menu for the rest
         const ctxMenuBtns = children.filter(c=>{
-            return c.type === 'button' && c.tags?.includes('context-menu')
+            return c.type === 'button' && c.tags?.includes('context-menu') && !c.tags?.includes('inline')
         })
         let endIcon: MaybeElement = undefined
         if(ctxMenuBtns.length > 0){
             children = children.filter(c=>!ctxMenuBtns.includes(c))
             endIcon = (
-                <Popover
-                    content={<ContextMenu buttons={ctxMenuBtns} context={this.context} />}
-                    placement="bottom-end"
-                >
-                    <Button
-                        icon="more"
-                        variant={"minimal"}
-                        size={"small"}
-                    />
-                </Popover>
+                <FolderActions
+                    buttons={ctxMenuBtns}
+                    context={this.context}
+                    disabled={this.state.disabled}
+                    onWidth={(w) => w !== this.state.actionsWidth && this.setState({...this.state, actionsWidth: w})}
+                />
             )
         }
 
@@ -83,6 +83,7 @@ export class BPFolderComponent extends BPContainerComponent<BPFolderComponentSta
                 }}
                 icon={icon}
                 endIcon={endIcon}
+                endWidth={endIcon ? this.state.actionsWidth : undefined}
                 label={this.state.label}
                 enabled={enabledToggle ? this.context.methods.getRawValue(enabledToggle) : undefined}
                 onEnabledChange={(e) => enabledToggle && this.context.methods.setValue(enabledToggle, e.target.checked, {}).then(() => this.setState(this.state))}
@@ -111,6 +112,8 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{
     onClick: DOMAttributes<HTMLElement>['onClick']
     icon?: IconName | MaybeElement
     endIcon?: IconName | MaybeElement
+    /** The width that endIcon takes at the right; the label ends before it */
+    endWidth?: number
 }>> = (props) => {
     const hasEnabled = (props.enabled !== undefined)
     return (
@@ -151,7 +154,10 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{
                     variant={"minimal"}
                     disabled={props.disabled}
                     size={props.minimal?"small":"medium"}
-                    style={props.level ? {marginLeft: "6px"} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"}}
+                    style={{
+                        ...props.level ? {marginLeft: "6px"} : {fontSize: "0.95rem", paddingTop: "8px", paddingBottom: "8px"},
+                        ...props.endWidth ? {paddingRight: `${props.endWidth}px`} : {},
+                    }}
                     // intent={props.open ? Intent.PRIMARY : Intent.NONE}
                     intent={Intent.NONE}
                     // icon={props.enabled !== undefined  && <span style={{minWidth: '20px'}}></span>} // adding a span here will center the text in the button
@@ -173,7 +179,7 @@ export const FolderHeadCard: React.FC<React.PropsWithChildren<{
                     disabled={props.disabled}
                     onClick={(e) => e.stopPropagation()}
                 />}
-                {props.endIcon && <div style={{position: 'absolute', right: '10px'}}>
+                {props.endIcon && <div className="folder-head-end">
                     {props.endIcon}
                 </div>}
             </div>
@@ -251,7 +257,7 @@ export const ContextMenu: React.FC<{
     context: UiConfigRendererContextType;
 }> = ({ buttons, context }) => {
     return (
-        <Menu>
+        <Menu size="small" className="folder-actions-menu">
             {buttons.map((btn, i) => {
                 const getProps = ()=>{ // todo use UiConfigMethods.getBaseProps
                     const hidden = getOrCall(btn.hidden) ?? false
@@ -265,6 +271,7 @@ export const ContextMenu: React.FC<{
                         key={'ctx' + i}
                         disabled={props.disabled || props.readOnly}
                         text={context.methods.getLabel(btn)}
+                        icon={configIcon(btn)}
                         onClick={(e) => {
                             e.stopPropagation();
                             const {hidden, disabled, readOnly} = getProps()
@@ -278,3 +285,102 @@ export const ContextMenu: React.FC<{
         </Menu>
     );
 };
+
+const isOff = (b: UiObjectConfig) => !!(getOrCall(b.disabled) || getOrCall(b.readOnly))
+
+/**
+ * The icon of a config (`config.icon`) for a Blueprint button or menu item: SVG markup inline, an image URL as an
+ * `<img>`, any other string as a Blueprint icon name.
+ */
+export function configIcon(config: UiObjectConfig): IconName | MaybeElement {
+    const icon = getOrCall(config.icon)?.trim()
+    if (!icon) return undefined
+    // app markup, see UiObjectConfig.icon
+    if (icon.startsWith('<svg')) return <span className="folder-action-icon" dangerouslySetInnerHTML={{__html: icon}}/>
+    if (/^(https?:|data:|blob:)/.test(icon) || /[/.]/.test(icon)) return <img className="folder-action-icon" src={icon} alt=""/>
+    return icon as IconName
+}
+
+/**
+ * The actions in a folder header: a button for each of `buttons` that fits after the folder label, and a ⋯ button with
+ * a menu of the rest. It follows the size of the header (a resize of the panel) and each render of the folder.
+ */
+export const FolderActions: React.FC<{
+    buttons: UiObjectConfig[]
+    context: UiConfigRendererContextType
+    /** the folder is disabled: all the actions are off */
+    disabled?: boolean
+    /** called with the width that the actions take at the right of the header (with their margin) */
+    onWidth?: (width: number) => void
+}> = ({buttons, context, disabled, onWidth}) => {
+    const bar = React.useRef<HTMLDivElement>(null)
+    const shown = buttons.filter(b => !getOrCall(b.hidden))
+    const [fit, setFit] = React.useState(shown.length)
+    // the buttons that fit after the label; the rest go to the menu. The display of each is set here, not by React
+    const layout = () => {
+        const el = bar.current
+        const head = el?.closest<HTMLElement>('.folder-head-card, .folder-head-card-minimal')
+        if (!el || !head) return
+        const items = Array.from(el.querySelectorAll<HTMLElement>(':scope > .folder-action'))
+        const more = el.querySelector<HTMLElement>(':scope > .folder-actions-more')
+        for (const item of items) item.style.display = ''
+        if (more) more.style.display = ''
+        const h = head.getBoundingClientRect()
+        if (!h.width) return // not on the page: the resize observer calls this again when it shows
+        const end = el.parentElement ? h.right - el.parentElement.getBoundingClientRect().right : 0
+        const text = head.querySelector(`.folder-trigger-button .${Classes.BUTTON_TEXT}`)
+        let textRight = h.left
+        if (text) {
+            const range = document.createRange()
+            range.selectNodeContents(text)
+            textRight = Math.max(range.getBoundingClientRect().right, h.left)
+        }
+        const room = h.right - end - textRight - 8
+        const gap = 2
+        const widths = items.map(i => i.offsetWidth)
+        let count = items.length
+        if (widths.reduce((sum, w) => sum + w + gap, -gap) > room) {
+            let used = more?.offsetWidth ?? 0
+            count = 0
+            while (count < items.length && used + gap + widths[count] <= room) used += gap + widths[count++]
+        }
+        items.forEach((item, i) => item.style.display = i < count ? '' : 'none')
+        if (more) more.style.display = count < items.length ? '' : 'none'
+        if (count !== fit) setFit(count)
+        onWidth?.(end + el.offsetWidth + 4)
+    }
+    const layoutRef = React.useRef(layout)
+    layoutRef.current = layout
+    React.useLayoutEffect(() => layout())
+    React.useEffect(() => {
+        const head = bar.current?.closest('.folder-head-card, .folder-head-card-minimal')
+        if (!head) return
+        const observer = new ResizeObserver(() => layoutRef.current())
+        observer.observe(head)
+        return () => observer.disconnect()
+    }, [])
+    return (
+        <div className="folder-actions" ref={bar}>
+            {shown.map((b, i) => (
+                <Button
+                    key={b.uuid ?? 'a' + i}
+                    className="folder-action"
+                    size="small"
+                    // with an icon: the icon only, and the label as its tooltip and name
+                    {...configIcon(b) ? {icon: configIcon(b), title: context.methods.getLabel(b), 'aria-label': context.methods.getLabel(b)} : {text: context.methods.getLabel(b)}}
+                    disabled={disabled || isOff(b)}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        if (disabled || getOrCall(b.hidden) || isOff(b)) return
+                        context.methods.clickButton(b, {args: [e]})
+                    }}
+                />
+            ))}
+            <span className="folder-actions-more">
+                <Popover content={<ContextMenu buttons={shown.slice(fit)} context={context} />} placement="bottom-end" disabled={disabled}>
+                    <Button icon="more" variant="minimal" size="small" disabled={disabled} aria-label="More actions" title="More actions" />
+                </Popover>
+            </span>
+        </div>
+    )
+}

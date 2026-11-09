@@ -3,6 +3,7 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
+- `UiObjectConfig.icon` (a string or a function): SVG markup, an image URL, or an icon name of the renderer. uiconfig-tweakpane and uiconfig-blueprint draw it on the folder header actions and their menus.
 
 ## v0.4.1
 - Fix: a binding with the key `0` (`property: [array, 0]`) works; `GetBinding` rejected every falsy key.

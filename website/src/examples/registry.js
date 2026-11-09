@@ -89,6 +89,11 @@ export const examples = [
         preview: ['button', 'button', 'monitor'], log: true,
     },
     {
+        slug: 'folder-menus', topic: 'components', title: 'Folder menus', renderers: both,
+        summary: 'A `button` with the tag `context-menu` goes to its folder header, not to the folder body: a small button after the title while it fits, else in the menu of the ⋮ button. With an `icon` (SVG markup, an image URL or a Blueprint icon name) the header shows the icon only, and the label on hover. Make the window narrow to see more buttons move to the menu. With the tag `inline` too, a button stays in the body. `hidden` and `disabled` work there too.',
+        preview: ['folder', 'button', 'button'], log: true,
+    },
+    {
         slug: 'colors-vectors', topic: 'components', title: 'Colors and vectors', renderers: both,
         summary: '`color` edits a hex string, a number or a three.js `Color`; `vec2`, `vec3` and `vec4` edit `{x, y, z, w}` objects. Both components create their values with the classes in `ui.THREE`.',
         preview: ['color', 'color', 'vec', 'vec'], log: true,
