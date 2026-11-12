@@ -248,7 +248,8 @@ export function closeButtonMenu() {
 
 /** A bar of folder actions: the header bar of a folder, or one mounted in another element ({@link mountFolderActions}) */
 interface ActionsBar {
-    update: (buttons: UiObjectConfig[]) => void
+    /** `folder`: the folder of this render (its config's `uiRef` is set only after the folder generator returns) */
+    update: (buttons: UiObjectConfig[], folder?: FolderApi) => void
     remove: () => void
 }
 /** The header actions of each folder (its element) */
@@ -263,7 +264,7 @@ const mountedActions = new WeakMap<UiObjectConfig, Set<ActionsBar>>()
  * folder with {@link mountFolderActions}.
  */
 export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: FolderApi, buttons: UiObjectConfig[], config?: UiObjectConfig) {
-    if (config) mountedActions.get(config)?.forEach(m => m.update(buttons))
+    if (config) mountedActions.get(config)?.forEach(m => m.update(buttons, folder))
     const element = folder.controller_.view.element as HTMLElement
     let actions = folderActions.get(element)
     if (!buttons.some(b => !isHidden(b))) {
@@ -462,8 +463,10 @@ export interface MountedFolderActions {
  * variables of the folder.
  */
 export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: UiObjectConfig, element: HTMLElement): MountedFolderActions {
+    // the folder of the last render; before one, the rendered folder of the config, if any
+    let rendered: FolderApi | undefined
     const folder = () => {
-        const f = config.uiRef as FolderApi | undefined
+        const f = rendered ?? config.uiRef as FolderApi | undefined
         return f && !f.controller_.viewProps.get('disposed') ? f : undefined
     }
     const actions = createActionsBar(renderer, {
@@ -496,7 +499,13 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
     element.appendChild(actions.bar)
     let set = mountedActions.get(config)
     if (!set) mountedActions.set(config, set = new Set())
-    const handle: ActionsBar = {update: actions.update, remove: () => remove()}
+    const handle: ActionsBar = {
+        update: (buttons, f) => {
+            if (f) rendered = f
+            actions.update(buttons)
+        },
+        remove: () => remove(),
+    }
     set.add(handle)
     const remove = () => {
         observer.disconnect()
