@@ -1,4 +1,5 @@
 import {FolderApi} from 'tweakpane'
+import type {ViewProps} from '@tweakpane/core'
 import {UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {createStyles, css, getOrCall} from 'ts-browser-helpers'
 import type {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
@@ -37,6 +38,8 @@ function addStyles() {
     styles = createStyles(css`
       .tpfm-actions { position: absolute; z-index: 1; display: flex; align-items: center; gap: 2px; pointer-events: none; }
       .tpfm-actions > * { pointer-events: auto; }
+      .tpfm-actions.tpfm-mounted { position: static; justify-content: flex-end; pointer-events: auto; }
+      .tpfm-mounted > .tpfm-action, .tpfm-mounted > .tpfm-button { height: var(--tp-blade-unit-size, 20px); max-height: none; }
       .tpfm-actions > [hidden] { display: none !important; } /* over the display of the icon-only buttons */
       .tpfm-action {
         height: calc(100% - 6px); max-height: var(--tp-blade-unit-size, 20px); padding: 0 8px; border: 0;
@@ -243,19 +246,24 @@ export function closeButtonMenu() {
     open?.close()
 }
 
-interface FolderActions {
+/** A bar of folder actions: the header bar of a folder, or one mounted in another element ({@link mountFolderActions}) */
+interface ActionsBar {
     update: (buttons: UiObjectConfig[]) => void
     remove: () => void
 }
 /** The header actions of each folder (its element) */
-const folderActions = new WeakMap<HTMLElement, FolderActions>()
+const folderActions = new WeakMap<HTMLElement, ActionsBar>()
+/** The bars mounted for each folder config, updated at each render of the folder */
+const mountedActions = new WeakMap<UiObjectConfig, Set<ActionsBar>>()
 
 /**
  * Adds, updates or removes the actions in the header of a folder, for its menu buttons ({@link isFolderMenuButton}):
  * as many buttons as fit after the title, and a ⋮ button with a menu of the rest. Called by the folder generator at
- * each render, with the menu buttons that it left out of the folder body.
+ * each render, with the menu buttons that it left out of the folder body. It also updates the bars mounted for the
+ * folder with {@link mountFolderActions}.
  */
-export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: FolderApi, buttons: UiObjectConfig[]) {
+export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: FolderApi, buttons: UiObjectConfig[], config?: UiObjectConfig) {
+    if (config) mountedActions.get(config)?.forEach(m => m.update(buttons))
     const element = folder.controller_.view.element as HTMLElement
     let actions = folderActions.get(element)
     if (!buttons.some(b => !isHidden(b))) {
@@ -269,18 +277,24 @@ export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, fold
     actions.update(buttons)
 }
 
+/** The CSS variables that a mounted bar copies from its folder (its element can be outside the Tweakpane panel) */
+const BAR_THEME_VARS = [...THEME_VARS, '--tp-button-background-color', '--tp-button-background-color-hover',
+    '--tp-button-foreground-color', '--tp-blade-unit-size', '--tp-element-border-radius']
+
 /**
- * The actions in the header of a folder: a bar over the right of the header, with a button for each menu button that
- * fits after the title and a ⋮ button for the rest. It follows the header size (a resize, a theme) and each render.
+ * The parts of an actions bar that do not depend on where it is: the bar, a button for each shown menu button, the
+ * ⋮ button with a menu of the rest, the disabled state (the folder's, through `viewProps`) and the fit.
+ * `layout` places the bar and returns the room for the buttons in px, or undefined when the bar is not shown.
  */
-function createFolderActions(renderer: UiConfigRendererTweakpane, folder: FolderApi): FolderActions {
+function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
+    className: string
+    viewProps: () => ViewProps | undefined
+    layout: (bar: HTMLElement) => number | undefined
+    afterLayout?: (bar: HTMLElement) => void
+}) {
     addStyles()
-    const view = folder.controller_.view
-    const element = view.element as HTMLElement, header = view.buttonElement, title = view.titleElement
-    const viewProps = folder.controller_.viewProps
-    // over the right of the header, a sibling of it (a button can not hold buttons); its gaps let clicks through to fold
     const bar = document.createElement('div')
-    bar.className = 'tpfm-actions'
+    bar.className = opts.className
     const more = document.createElement('button')
     more.type = 'button'
     more.className = 'tpfm-button'
@@ -289,38 +303,38 @@ function createFolderActions(renderer: UiConfigRendererTweakpane, folder: Folder
     more.setAttribute('aria-label', 'More actions')
     more.setAttribute('aria-haspopup', 'menu')
     more.setAttribute('aria-expanded', 'false')
-    viewProps.bindDisabled(more) // off in a disabled folder, or in a folder in one, like the Tweakpane controls
     bar.appendChild(more)
 
     const itemOf = new Map<UiObjectConfig, HTMLButtonElement>()
     let shown: UiObjectConfig[] = []
     let overflow: UiObjectConfig[] = []
-    const folderOff = () => viewProps.globalDisabled.rawValue
+    // off in a disabled folder, or in a folder in one, like the Tweakpane controls; a disable closes the open menu
+    const folderOff = () => !!opts.viewProps()?.globalDisabled.rawValue
     const setDisabled = () => {
-        for (const [b, item] of itemOf) item.disabled = folderOff() || isOff(b)
+        const off = folderOff()
+        more.disabled = off
+        for (const [b, item] of itemOf) item.disabled = off || isOff(b)
+    }
+    const onDisabled = () => {
+        setDisabled()
+        if (folderOff() && open?.anchor === more) closeButtonMenu()
+    }
+    let watched: ViewProps | undefined
+    const watchDisabled = () => {
+        const vp = opts.viewProps()
+        if (vp === watched) return
+        watched?.globalDisabled.emitter.off('change', onDisabled)
+        vp?.globalDisabled.emitter.on('change', onDisabled)
+        watched = vp
     }
 
-    // the buttons that fit after the title, the ⋮ button for the rest; placed from the header, so that any theme fits
+    // the buttons that fit in the room, the ⋮ button for the rest
     const layout = () => {
         const items = shown.map(b => itemOf.get(b)).filter((i): i is HTMLButtonElement => !!i)
         for (const item of items) item.hidden = false
         more.hidden = false
-        const h = header.getBoundingClientRect(), box = element.getBoundingClientRect()
-        // the header is not shown (an app hides it, or the panel is hidden): no actions there; the resize observer calls
-        // this again when it shows. An app that hides the header can open the menu with openFolderMenu.
-        bar.style.display = h.width ? '' : 'none'
-        if (!h.width) return
-        // the fold mark keeps its room when it is on the right (the Tweakpane default); a theme can put it on the left
-        const mark = header.querySelector('.tp-fldv_m')?.getBoundingClientRect()
-        const right = mark && mark.width && mark.left > h.left + h.width / 2 ? h.right - mark.left + 2 : 4
-        // from the padding box of the folder (a theme can give it a border)
-        const borderRight = element.offsetWidth - element.clientWidth - element.clientLeft
-        bar.style.top = `${h.top - box.top - element.clientTop}px`
-        bar.style.height = `${h.height}px`
-        bar.style.right = `${box.right - h.right - borderRight + right}px`
-        const range = document.createRange()
-        range.selectNodeContents(title)
-        const room = h.right - right - Math.max(range.getBoundingClientRect().right, h.left) - 8
+        const room = opts.layout(bar)
+        if (room === undefined) return
         const gap = 2
         const widths = items.map(i => i.offsetWidth)
         let count = items.length
@@ -332,10 +346,7 @@ function createFolderActions(renderer: UiConfigRendererTweakpane, folder: Folder
         items.forEach((item, i) => item.hidden = i >= count)
         more.hidden = count === items.length
         overflow = shown.slice(count)
-        // a long title ends with … before the actions; never wider than the folder, as a padding larger than the header
-        // makes the header wider (then the next layout would fit more, and pad more)
-        const maxPadding = element.clientWidth - parseFloat(getComputedStyle(header).paddingLeft)
-        header.style.paddingRight = `${Math.min(right + bar.offsetWidth + 4, maxPadding)}px`
+        opts.afterLayout?.(bar)
         if (open?.anchor === more) {
             if (overflow.length) open.update(overflow)
             else closeButtonMenu()
@@ -365,31 +376,133 @@ function createFolderActions(renderer: UiConfigRendererTweakpane, folder: Folder
             return item
         })
         if ([...items, more].some((item, i) => bar.children[i] !== item)) bar.replaceChildren(...items, more)
+        watchDisabled()
         setDisabled()
         layout()
     }
 
-    // a disable closes the open menu, and turns the buttons off
-    const onDisabled = () => {
-        setDisabled()
-        if (folderOff() && open?.anchor === more) closeButtonMenu()
-    }
-    viewProps.globalDisabled.emitter.on('change', onDisabled)
-    const observer = new ResizeObserver(() => layout())
-    observer.observe(header)
     more.addEventListener('click', () => {
         if (open?.anchor === more) return closeButtonMenu()
         openButtonMenu(renderer, overflow, more)
     })
-    element.appendChild(bar)
+    const dispose = () => {
+        watched?.globalDisabled.emitter.off('change', onDisabled)
+        watched = undefined
+        if (open?.anchor === more) closeButtonMenu()
+        bar.remove()
+    }
+    return {bar, update, layout, dispose}
+}
+
+/**
+ * The actions in the header of a folder: a bar over the right of the header, with a button for each menu button that
+ * fits after the title and a ⋮ button for the rest. It follows the header size (a resize, a theme) and each render.
+ */
+function createFolderActions(renderer: UiConfigRendererTweakpane, folder: FolderApi): ActionsBar {
+    const view = folder.controller_.view
+    const element = view.element as HTMLElement, header = view.buttonElement, title = view.titleElement
+    const viewProps = folder.controller_.viewProps
+    let right = 4
+    // over the right of the header, a sibling of it (a button can not hold buttons); its gaps let clicks through to fold
+    const actions = createActionsBar(renderer, {
+        className: 'tpfm-actions',
+        viewProps: () => viewProps,
+        layout: (bar) => {
+            const h = header.getBoundingClientRect(), box = element.getBoundingClientRect()
+            // the header is not shown (an app hides it, or the panel is hidden): no actions there; the resize observer
+            // calls this again when it shows. An app that hides the header can mount them elsewhere (mountFolderActions).
+            bar.style.display = h.width ? '' : 'none'
+            if (!h.width) return undefined
+            // the fold mark keeps its room when it is on the right (the Tweakpane default); a theme can put it on the left
+            const mark = header.querySelector('.tp-fldv_m')?.getBoundingClientRect()
+            right = mark && mark.width && mark.left > h.left + h.width / 2 ? h.right - mark.left + 2 : 4
+            // from the padding box of the folder (a theme can give it a border)
+            const borderRight = element.offsetWidth - element.clientWidth - element.clientLeft
+            bar.style.top = `${h.top - box.top - element.clientTop}px`
+            bar.style.height = `${h.height}px`
+            bar.style.right = `${box.right - h.right - borderRight + right}px`
+            const range = document.createRange()
+            range.selectNodeContents(title)
+            return h.right - right - Math.max(range.getBoundingClientRect().right, h.left) - 8
+        },
+        // a long title ends with … before the actions; never wider than the folder, as a padding larger than the header
+        // makes the header wider (then the next layout would fit more, and pad more)
+        afterLayout: (bar) => {
+            const maxPadding = element.clientWidth - parseFloat(getComputedStyle(header).paddingLeft)
+            header.style.paddingRight = `${Math.min(right + bar.offsetWidth + 4, maxPadding)}px`
+        },
+    })
+    const observer = new ResizeObserver(() => actions.layout())
+    observer.observe(header)
+    element.appendChild(actions.bar)
 
     const remove = () => {
         observer.disconnect()
-        viewProps.globalDisabled.emitter.off('change', onDisabled)
-        bar.remove()
+        actions.dispose()
         header.style.paddingRight = ''
         folderActions.delete(element)
     }
     viewProps.handleDispose(remove)
-    return {update, remove}
+    return {update: actions.update, remove}
+}
+
+/** A bar of a folder's actions mounted in another element, from {@link mountFolderActions} */
+export interface MountedFolderActions {
+    /** Draws the buttons again from the folder config (a render of the folder does it too) */
+    refresh(): void
+    /** Removes the bar from the element */
+    remove(): void
+}
+
+/**
+ * Draws the actions of a folder (its menu buttons, {@link isFolderMenuButton}) in another element: as many buttons as
+ * fit in the element's width, and a ⋮ button with a menu of the rest, as in a folder header. For an app that hides the
+ * header of a folder (and shows its own title row): the actions of a hidden header are not shown there. The bar
+ * follows each render of the folder, the element's size and the folder's disabled state, and takes the Tweakpane theme
+ * variables of the folder.
+ */
+export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: UiObjectConfig, element: HTMLElement): MountedFolderActions {
+    const folder = () => {
+        const f = config.uiRef as FolderApi | undefined
+        return f && !f.controller_.viewProps.get('disposed') ? f : undefined
+    }
+    const actions = createActionsBar(renderer, {
+        className: 'tpfm-actions tpfm-mounted',
+        viewProps: () => folder()?.controller_.viewProps,
+        layout: (bar) => {
+            // the colours and sizes of the folder's theme
+            const from = folder()?.controller_.view.element as HTMLElement | undefined
+            if (from) {
+                const computed = getComputedStyle(from)
+                for (const v of BAR_THEME_VARS) {
+                    const value = computed.getPropertyValue(v)
+                    if (value) bar.style.setProperty(v, value)
+                }
+            }
+            const shown = Array.from(bar.children).some(c => c.classList.contains('tpfm-action'))
+            bar.style.display = shown ? '' : 'none'
+            if (!shown || !element.clientWidth) return undefined
+            const style = getComputedStyle(element)
+            return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+        },
+    })
+    const refresh = () => {
+        const buttons = renderer.folderMenuButtons(config)
+        for (const b of buttons) UiConfigMethods.InitUiConfig(b) // binding to property, also before the folder renders
+        actions.update(buttons)
+    }
+    const observer = new ResizeObserver(() => actions.layout())
+    observer.observe(element)
+    element.appendChild(actions.bar)
+    let set = mountedActions.get(config)
+    if (!set) mountedActions.set(config, set = new Set())
+    const handle: ActionsBar = {update: actions.update, remove: () => remove()}
+    set.add(handle)
+    const remove = () => {
+        observer.disconnect()
+        actions.dispose()
+        mountedActions.get(config)?.delete(handle)
+    }
+    refresh()
+    return {refresh, remove}
 }

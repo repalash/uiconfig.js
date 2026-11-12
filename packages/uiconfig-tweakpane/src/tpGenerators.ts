@@ -149,7 +149,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         b.parentOnChange = onChildChange
         b.uiRefresh = (_deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => config.uiRefresh?.(false, mode, delay)
     }
-    updateFolderMenuButton(plugin, folder, menuButtons)
+    updateFolderMenuButton(plugin, folder, menuButtons, config)
     return folder
 }
 

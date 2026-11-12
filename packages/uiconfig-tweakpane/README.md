@@ -133,6 +133,17 @@ does the same in its folders. Example: https://repalash.com/uiconfig.js/examples
 - The menu stays inside the window, and scrolls when it is taller (a phone in landscape). It takes the colours of the
   folder (the Tweakpane theme variables).
 - `ui.folderMenus = false` (before the folders render) shows all the buttons in the body, as before.
+- `ui.mountFolderActions(config, element)` draws the actions of a folder in another element, as in its header: buttons
+  while they fit in the element's width, and the rest in a ⋮ menu. It is for an app that hides the header of a folder and
+  shows its own title row (the actions of a hidden header are not shown there). The bar follows each render of the
+  folder, the element's size and the folder's disabled state, and takes the folder's Tweakpane theme. It returns
+  `refresh()` and `remove()`.
+
+  ```js
+  const actions = ui.mountFolderActions(objectConfig, myTitleRow) // myTitleRow: an element of the app
+  // later
+  actions.remove()
+  ```
 - `ui.openFolderMenu(config, element)` opens a menu with all the header buttons of a folder at another element, for a
   folder whose header the app hides; `ui.folderMenuButtons(config)` lists them. `openButtonMenu(ui, buttons, element)` opens
   such a menu for any list of buttons.

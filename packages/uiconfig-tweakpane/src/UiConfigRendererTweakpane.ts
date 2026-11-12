@@ -13,7 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
-import {folderHeaderButtons, isFolderMenuButton, openButtonMenu} from './tpFolderMenu'
+import {folderHeaderButtons, isFolderMenuButton, mountFolderActions, openButtonMenu, type MountedFolderActions} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -54,6 +54,16 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
      */
     openFolderMenu(config: UiObjectConfig, anchor: HTMLElement): boolean {
         return openButtonMenu(this, this.folderMenuButtons(config), anchor)
+    }
+
+    /**
+     * Draws the actions of a folder config in another element, as in its header: as many buttons as fit in the element's
+     * width, and a ⋮ button with a menu of the rest. For a folder whose header the app hides (the actions of a hidden
+     * header are not shown there), like a panel with its own title row. The bar follows each render of the folder.
+     * @returns `refresh()` (draw again from the config) and `remove()`
+     */
+    mountFolderActions(config: UiObjectConfig, element: HTMLElement): MountedFolderActions {
+        return mountFolderActions(this, config, element)
     }
 
     /**
