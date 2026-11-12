@@ -49,7 +49,7 @@ function addStyles() {
     if (styles?.isConnected) return
     styles = createStyles(css`
       .tpfm-actions { position: absolute; z-index: 1; display: flex; align-items: center; gap: 2px; pointer-events: none; }
-      .tpfm-actions > * { pointer-events: auto; }
+      .tpfm-actions > * { pointer-events: auto; flex: none; } /* the fit measures their full widths */
       .tpfm-actions.tpfm-mounted { position: static; justify-content: flex-end; pointer-events: auto; }
       .tpfm-mounted > .tpfm-action, .tpfm-mounted > .tpfm-button { height: var(--tp-blade-unit-size, 20px); max-height: none; }
       .tpfm-actions > [hidden] { display: none !important; } /* over the display of the icon-only buttons */
