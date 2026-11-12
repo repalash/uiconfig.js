@@ -1,6 +1,6 @@
 import {FolderApi} from 'tweakpane'
 import type {ViewProps} from '@tweakpane/core'
-import {UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
+import {ChangeEvent, TUiRefreshModes, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {createStyles, css, getOrCall} from 'ts-browser-helpers'
 import type {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
 
@@ -22,6 +22,18 @@ const hasTag = (config: UiObjectConfig, tag: string) => {
  * their folder for them, not a body control: a deep refresh can still list a button that just moved from the body.
  */
 export const folderHeaderButtons = new WeakSet<UiObjectConfig>()
+
+/**
+ * Sets up a header button of a folder as `renderUiObject` does for a body control, since it is not rendered: the binding
+ * to its property, its change events to the folder (`onChange` of the folder gets the click) and its refresh (of the
+ * folder). By the folder generator at each render, and by {@link mountFolderActions} for the buttons that it reads.
+ */
+export function setupFolderMenuButton(folder: UiObjectConfig, button: UiObjectConfig) {
+    folderHeaderButtons.add(button)
+    UiConfigMethods.InitUiConfig(button)
+    button.parentOnChange = (ev: ChangeEvent, ...args: any[]) => UiConfigMethods.DispatchOnChangeSync(folder, {...ev}, ...args)
+    button.uiRefresh = (_deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => folder.uiRefresh?.(false, mode, delay)
+}
 
 /** A button that a folder shows in its menu: a `button` with the `context-menu` tag, without the `inline` tag */
 export function isFolderMenuButton(config: UiObjectConfig) {
@@ -491,7 +503,8 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
     })
     const refresh = () => {
         const buttons = renderer.folderMenuButtons(config)
-        for (const b of buttons) UiConfigMethods.InitUiConfig(b) // binding to property, also before the folder renders
+        // set up as the folder render does (a function in children can make new configs; a button added since)
+        for (const b of buttons) setupFolderMenuButton(config, b)
         actions.update(buttons)
     }
     const observer = new ResizeObserver(() => actions.layout())
