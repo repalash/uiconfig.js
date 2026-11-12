@@ -1,7 +1,7 @@
 {
   "name": "uiconfig-blueprint",
   "name:umd": "bpui",
-  "version": "0.1.0-dev.18",
+  "version": "0.1.0-dev.19",
   "publishConfig": {
     "tag": "latest"
   },
@@ -142,7 +142,7 @@
   },
   "dependencies": {
     "ts-browser-helpers": ">=0.19.4",
-    "uiconfig.js": "^0.4.1",
+    "uiconfig.js": "^0.4.2",
     "@blueprintjs/icons": "^5.23.0",
     "@blueprintjs/select": "^5.3.21",
     "blueprint-styler": "^5.0.2",
