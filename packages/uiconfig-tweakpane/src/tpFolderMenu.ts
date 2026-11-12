@@ -512,8 +512,9 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
                     else bar.style.removeProperty(v)
                 }
             }
-            // as the header: not shown while the folder is hidden, or after it left the UI (before its first render, shown)
-            const gone = !!current() && (!f || !!f.controller_.viewProps.get('hidden'))
+            // as the header: shown only while the folder is rendered (not hidden, also by a folder that holds it, and not
+            // removed from the UI); before its first render, shown
+            const gone = !!current() && (!f || !f.controller_.view.element.getClientRects().length)
             const shown = !gone && Array.from(bar.children).some(c => c.classList.contains('tpfm-action'))
             bar.style.display = shown ? '' : 'none'
             if (!shown || !element.clientWidth) return undefined
@@ -527,18 +528,21 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
         for (const b of buttons) setupFolderMenuButton(config, b)
         actions.update(buttons)
     }
-    // a hide or a dispose of the folder lays out again (the renderer sets hidden after the folder generator returns)
+    // the size of the element, and the folder element: it stops or starts being rendered (a hide, also of a folder that
+    // holds it, a fold), which the renderer can do after the folder generator returns; a dispose of the folder too
     const relayout = () => actions.layout()
+    const observer = new ResizeObserver(relayout)
+    observer.observe(element)
     let watched: FolderApi | undefined
     const watch = (f: FolderApi | undefined) => {
         if (f === watched) return
-        watched?.controller_.viewProps.value('hidden').emitter.off('change', relayout)
-        f?.controller_.viewProps.value('hidden').emitter.on('change', relayout)
-        f?.controller_.viewProps.handleDispose(relayout)
+        if (watched) observer.unobserve(watched.controller_.view.element)
+        if (f) {
+            observer.observe(f.controller_.view.element)
+            f.controller_.viewProps.handleDispose(relayout)
+        }
         watched = f
     }
-    const observer = new ResizeObserver(relayout)
-    observer.observe(element)
     element.appendChild(actions.bar)
     let set = mountedActions.get(renderer)
     if (!set) mountedActions.set(renderer, set = new Set())
