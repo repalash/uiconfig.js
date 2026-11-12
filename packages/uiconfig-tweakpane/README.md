@@ -137,9 +137,11 @@ does the same in its folders. Example: https://repalash.com/uiconfig.js/examples
   while they fit in the element's width, and the rest in a ⋮ menu. It is for an app that hides the header of a folder and
   shows its own title row (the actions of a hidden header are not shown there). The bar follows each render of the
   folder, the element's size and the folder's disabled state, and takes the folder's Tweakpane theme. It returns
-  `refresh()` and `remove()`.
+  `refresh()` and `remove()`. `ui.title = ''` (or `new UI(container, {title: ''})`) hides the "Configuration" header of
+  the panel, so the title row is the only one. Example: https://repalash.com/uiconfig.js/examples/folder-actions-row.html
 
   ```js
+  ui.title = '' // no "Configuration" header
   const actions = ui.mountFolderActions(objectConfig, myTitleRow) // myTitleRow: an element of the app
   // later
   actions.remove()

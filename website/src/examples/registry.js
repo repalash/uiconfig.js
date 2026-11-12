@@ -94,6 +94,12 @@ export const examples = [
         preview: ['folder', 'button', 'button'], log: true,
     },
     {
+        slug: 'folder-actions-row', topic: 'components', title: 'Actions in your own title row', renderers: ['tweakpane'],
+        summary: 'An app can show its own title row instead of the folder header: `ui.mountFolderActions(config, element)` draws the actions of the folder there (buttons while they fit, the rest in ⋮), and `ui.title = \'\'` hides the "Configuration" header of the panel. Make the window narrow to see buttons move to the menu, and clear "Own title row" to compare with the folder header.',
+        preview: ['folder', 'button', 'button'], log: true,
+        note: 'uiconfig-blueprint has no `mountFolderActions`: it shows the actions in the folder header.',
+    },
+    {
         slug: 'colors-vectors', topic: 'components', title: 'Colors and vectors', renderers: both,
         summary: '`color` edits a hex string, a number or a three.js `Color`; `vec2`, `vec3` and `vec4` edit `{x, y, z, w}` objects. Both components create their values with the classes in `ui.THREE`.',
         preview: ['color', 'color', 'vec', 'vec'], log: true,

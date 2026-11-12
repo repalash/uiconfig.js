@@ -79,9 +79,28 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         super.unmount()
     }
 
-    constructor(container: HTMLElement = document.body, {expanded = true, autoPostFrame = true} = {}, undoManager?: JSUndoManager|false) {
+    /**
+     * The title in the header of the panel, 'Configuration' by default. An empty title hides the header, for an app that
+     * shows its own title row (see {@link mountFolderActions}); the panel then has no button to fold it, so keep it expanded.
+     */
+    get title(): string {
+        return this._root?.title ?? ''
+    }
+    set title(title: string) {
+        // Tweakpane hides the header for no title (undefined), not for an empty one
+        if (this._root) this._root.title = title || undefined
+    }
+
+    /**
+     * @param container - the element of the panel
+     * @param options - `expanded`: the panel is open (default true); `autoPostFrame`: refresh after each frame (default
+     * true); `title`: the title of the panel header, '' for no header ({@link title})
+     * @param undoManager - the undo manager, or false for none
+     */
+    constructor(container: HTMLElement = document.body, {expanded = true, autoPostFrame = true, title}: {expanded?: boolean, autoPostFrame?: boolean, title?: string} = {}, undoManager?: JSUndoManager|false) {
         super(container, autoPostFrame, undefined, undoManager)
         if (this._root) this._root.expanded = expanded
+        if (title !== undefined) this.title = title
     }
 
     protected _createUiContainer(): HTMLDivElement {
