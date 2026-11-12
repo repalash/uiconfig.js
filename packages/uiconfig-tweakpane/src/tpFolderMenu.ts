@@ -306,7 +306,10 @@ function createFolderActions(renderer: UiConfigRendererTweakpane, folder: Folder
         for (const item of items) item.hidden = false
         more.hidden = false
         const h = header.getBoundingClientRect(), box = element.getBoundingClientRect()
-        if (!h.width) return // not on the page: the resize observer calls this again when it shows
+        // the header is not shown (an app hides it, or the panel is hidden): no actions there; the resize observer calls
+        // this again when it shows. An app that hides the header can open the menu with openFolderMenu.
+        bar.style.display = h.width ? '' : 'none'
+        if (!h.width) return
         // the fold mark keeps its room when it is on the right (the Tweakpane default); a theme can put it on the left
         const mark = header.querySelector('.tp-fldv_m')?.getBoundingClientRect()
         const right = mark && mark.width && mark.left > h.left + h.width / 2 ? h.right - mark.left + 2 : 4

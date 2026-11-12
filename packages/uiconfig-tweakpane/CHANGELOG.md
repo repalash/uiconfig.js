@@ -1,6 +1,7 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+- Fix: the header actions of a folder whose header is not shown (an app hides it with CSS, or the panel is hidden) are hidden too. Before, all of them and the ⋮ button stayed on screen, outside any header (for example at the bottom of the folder). An app that hides a header can open the folder menu with `openFolderMenu(config, element)`.
 
 ## [2.1.0] - 2026-11-09
 - Depends on uiconfig.js `^0.4.2` (the type of `UiObjectConfig.icon`).
