@@ -136,9 +136,12 @@ does the same in its folders. Example: https://repalash.com/uiconfig.js/examples
 - `ui.mountFolderActions(config, element)` draws the actions of a folder in another element, as in its header: buttons
   while they fit in the element's width, and the rest in a ⋮ menu. It is for an app that hides the header of a folder and
   shows its own title row (the actions of a hidden header are not shown there). The bar follows each render of the
-  folder, the element's size and the folder's disabled state, and takes the folder's Tweakpane theme. It returns
+  folder, the element's size, the folder's disabled state and its Tweakpane theme; like the header, it is not shown
+  while the folder is hidden or after the folder leaves the UI. The element needs a width that does not come from its
+  content (a block, or a flex item with `flex: 1; min-width: 0`): the bar fits its buttons into that width. It returns
   `refresh()` and `remove()`. `ui.title = ''` (or `new UI(container, {title: ''})`) hides the "Configuration" header of
-  the panel, so the title row is the only one. Example: https://repalash.com/uiconfig.js/examples/folder-actions-row.html
+  the panel, so the title row is the only one, and opens the panel. Example:
+  https://repalash.com/uiconfig.js/examples/folder-actions-row.html
 
   ```js
   ui.title = '' // no "Configuration" header

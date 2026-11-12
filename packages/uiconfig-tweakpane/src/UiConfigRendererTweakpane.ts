@@ -13,7 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
-import {folderHeaderButtons, isFolderMenuButton, mountFolderActions, openButtonMenu, type MountedFolderActions} from './tpFolderMenu'
+import {folderHeaderButtons, isFolderMenuButton, layoutMountedActions, mountFolderActions, openButtonMenu, type MountedFolderActions} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -72,6 +72,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
      */
     setTheme(mode: TweakpaneThemeMode | null) {
         if (this._container) applyTweakpaneTheme(this._container, mode)
+        layoutMountedActions(this) // they copy the theme of their folder
     }
 
     unmount() {
@@ -81,14 +82,17 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
 
     /**
      * The title in the header of the panel, 'Configuration' by default. An empty title hides the header, for an app that
-     * shows its own title row (see {@link mountFolderActions}); the panel then has no button to fold it, so keep it expanded.
+     * shows its own title row (see {@link mountFolderActions}), and opens the panel, since the header holds the button
+     * that folds it.
      */
     get title(): string {
         return this._root?.title ?? ''
     }
     set title(title: string) {
+        if (!this._root) return
         // Tweakpane hides the header for no title (undefined), not for an empty one
-        if (this._root) this._root.title = title || undefined
+        this._root.title = title || undefined
+        if (!title) this._root.expanded = true
     }
 
     /**

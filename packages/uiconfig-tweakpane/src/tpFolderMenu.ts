@@ -258,16 +258,27 @@ export function closeButtonMenu() {
     open?.close()
 }
 
-/** A bar of folder actions: the header bar of a folder, or one mounted in another element ({@link mountFolderActions}) */
+/** The actions in the header of a folder */
 interface ActionsBar {
-    /** `folder`: the folder of this render (its config's `uiRef` is set only after the folder generator returns) */
-    update: (buttons: UiObjectConfig[], folder?: FolderApi) => void
+    update: (buttons: UiObjectConfig[]) => void
     remove: () => void
+}
+/** A bar mounted in another element ({@link mountFolderActions}) for a folder config */
+interface MountedBar {
+    config: UiObjectConfig
+    /** `folder`: the folder of this render (its config's `uiRef` is set only after the folder generator returns) */
+    update: (buttons: UiObjectConfig[], folder: FolderApi) => void
+    layout: () => void
 }
 /** The header actions of each folder (its element) */
 const folderActions = new WeakMap<HTMLElement, ActionsBar>()
-/** The bars mounted for each folder config, updated at each render of the folder */
-const mountedActions = new WeakMap<UiObjectConfig, Set<ActionsBar>>()
+/** The bars mounted with each renderer, updated at each render of their folder by that renderer */
+const mountedActions = new WeakMap<UiConfigRendererTweakpane, Set<MountedBar>>()
+
+/** Lays out the bars mounted with a renderer again, for a change that is not a render or a resize (its theme) */
+export function layoutMountedActions(renderer: UiConfigRendererTweakpane) {
+    mountedActions.get(renderer)?.forEach(m => m.layout())
+}
 
 /**
  * Adds, updates or removes the actions in the header of a folder, for its menu buttons ({@link isFolderMenuButton}):
@@ -276,7 +287,7 @@ const mountedActions = new WeakMap<UiObjectConfig, Set<ActionsBar>>()
  * folder with {@link mountFolderActions}.
  */
 export function updateFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: FolderApi, buttons: UiObjectConfig[], config?: UiObjectConfig) {
-    if (config) mountedActions.get(config)?.forEach(m => m.update(buttons, folder))
+    if (config) mountedActions.get(renderer)?.forEach(m => m.config === config && m.update(buttons, folder))
     const element = folder.controller_.view.element as HTMLElement
     let actions = folderActions.get(element)
     if (!buttons.some(b => !isHidden(b))) {
@@ -341,8 +352,11 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
         watched = vp
     }
 
+    // removed: a later refresh or render does nothing (no listeners again on a removed bar)
+    let disposed = false
     // the buttons that fit in the room, the ⋮ button for the rest
     const layout = () => {
+        if (disposed) return
         const items = shown.map(b => itemOf.get(b)).filter((i): i is HTMLButtonElement => !!i)
         for (const item of items) item.hidden = false
         more.hidden = false
@@ -367,6 +381,7 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
     }
 
     const update = (buttons: UiObjectConfig[]) => {
+        if (disposed) return
         shown = buttons.filter(b => !isHidden(b))
         for (const [b, item] of itemOf) {
             if (shown.includes(b)) continue
@@ -399,6 +414,7 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
         openButtonMenu(renderer, overflow, more)
     })
     const dispose = () => {
+        disposed = true
         watched?.globalDisabled.emitter.off('change', onDisabled)
         watched = undefined
         if (open?.anchor === more) closeButtonMenu()
@@ -475,26 +491,30 @@ export interface MountedFolderActions {
  * variables of the folder.
  */
 export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: UiObjectConfig, element: HTMLElement): MountedFolderActions {
-    // the folder of the last render; before one, the rendered folder of the config, if any
-    let rendered: FolderApi | undefined
+    // the folder of the last render (at first, the rendered folder of the config, if any): kept after it is disposed
+    let rendered = config.uiRef as FolderApi | undefined
+    const current = () => rendered ?? config.uiRef as FolderApi | undefined
     const folder = () => {
-        const f = rendered ?? config.uiRef as FolderApi | undefined
+        const f = current()
         return f && !f.controller_.viewProps.get('disposed') ? f : undefined
     }
     const actions = createActionsBar(renderer, {
         className: 'tpfm-actions tpfm-mounted',
         viewProps: () => folder()?.controller_.viewProps,
         layout: (bar) => {
-            // the colours and sizes of the folder's theme
-            const from = folder()?.controller_.view.element as HTMLElement | undefined
-            if (from) {
-                const computed = getComputedStyle(from)
+            const f = folder()
+            // the colours and sizes of the folder's theme (and none that it does not set, after a change of the theme)
+            if (f) {
+                const computed = getComputedStyle(f.controller_.view.element)
                 for (const v of BAR_THEME_VARS) {
                     const value = computed.getPropertyValue(v)
                     if (value) bar.style.setProperty(v, value)
+                    else bar.style.removeProperty(v)
                 }
             }
-            const shown = Array.from(bar.children).some(c => c.classList.contains('tpfm-action'))
+            // as the header: not shown while the folder is hidden, or after it left the UI (before its first render, shown)
+            const gone = !!current() && (!f || !!f.controller_.viewProps.get('hidden'))
+            const shown = !gone && Array.from(bar.children).some(c => c.classList.contains('tpfm-action'))
             bar.style.display = shown ? '' : 'none'
             if (!shown || !element.clientWidth) return undefined
             const style = getComputedStyle(element)
@@ -507,24 +527,38 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
         for (const b of buttons) setupFolderMenuButton(config, b)
         actions.update(buttons)
     }
-    const observer = new ResizeObserver(() => actions.layout())
+    // a hide or a dispose of the folder lays out again (the renderer sets hidden after the folder generator returns)
+    const relayout = () => actions.layout()
+    let watched: FolderApi | undefined
+    const watch = (f: FolderApi | undefined) => {
+        if (f === watched) return
+        watched?.controller_.viewProps.value('hidden').emitter.off('change', relayout)
+        f?.controller_.viewProps.value('hidden').emitter.on('change', relayout)
+        f?.controller_.viewProps.handleDispose(relayout)
+        watched = f
+    }
+    const observer = new ResizeObserver(relayout)
     observer.observe(element)
     element.appendChild(actions.bar)
-    let set = mountedActions.get(config)
-    if (!set) mountedActions.set(config, set = new Set())
-    const handle: ActionsBar = {
+    let set = mountedActions.get(renderer)
+    if (!set) mountedActions.set(renderer, set = new Set())
+    const handle: MountedBar = {
+        config,
         update: (buttons, f) => {
-            if (f) rendered = f
+            rendered = f
+            watch(f)
             actions.update(buttons)
         },
-        remove: () => remove(),
+        layout: relayout,
     }
     set.add(handle)
     const remove = () => {
         observer.disconnect()
+        watch(undefined)
         actions.dispose()
-        mountedActions.get(config)?.delete(handle)
+        mountedActions.get(renderer)?.delete(handle)
     }
+    watch(folder())
     refresh()
     return {refresh, remove}
 }
