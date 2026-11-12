@@ -13,7 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
-import {folderHeaderButtons, isFolderMenuButton, openButtonMenu} from './tpFolderMenu'
+import {folderHeaderButtons, isFolderMenuButton, layoutMountedActions, mountFolderActions, openButtonMenu, type MountedFolderActions} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -57,11 +57,22 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     }
 
     /**
+     * Draws the actions of a folder config in another element, as in its header: as many buttons as fit in the element's
+     * width, and a ⋮ button with a menu of the rest. For a folder whose header the app hides (the actions of a hidden
+     * header are not shown there), like a panel with its own title row. The bar follows each render of the folder.
+     * @returns `refresh()` (draw again from the config) and `remove()`
+     */
+    mountFolderActions(config: UiObjectConfig, element: HTMLElement): MountedFolderActions {
+        return mountFolderActions(this, config, element)
+    }
+
+    /**
      * Applies a color mode of the theme in `uiconfig-tweakpane/theme.css` to this renderer's panel; `null` removes it.
      * Import the stylesheet once (`import 'uiconfig-tweakpane/theme.css'`).
      */
     setTheme(mode: TweakpaneThemeMode | null) {
         if (this._container) applyTweakpaneTheme(this._container, mode)
+        layoutMountedActions(this) // they copy the theme of their folder
     }
 
     unmount() {
@@ -69,9 +80,31 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         super.unmount()
     }
 
-    constructor(container: HTMLElement = document.body, {expanded = true, autoPostFrame = true} = {}, undoManager?: JSUndoManager|false) {
+    /**
+     * The title in the header of the panel, 'Configuration' by default. An empty title hides the header, for an app that
+     * shows its own title row (see {@link mountFolderActions}), and opens the panel, since the header holds the button
+     * that folds it.
+     */
+    get title(): string {
+        return this._root?.title ?? ''
+    }
+    set title(title: string) {
+        if (!this._root) return
+        // Tweakpane hides the header for no title (undefined), not for an empty one
+        this._root.title = title || undefined
+        if (!title) this._root.expanded = true
+    }
+
+    /**
+     * @param container - the element of the panel
+     * @param options - `expanded`: the panel is open (default true); `autoPostFrame`: refresh after each frame (default
+     * true); `title`: the title of the panel header, '' for no header ({@link title})
+     * @param undoManager - the undo manager, or false for none
+     */
+    constructor(container: HTMLElement = document.body, {expanded = true, autoPostFrame = true, title}: {expanded?: boolean, autoPostFrame?: boolean, title?: string} = {}, undoManager?: JSUndoManager|false) {
         super(container, autoPostFrame, undefined, undoManager)
         if (this._root) this._root.expanded = expanded
+        if (title !== undefined) this.title = title
     }
 
     protected _createUiContainer(): HTMLDivElement {

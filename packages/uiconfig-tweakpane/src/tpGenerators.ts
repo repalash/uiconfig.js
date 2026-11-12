@@ -1,10 +1,10 @@
 import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi, TabApi} from 'tweakpane'
 import {BladeController, TextView, View} from '@tweakpane/core'
 import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
-import {ChangeEvent, TUiRefreshModes, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
+import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
-import {folderHeaderButtons, isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
+import {folderHeaderButtons, isFolderMenuButton, setupFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
 
 export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
     let folder = config.uiRef as FolderApi | undefined
@@ -141,15 +141,10 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         folder.controller_.foldable.cleanUpTransition()
     }
 
-    // the menu buttons are not rendered: set up as renderUiObject does for the body controls (binding to property, the
-    // change events, a refresh), after the loop above, which clears these on a button that was in the body before
-    for (const b of menuButtons) {
-        folderHeaderButtons.add(b)
-        UiConfigMethods.InitUiConfig(b)
-        b.parentOnChange = onChildChange
-        b.uiRefresh = (_deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => config.uiRefresh?.(false, mode, delay)
-    }
-    updateFolderMenuButton(plugin, folder, menuButtons)
+    // the menu buttons are not rendered: set up as renderUiObject does for the body controls, after the loop above, which
+    // clears these on a button that was in the body before
+    for (const b of menuButtons) setupFolderMenuButton(config, b)
+    updateFolderMenuButton(plugin, folder, menuButtons, config)
     return folder
 }
 
