@@ -194,7 +194,7 @@ License (some derived from Feather, MIT); see [NOTICE](NOTICE).
   config without setting their `parentOnChange` (on a config that a Tweakpane panel also draws, that would replace the
   panel's), it calls `onStructureChange` after the undo and redo of a dropdown, and it refreshes at once after an undo or
   redo. Aligning `SetValue` of uiconfig.js (an undo/redo hook, the dispatch to the caller's folders, one merge rule) is a
-  follow-up.
+  follow-up: [#20](https://github.com/repalash/uiconfig.js/issues/20).
 - **Tooltips are a hook**, with the native `title` by default, so the package depends only on uiconfig.js and
   ts-browser-helpers. An app passes its tooltip library through the hook.
 - **No threepipe imports.** The plan is that threepipe re-exports the form from its core bundle (and its editor passes its
