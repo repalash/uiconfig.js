@@ -133,6 +133,22 @@ does the same in its folders. Example: https://repalash.com/uiconfig.js/examples
 - The menu stays inside the window, and scrolls when it is taller (a phone in landscape). It takes the colours of the
   folder (the Tweakpane theme variables).
 - `ui.folderMenus = false` (before the folders render) shows all the buttons in the body, as before.
+- `ui.mountFolderActions(config, element)` draws the actions of a folder in another element, as in its header: buttons
+  while they fit in the element's width, and the rest in a ⋮ menu. It is for an app that hides the header of a folder and
+  shows its own title row (the actions of a hidden header are not shown there). The bar follows each render of the
+  folder, the element's size, the folder's disabled state and its Tweakpane theme; like the header, it is shown only
+  while the folder is rendered (not while it or a folder that holds it is hidden or folded, and not after it leaves the UI). The element needs a width that does not come from its
+  content (a block, or a flex item with `flex: 1; min-width: 0`): the bar fits its buttons into that width. It returns
+  `refresh()` and `remove()`. `ui.title = ''` (or `new UI(container, {title: ''})`) hides the "Configuration" header of
+  the panel, so the title row is the only one, and opens the panel. Example:
+  https://repalash.com/uiconfig.js/examples/folder-actions-row.html
+
+  ```js
+  ui.title = '' // no "Configuration" header
+  const actions = ui.mountFolderActions(objectConfig, myTitleRow) // myTitleRow: an element of the app
+  // later
+  actions.remove()
+  ```
 - `ui.openFolderMenu(config, element)` opens a menu with all the header buttons of a folder at another element, for a
   folder whose header the app hides; `ui.folderMenuButtons(config)` lists them. `openButtonMenu(ui, buttons, element)` opens
   such a menu for any list of buttons.
