@@ -43,7 +43,9 @@ function setUiRefresh(this: ConfigWithListeners, fn: UiRefreshListener | undefin
 function createListeners(): RefreshListeners {
     const s: RefreshListeners = {
         listeners: [],
-        dispatch: (deep, mode, delay) => {
+        // a function, not an arrow: called as `config.uiRefresh()`, `this` is the config, and an assigned method-style
+        // `uiRefresh` (one that uses `this`) gets it as it did before there were listeners
+        dispatch: function(this: unknown, deep, mode, delay) {
             const fns = s.assigned ? [s.assigned, ...s.listeners] : [...s.listeners]
             let failed = false
             let error: unknown
@@ -51,7 +53,7 @@ function createListeners(): RefreshListeners {
                 // removed by a listener before it (for example a renderer that disposed the config): not called
                 if (fn !== s.assigned && !s.listeners.includes(fn)) continue
                 try {
-                    fn(deep, mode, delay)
+                    fn.call(this, deep, mode, delay)
                 } catch (e) {
                     // the other renderers still refresh; the first error is thrown after them
                     if (!failed) error = e

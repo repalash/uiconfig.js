@@ -155,6 +155,22 @@ describe('refresh listeners', () => {
     })
 })
 
+describe('refresh listeners: the receiver', () => {
+    test('an assigned method-style uiRefresh is called on the config, with and without listeners', () => {
+        const seen: unknown[] = []
+        const config: UiObjectConfig = {
+            type: 'folder',
+            uiRefresh(this: UiObjectConfig) {
+                seen.push(this)
+            },
+        }
+        config.uiRefresh!()
+        UiConfigMethods.AddRefreshListener(config, () => {})
+        config.uiRefresh!()
+        expect(seen).toEqual([config, config])
+    })
+})
+
 describe('renderer refresh listeners', () => {
     test('two renderers on one config both refresh it; disposeUiConfig removes only the listener of its renderer', async() => {
         const config: UiObjectConfig = {type: 'number'}
