@@ -41,6 +41,13 @@
             "require": "./src/"
         }
     },
+    "typesVersions": {
+        "*": {
+            "dom": [
+                "./dist/dom/index.d.ts"
+            ]
+        }
+    },
     "clean-package": {
         "remove": [
             "clean-package",

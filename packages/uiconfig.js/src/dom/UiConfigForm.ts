@@ -363,7 +363,7 @@ export class UiConfigForm extends UiConfigRendererBase {
         if (!obj) return
         const before = cloneValue(obj[key])
         if (equalsValue(before, value)) {
-            if (last) this._end(c, parents)
+            if (last) this._endNow(c, parents)
             return
         }
         const apply = (v: any, isLast: boolean, replay = false) => {
@@ -402,20 +402,32 @@ export class UiConfigForm extends UiConfigRendererBase {
      */
     private _atDispatch(c: UiObjectConfig, run: () => void) {
         const mode = getOrCall(c.dispatchMode, c) ?? UiConfigMethods.DefaultDispatchMode
-        if (mode === 'immediate') run()
-        else void this.methods.runAtEvent(c, run)
+        if (mode === 'immediate') return run()
+        // later, in a frame listener: an error goes to onError, not to an unhandled rejection
+        void this.methods.runAtEvent(c, () => {
+            try {
+                run()
+            } catch (e) {
+                this._error(e, c)
+            }
+        })
     }
 
-    /** The end of a continuous edit: the final change (`last`), which some configs wait for (e.g. to rebuild a geometry) */
+    /**
+     * The end of a continuous edit: the final change (`last`), which some configs wait for (e.g. to rebuild a geometry).
+     * At the dispatchMode event, after the changes of the edit, which set {@link _unfinished} when they run.
+     */
     private _end(c: UiObjectConfig, parents: UiObjectConfig[]) {
+        this._atDispatch(c, () => this._endNow(c, parents))
+    }
+
+    /** {@link _end}, now */
+    private _endNow(c: UiObjectConfig, parents: UiObjectConfig[]) {
         if (this._unfinished !== c) return
         this._unfinished = undefined
-        // after the changes of the edit, which can wait for the dispatchMode event
-        this._atDispatch(c, () => {
-            const [obj, key] = UiConfigMethods.GetBinding(c)
-            const value = obj ? obj[key] : undefined
-            this._dispatch(c, parents, true, false, {value, lastValue: cloneValue(value)})
-        })
+        const [obj, key] = UiConfigMethods.GetBinding(c)
+        const value = obj ? obj[key] : undefined
+        this._dispatch(c, parents, true, false, {value, lastValue: cloneValue(value)})
     }
 
     /**
@@ -609,6 +621,8 @@ export class UiConfigForm extends UiConfigRendererBase {
         b.disabled = isDisabled()
         // while the function of the button runs (a promise): disabled, with a spinner
         let busy = false
+        // a click that has not finished (also while it waits for the dispatchMode event): another click does nothing
+        let running = false
         const pending = () => {
             if (busy) return
             busy = true
@@ -621,7 +635,8 @@ export class UiConfigForm extends UiConfigRendererBase {
             this._structureChange()
         }
         b.addEventListener('click', async(event: MouseEvent) => {
-            if (busy) return
+            if (busy || running) return
+            running = true
             // at the event of its `dispatchMode` (immediate by default), as `clickButton` of uiconfig.js runs a button
             const ran = await this.methods.runAtEvent(c, async() => {
                 try {
@@ -640,6 +655,7 @@ export class UiConfigForm extends UiConfigRendererBase {
                     this._error(e, c)
                     return false
                 } finally {
+                    running = false
                     if (busy) {
                         busy = false
                         b.classList.remove('ucf-busy')
@@ -938,7 +954,8 @@ export class UiConfigForm extends UiConfigRendererBase {
             // a scrub edits this field: it shows the value also when it has the focus, which the scrub keeps
             const scrubSet = (n: number) => {
                 this._set(c, parents, clamp(n), false)
-                writeValue(input, fmt(value()))
+                // after the edit, which can wait for the dispatchMode event
+                this._atDispatch(c, () => writeValue(input, fmt(value())))
             }
             this._scrub(name, isDisabled, () => +(value() as any), scrubStep, scrubSet, () => this._end(c, parents))
         } else if (kind === 'monitor') {

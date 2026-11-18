@@ -649,6 +649,63 @@ describe('UiConfigForm', () => {
         }
     })
 
+    test('a slider with a dispatchMode: the release still sends the final change (last), after the moves', async() => {
+        const target = {size: 1}
+        const lasts: boolean[] = []
+        const form = new UiConfigForm([{type: 'slider', label: 'Size', property: [target, 'size'], bounds: [0, 4], dispatchMode: 'postFrame', onChange: (e: any) => lasts.push(e.last)}])
+        const [range] = row(form, 'Size').inputs
+        range.value = '2'
+        range.fire('input')
+        range.value = '3'
+        range.fire('input')
+        range.fire('change') // released in the same task as the last move
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.size).toBe(3)
+        expect(lasts).toEqual([false, false, true])
+    })
+
+    test('a focused number field with a dispatchMode shows the scrubbed value after the edit runs', async() => {
+        const target = {width: 1}
+        const form = new UiConfigForm([{type: 'number', label: 'Width', property: [target, 'width'], dispatchMode: 'postFrame'}])
+        const r = row(form, 'Width')
+        const [input] = r.inputs
+        doc.activeElement = input
+        try {
+            const name = r.row.children[0]
+            name.fire('pointerdown', {clientX: 0})
+            name.fire('pointermove', {clientX: 100})
+            name.fire('pointerup')
+            await new Promise(res => setTimeout(res, 20))
+            expect(target.width).toBeCloseTo(2)
+            expect(input.value).toBe('2')
+        } finally {
+            doc.activeElement = null
+        }
+    })
+
+    test('a button with a dispatchMode: a second click before the event does not run it twice', async() => {
+        const onClick = vi.fn()
+        const form = new UiConfigForm([{type: 'button', label: 'Once', dispatchMode: 'postFrame', onClick}])
+        const button = (form.element as any as FakeElement).all().find(e => e.tagName === 'button')!
+        button.fire('click')
+        button.fire('click')
+        await new Promise(r => setTimeout(r, 20))
+        expect(onClick).toHaveBeenCalledTimes(1)
+    })
+
+    test('a field with a dispatchMode: an error of the edit goes to onError', async() => {
+        const onError = vi.fn()
+        const error = new Error('no')
+        const form = new UiConfigForm([{type: 'number', label: 'Bad', getValue: () => 1, setValue: () => {
+            throw error
+        }, dispatchMode: 'postFrame'}], {onError})
+        const [input] = row(form, 'Bad').inputs
+        input.value = '2'
+        input.fire('change')
+        await new Promise(r => setTimeout(r, 20))
+        expect(onError).toHaveBeenCalledWith(error, expect.anything())
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])
