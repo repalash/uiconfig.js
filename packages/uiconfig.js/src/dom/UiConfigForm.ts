@@ -362,9 +362,9 @@ export class UiConfigForm extends UiConfigRendererBase {
         const apply = (v: any, isLast: boolean, replay = false) => {
             const cur = obj[key]
             const lastValue = cloneValue(cur)
+            // as SetValue of uiconfig.js: an object with copy() is changed in place; any other value (a plain object
+            // like {x, y} too) is assigned through the binding, so a setter (getValue / setValue) runs
             if (cur && typeof cur === 'object' && typeof cur.copy === 'function') copyPrimitive(cur, v)
-            // a plain object (a vector like {x, y}): changed in place, as an object with copy()
-            else if (isPlainObject(cur) && isPlainObject(v)) Object.assign(cur, v)
             else obj[key] = cloneValue(v)
             // the events carry the new and the previous value, as the change events of the other renderers
             this._dispatch(c, parents, isLast, replay, {value: obj[key], lastValue})
@@ -601,27 +601,32 @@ export class UiConfigForm extends UiConfigRendererBase {
         }
         b.addEventListener('click', async(event: MouseEvent) => {
             if (busy) return
-            try {
-                const [obj, key] = UiConfigMethods.GetBinding(c, false)
-                const fn = obj ? obj[key] ?? obj.value : undefined
-                // the click event, as `clickButton` of uiconfig.js passes it (unless `sendArgs` is false); undo and redo
-                // run with the same arguments
-                const args = getOrCall(c.sendArgs, c) === false ? [] : [event]
-                // as in uiconfig.js: the result can be an undo function or {action, undo, redo}, one undo step
-                if (typeof fn === 'function') await this.methods.performAction(obj, fn as AnyFunction, args, c, replayed, pending)
-                // called on the config, as `clickButton` of uiconfig.js does (a method-style onClick that uses `this`)
-                if (typeof c.onClick === 'function') await this.methods.performAction(c, c.onClick as AnyFunction, args, c, replayed, pending)
-            } catch (e) {
-                // a failed run changed nothing to report: no change events, no structure change
-                this._error(e, c)
-                return
-            } finally {
-                if (busy) {
-                    busy = false
-                    b.classList.remove('ucf-busy')
-                    b.disabled = isDisabled()
+            // at the event of its `dispatchMode` (immediate by default), as `clickButton` of uiconfig.js runs a button
+            const ran = await this.methods.runAtEvent(c, async() => {
+                try {
+                    const [obj, key] = UiConfigMethods.GetBinding(c, false)
+                    const fn = obj ? obj[key] ?? obj.value : undefined
+                    // the click event, as `clickButton` of uiconfig.js passes it (unless `sendArgs` is false); undo and
+                    // redo run with the same arguments
+                    const args = getOrCall(c.sendArgs, c) === false ? [] : [event]
+                    // as in uiconfig.js: the result can be an undo function or {action, undo, redo}, one undo step
+                    if (typeof fn === 'function') await this.methods.performAction(obj, fn as AnyFunction, args, c, replayed, pending)
+                    // called on the config, as `clickButton` of uiconfig.js does (a method-style onClick that uses `this`)
+                    if (typeof c.onClick === 'function') await this.methods.performAction(c, c.onClick as AnyFunction, args, c, replayed, pending)
+                    return true
+                } catch (e) {
+                    // a failed run changed nothing to report: no change events, no structure change
+                    this._error(e, c)
+                    return false
+                } finally {
+                    if (busy) {
+                        busy = false
+                        b.classList.remove('ucf-busy')
+                        b.disabled = isDisabled()
+                    }
                 }
-            }
+            })
+            if (!ran) return
             this._dispatch(c, parents, true)
             this._structureChange()
         })

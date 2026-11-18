@@ -188,19 +188,31 @@ describe('UiConfigForm', () => {
         expect(seen).toEqual([field])
     })
 
-    test('a vector bound to a plain object is edited in place, and undo restores it', () => {
-        const offset = {x: 0, y: 0.5}
-        const target = {offset}
+    test('a vector bound to a plain object: an edit assigns a new value through the binding, and undo restores it', () => {
+        const target = {offset: {x: 0, y: 0.5}}
         const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
         const form = new UiConfigForm([{type: 'vec2', label: 'Offset', property: [target, 'offset']}], {undoManager})
         const inputs = row(form, 'Offset').inputs
         expect(inputs.map(i => i.value)).toEqual(['0', '0.5'])
         inputs[0].value = '2'
         inputs[0].fire('change')
-        expect(target.offset).toBe(offset) // the same object
-        expect(offset).toEqual({x: 2, y: 0.5})
+        expect(target.offset).toEqual({x: 2, y: 0.5})
         undoManager.undo()
-        expect(offset).toEqual({x: 0, y: 0.5})
+        expect(target.offset).toEqual({x: 0, y: 0.5})
+    })
+
+    test('a vector with getValue / setValue (a new object from each get): an edit and its undo call the setter', () => {
+        const state = {x: 0, y: 0.5}
+        const set = vi.fn((v: {x: number, y: number}) => Object.assign(state, v))
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([{type: 'vec2', label: 'Offset', getValue: () => ({x: state.x, y: state.y}), setValue: set}], {undoManager})
+        const inputs = row(form, 'Offset').inputs
+        inputs[1].value = '3'
+        inputs[1].fire('change')
+        expect(set).toHaveBeenCalledTimes(1)
+        expect(state).toEqual({x: 0, y: 3})
+        undoManager.undo()
+        expect(state).toEqual({x: 0, y: 0.5})
     })
 
     test('a folder\'s onChange can be a list of functions', () => {
@@ -558,6 +570,16 @@ describe('UiConfigForm', () => {
         expect(got.map(g => g[0])).toEqual(['value', 'onClick', 'noArgs'])
         expect(got[0][1]).toMatchObject(event)
         expect(got[1][1]).toMatchObject(event)
+    })
+
+    test('a button with a dispatchMode runs at that event, not during the click', async() => {
+        const onClick = vi.fn()
+        const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])
+        const button = (form.element as any as FakeElement).all().find(e => e.tagName === 'button')!
+        button.fire('click')
+        expect(onClick).not.toHaveBeenCalled()
+        await new Promise(r => setTimeout(r, 20))
+        expect(onClick).toHaveBeenCalledTimes(1)
     })
 
     test('the undo result of an onClick is one undo step', async() => {
