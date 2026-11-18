@@ -962,7 +962,15 @@ export class UiConfigForm extends UiConfigRendererBase {
                 // after the edit, which can wait for the dispatchMode event
                 this._atDispatch(c, () => writeValue(input, fmt(value())))
             }
-            this._scrub(name, isDisabled, () => +(value() as any), scrubStep, scrubSet, () => this._end(c, parents))
+            // the end of a drag: the final change, and the next edit is a new undo step (also in the first second), after
+            // the moves of the drag, which can wait for the dispatchMode event
+            const scrubEnd = () => {
+                this._end(c, parents)
+                this._atDispatch(c, () => {
+                    if (this._undo) this._undo.time = -Infinity
+                })
+            }
+            this._scrub(name, isDisabled, () => +(value() as any), scrubStep, scrubSet, scrubEnd)
         } else if (kind === 'monitor') {
             const out = document.createElement('span')
             out.className = 'ucf-monitor'
@@ -1031,7 +1039,6 @@ export class UiConfigForm extends UiConfigRendererBase {
                 handle.removeEventListener('pointermove', move)
                 handle.removeEventListener('pointerup', up)
                 handle.removeEventListener('pointercancel', up)
-                if (this._undo) this._undo.time = -Infinity // the next edit is a new undo step (also in the first second of the page)
                 end()
             }
             handle.addEventListener('pointermove', move)

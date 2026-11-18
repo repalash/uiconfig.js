@@ -744,6 +744,28 @@ describe('UiConfigForm', () => {
         expect(target.on).toBe(true)
     })
 
+    test('scrub with a dispatchMode: a second drag within a second is a new undo step', async() => {
+        const target = {width: 1}
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([{type: 'number', label: 'Width', property: [target, 'width'], dispatchMode: 'postFrame'}], {undoManager})
+        const name = row(form, 'Width').row.children[0]
+        const frame = () => new Promise(r => setTimeout(r, 20))
+        name.fire('pointerdown', {clientX: 0})
+        name.fire('pointermove', {clientX: 100})
+        name.fire('pointerup') // released before the move runs
+        await frame()
+        expect(target.width).toBeCloseTo(2)
+        name.fire('pointerdown', {clientX: 0})
+        name.fire('pointermove', {clientX: 100})
+        await frame()
+        name.fire('pointerup')
+        await frame()
+        expect(target.width).toBeCloseTo(4)
+        undoManager.undo()
+        await frame()
+        expect(target.width).toBeCloseTo(2)
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])
