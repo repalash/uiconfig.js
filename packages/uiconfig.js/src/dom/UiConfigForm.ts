@@ -158,7 +158,7 @@ export class UiConfigForm extends UiConfigRendererBase {
     private _rows: FormRow[] = []
     /** A config that is in the list twice is drawn once */
     private _drawn = new Set<UiObjectConfig>()
-    private _undo?: {config: UiObjectConfig, cmd: {undo: () => void, redo: () => void}, time: number, before: any}
+    private _undo?: {config: UiObjectConfig, obj: any, key: string | number, cmd: {undo: () => void, redo: () => void}, time: number, before: any}
     /** The config of a continuous edit (scrub, slider, colour picker) that has no final (`last`) change yet */
     private _unfinished?: UiObjectConfig
     /** The form that the page made in `onStructureChange` of this one, to take its place */
@@ -385,15 +385,15 @@ export class UiConfigForm extends UiConfigRendererBase {
         if (!um) return
         const now = performance.now()
         const u = this._undo
-        // the same field again, in the same gesture or within a second, with no other step between: one step from the
-        // first value
-        const merge = !!u && u.config === c && um.peek() === u.cmd && (continuing || now - u.time < 1000)
+        // the same field (and the same target: a property can be a function) again, in the same gesture or within a
+        // second, with no other step between: one step from the first value
+        const merge = !!u && u.config === c && u.obj === obj && u.key === key && um.peek() === u.cmd && (continuing || now - u.time < 1000)
         const first = merge && u ? u.before : before
         const after = cloneValue(value)
         const cmd = {undo: () => this._atDispatch(c, () => apply(first, true, true)), redo: () => this._atDispatch(c, () => apply(after, true, true))}
         if (merge) um.replaceLast(cmd)
         else um.record(cmd)
-        this._undo = {config: c, cmd, time: now, before: first}
+        this._undo = {config: c, obj, key, cmd, time: now, before: first}
     }
 
     /**

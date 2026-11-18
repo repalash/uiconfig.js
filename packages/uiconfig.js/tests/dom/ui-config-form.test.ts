@@ -766,6 +766,24 @@ describe('UiConfigForm', () => {
         expect(target.width).toBeCloseTo(2)
     })
 
+    test('quick edits of a field whose property changed its target between them are separate undo steps', () => {
+        const a = {v: 1}, b = {v: 10}
+        let target = a
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([{type: 'number', label: 'V', property: () => [target, 'v']}], {undoManager})
+        const [input] = row(form, 'V').inputs
+        input.value = '2'
+        input.fire('change')
+        target = b
+        input.value = '20'
+        input.fire('change')
+        expect([a.v, b.v]).toEqual([2, 20])
+        undoManager.undo()
+        expect([a.v, b.v]).toEqual([2, 10])
+        undoManager.undo()
+        expect([a.v, b.v]).toEqual([1, 10])
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])
