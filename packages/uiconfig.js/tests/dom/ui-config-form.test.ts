@@ -609,6 +609,46 @@ describe('UiConfigForm', () => {
         expect(target.radius).toBe(1)
     })
 
+    test('a field with a dispatchMode: edits before the event run in order (back to the first value is kept)', async() => {
+        const target = {radius: 1}
+        const form = new UiConfigForm([{type: 'number', label: 'Radius', property: [target, 'radius'], dispatchMode: 'postFrame'}])
+        const [input] = row(form, 'Radius').inputs
+        input.value = '2'
+        input.fire('change')
+        input.value = '1'
+        input.fire('change')
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.radius).toBe(1)
+    })
+
+    test('a vector with a dispatchMode: edits of two components before the event both apply', async() => {
+        const target = {offset: [0, 0]}
+        const form = new UiConfigForm([{type: 'vec2', label: 'Offset', property: [target, 'offset'], dispatchMode: 'postFrame'}])
+        const inputs = row(form, 'Offset').inputs
+        inputs[0].value = '1'
+        inputs[0].fire('change')
+        inputs[1].value = '2'
+        inputs[1].fire('change')
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.offset).toEqual([1, 2])
+    })
+
+    test('a focused number field with a dispatchMode shows the committed value after the edit runs', async() => {
+        const target = {radius: 1}
+        const form = new UiConfigForm([{type: 'number', label: 'Radius', property: [target, 'radius'], bounds: [0, 10], dispatchMode: 'postFrame'}])
+        const [input] = row(form, 'Radius').inputs
+        doc.activeElement = input
+        try {
+            input.value = '25'
+            input.fire('change')
+            await new Promise(r => setTimeout(r, 20))
+            expect(target.radius).toBe(10)
+            expect(input.value).toBe('10')
+        } finally {
+            doc.activeElement = null
+        }
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])

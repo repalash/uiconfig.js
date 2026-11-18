@@ -352,6 +352,13 @@ export class UiConfigForm extends UiConfigRendererBase {
      * the change, and after its undo and redo
      */
     private _set(c: UiObjectConfig, parents: UiObjectConfig[], value: any, last = true, structural = false) {
+        // the whole edit (the compare with the value, the change, the undo step) at the event of the dispatchMode of the
+        // config, so that edits made before that event run in order, each against the value that the one before left
+        this._atDispatch(c, () => this._setNow(c, parents, value, last, structural))
+    }
+
+    /** {@link _set}, now */
+    private _setNow(c: UiObjectConfig, parents: UiObjectConfig[], value: any, last = true, structural = false) {
         const [obj, key] = UiConfigMethods.GetBinding(c)
         if (!obj) return
         const before = cloneValue(obj[key])
@@ -370,7 +377,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             this._dispatch(c, parents, isLast, replay, {value: obj[key], lastValue})
             if (structural) this._structureChange()
         }
-        this._atDispatch(c, () => apply(value, last))
+        apply(value, last)
         // a continuous edit of this field (scrub, slider, colour picker) that has not ended yet
         const continuing = this._unfinished === c
         this._unfinished = last ? undefined : c
@@ -883,13 +890,14 @@ export class UiConfigForm extends UiConfigRendererBase {
             const wrap = document.createElement('span')
             wrap.className = 'ucf-vec'
             const inputs = axes.map(a => {
-                const input = this._number(n => {
+                // the vector is read when the edit runs (at the dispatchMode event), after the edits of the other components
+                const input = this._number(c, n => this._atDispatch(c, () => {
                     const cur = value() as number[] | VectorLike
                     // a tuple, an object with clone() (a three.js vector), or a plain object ({x, y})
                     const v: any = Array.isArray(cur) ? [...cur] : typeof cur.clone === 'function' ? cur.clone() : {...cur}
                     v[a] = Math.min(max, Math.max(min, n))
-                    this._set(c, parents, v)
-                }, () => (value() as any)?.[a], getOrCall(c.stepSize))
+                    this._setNow(c, parents, v)
+                }), () => (value() as any)?.[a], getOrCall(c.stepSize))
                 input.title = String(a)
                 wrap.appendChild(input)
                 return input
@@ -906,7 +914,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             const {min, max, step} = UiConfigMethods.GetBounds(c, kind === 'number')
             const isInt = (this._options.isInteger ?? defaultIsInteger)(c, label)
             const clamp = (n: number) => Math.min(max, Math.max(min, isInt ? Math.round(n) : n))
-            const input = this._number(n => this._set(c, parents, clamp(n)), value, getOrCall(c.stepSize))
+            const input = this._number(c, n => this._set(c, parents, clamp(n)), value, getOrCall(c.stepSize))
             if (kind === 'slider') {
                 const range = document.createElement('input')
                 range.type = 'range'
@@ -966,18 +974,19 @@ export class UiConfigForm extends UiConfigRendererBase {
 
     /**
      * A number field. After a committed edit (Enter, the spinner, a blur), it shows the value of the binding, which can
-     * be clamped or rounded, also while it has the focus.
+     * be clamped or rounded, also while it has the focus (after the edit, which can wait for the dispatchMode event).
+     * @param c - the config, for its dispatchMode
      * @param step - the change of the arrow keys and the spinner: the `stepSize` of the config. A typed value off the
      * step is kept. Without one, the field takes any value and the browser steps by 1.
      */
-    private _number(set: (n: number) => void, get: () => any, step?: number) {
+    private _number(c: UiObjectConfig, set: (n: number) => void, get: () => any, step?: number) {
         const input = document.createElement('input')
         input.type = 'number'
         input.step = step && step > 0 ? String(step) : 'any'
         input.addEventListener('change', () => {
             const n = parseFloat(input.value)
             if (isFinite(n)) set(n)
-            input.value = fmt(get())
+            this._atDispatch(c, () => input.value = fmt(get()))
         })
         return input
     }
