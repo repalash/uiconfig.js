@@ -460,7 +460,11 @@ export class UiConfigForm extends UiConfigRendererBase {
                 f.setAttribute('aria-label', label)
             }
             host.appendChild(f)
-            for (const ch of this._children(c)) this._render(ch, f, path)
+            for (const ch of this._children(c)) {
+                // a child with only a `path`: the binding of the folder, as in the other renderers
+                UiConfigMethods.SetupPropertyForwarding(ch, c)
+                this._render(ch, f, path)
+            }
             return
         }
         if (type === 'button') return this._button(c, host, parents, label, isDisabled)
@@ -1091,7 +1095,8 @@ function placePopover(pop: HTMLElement, anchor: HTMLElement, side: 'top' | 'left
 /** `onChange` of a config, a function or a list of functions, without its `parentOnChange` */
 function callOnChange(config: UiObjectConfig, ev: ChangeEvent) {
     const on = config.onChange
-    if (typeof on === 'function') on(ev)
+    // called on the config, as `UiConfigMethods.DispatchOnChangeSync` calls it (a method-style onChange that uses `this`)
+    if (typeof on === 'function') on.call(config, ev)
     else if (Array.isArray(on)) on.flat().forEach(f => typeof f === 'function' && f(ev))
 }
 

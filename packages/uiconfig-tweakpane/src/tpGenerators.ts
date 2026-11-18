@@ -1,7 +1,7 @@
 import {BladeApi, ButtonApi, FolderApi, InputBindingApi, MonitorBindingApi, TabApi} from 'tweakpane'
 import {BladeController, TextView, View} from '@tweakpane/core'
-import {setupPropertyForwarding, tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
-import {ChangeEvent, UiObjectConfig} from 'uiconfig.js'
+import {tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
+import {ChangeEvent, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
 import {folderHeaderButtons, isFolderMenuButton, setupFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
@@ -44,7 +44,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     const newChildren = []
     for (const child of childObjects) { // todo check comparison with uiConfig.uuid
         child.parentOnChange = onChildChange
-        setupPropertyForwarding(child, config)
+        UiConfigMethods.SetupPropertyForwarding(child, config)
         folderHeaderButtons.delete(child)
 
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
@@ -400,7 +400,7 @@ export const tpTabGenerator = (parent: FolderApi, config: UiObjectConfig, plugin
         }
 
         // Set up property forwarding for the folder config from the parent tab config
-        setupPropertyForwarding(folderConfig, config)
+        UiConfigMethods.SetupPropertyForwarding(folderConfig, config)
 
         // Get the children of this folder
         const folderChildren = plugin.methods.getChildren(folderConfig)
@@ -417,7 +417,7 @@ export const tpTabGenerator = (parent: FolderApi, config: UiObjectConfig, plugin
                 plugin.methods.dispatchOnChangeSync(folderConfig, {...ev}, ...args)
             }
 
-            setupPropertyForwarding(child, folderConfig)
+            UiConfigMethods.SetupPropertyForwarding(child, folderConfig)
 
             // todo this recreates the complete ui, ideally there should be a proper refresh logic for children.
 

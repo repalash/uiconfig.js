@@ -318,6 +318,26 @@ export class UiConfigMethods {
         return (getOrCall(config.children, config) ?? []).map(v => getOrCall(v, config)).flat(2).filter(v => v) as UiObjectConfig[]
     }
 
+    /**
+     * Binds a child config to the binding of its parent (a folder with `property` or `value`) when the child has no
+     * binding of its own (no `property`, `value`, `getValue` or `setValue`) and is not a button: the child gets the
+     * parent's `property` (or `[parent, 'value']`), and its `path` then selects a value inside it. Renderers call it for
+     * each child before drawing it (uiconfig-tweakpane, uiconfig-dom).
+     * @param child - the child config
+     * @param parent - the folder (or other parent config) that holds it
+     */
+    static SetupPropertyForwarding(child: UiObjectConfig, parent: UiObjectConfig): void {
+        if (child.property === undefined &&
+            child.value === undefined &&
+            child.getValue === undefined &&
+            child.setValue === undefined &&
+            child.type !== 'button' &&
+            (parent.property !== undefined || parent.value !== undefined)
+        ) {
+            child.property = parent.property !== undefined ? parent.property : [parent, 'value']
+        }
+    }
+
     static InitUiConfig(config: UiObjectConfig) {
         if (!config) return
         if (!config.type) {

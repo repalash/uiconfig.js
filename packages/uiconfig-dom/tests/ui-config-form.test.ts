@@ -161,6 +161,33 @@ describe('UiConfigForm', () => {
         expect(events).toEqual([['field', 4, 1], ['folder', 4, 1]])
     })
 
+    test('children with only a path use the binding of their folder, also in a nested folder', () => {
+        const person = {name: {first: 'Ada'}, born: {year: 1815}}
+        const form = new UiConfigForm([{type: 'folder', label: 'Person', value: person, children: [
+            {type: 'input', label: 'First name', path: 'name.first'},
+            {type: 'folder', label: 'Born', children: [{type: 'number', label: 'Year', path: 'born.year'}]},
+        ]}])
+        expect(row(form, 'First name').inputs[0].value).toBe('Ada')
+        const [year] = row(form, 'Year').inputs
+        expect(year.value).toBe('1815')
+        year.value = '1816'
+        year.fire('change')
+        expect(person.born.year).toBe(1816)
+    })
+
+    test('a method-style onChange of a field in a folder is called on its config', () => {
+        const target = {radius: 1}
+        const seen: unknown[] = []
+        const field: UiObjectConfig = {type: 'number', label: 'Radius', property: [target, 'radius'], onChange(this: UiObjectConfig) {
+            seen.push(this)
+        }}
+        const form = new UiConfigForm([{type: 'folder', label: 'Shape', children: [field]}])
+        const [input] = row(form, 'Radius').inputs
+        input.value = '2'
+        input.fire('change')
+        expect(seen).toEqual([field])
+    })
+
     test('a folder\'s onChange can be a list of functions', () => {
         const target = {radius: 1}
         const parent = vi.fn()

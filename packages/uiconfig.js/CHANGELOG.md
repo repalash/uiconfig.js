@@ -15,6 +15,7 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 - Fixed: `PerformAction`, a redo of an action that returned an undo function: the redo runs the action again, and the undo function that this run returns is used for the next undo. Before, the next undo called the undo function of the first run (undo, redo, undo left the object of the redo).
 - Fixed: `PerformAction`, an action that returns `{undo, redo, action}`: `undo`, `redo` and `action` are read from the object when the step is undone or redone, and called on it, not bound when the step is recorded. An undo that replaces the redo (an undo that sets the redo to bring back the same object, as threepipe's `EntityComponentPlugin.addComponent` does) works. An object with only `undo` runs the action again on redo; before, the redo failed.
 - These fixes apply to the buttons of uiconfig-tweakpane and uiconfig-blueprint (`clickButton` uses `performAction`).
+- `UiConfigMethods.SetupPropertyForwarding(child, parent)`: a child config with no binding of its own (and not a button) gets the binding of its parent (its `property`, or `[parent, 'value']`), so a `path` selects a value inside it. Moved from uiconfig-tweakpane (an internal helper there), for every renderer.
 - `[Dev]` Unit tests (`npm test` runs them with vitest, after the type check and lint), and the lint errors in `src` fixed.
 
 

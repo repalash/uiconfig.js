@@ -1,6 +1,5 @@
 import {BladeApi, FolderApi, TabPageApi} from 'tweakpane'
 import {BladeController, View} from '@tweakpane/core'
-import {UiObjectConfig} from 'uiconfig.js'
 
 /**
  * Check if child.parent === parent
@@ -50,19 +49,3 @@ export const tweakPaneMoveToParentIndex = (child: BladeApi<BladeController<View>
     return false
 }
 
-/**
- * Set up property forwarding from parent config to child config
- * @param child - The child config that should inherit properties
- * @param parent - The parent config to inherit properties from
- */
-export const setupPropertyForwarding = (child: UiObjectConfig, parent: UiObjectConfig): void => {
-    if (child.property === undefined &&
-        child.value === undefined &&
-        child.getValue === undefined &&
-        child.setValue === undefined &&
-        child.type !== 'button' &&
-        (parent.property !== undefined || parent.value !== undefined)
-    ) {
-        child.property = parent.property !== undefined ? parent.property : [parent, 'value']
-    }
-}
