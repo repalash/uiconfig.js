@@ -590,6 +590,25 @@ describe('UiConfigForm', () => {
         expect(button.disabled).toBe(false)
     })
 
+    test('a field with a dispatchMode: the edit, its onChange and its undo run at that event', async() => {
+        const target = {radius: 1}
+        const onChange = vi.fn()
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([{type: 'number', label: 'Radius', property: [target, 'radius'], dispatchMode: 'postFrame', onChange}], {undoManager})
+        const [input] = row(form, 'Radius').inputs
+        input.value = '4'
+        input.fire('change')
+        expect(target.radius).toBe(1)
+        expect(onChange).not.toHaveBeenCalled()
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.radius).toBe(4)
+        expect(onChange).toHaveBeenCalledTimes(1)
+        undoManager.undo()
+        expect(target.radius).toBe(4)
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.radius).toBe(1)
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])

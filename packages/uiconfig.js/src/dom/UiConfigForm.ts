@@ -370,7 +370,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             this._dispatch(c, parents, isLast, replay, {value: obj[key], lastValue})
             if (structural) this._structureChange()
         }
-        apply(value, last)
+        this._atDispatch(c, () => apply(value, last))
         // a continuous edit of this field (scrub, slider, colour picker) that has not ended yet
         const continuing = this._unfinished === c
         this._unfinished = last ? undefined : c
@@ -383,19 +383,32 @@ export class UiConfigForm extends UiConfigRendererBase {
         const merge = !!u && u.config === c && um.peek() === u.cmd && (continuing || now - u.time < 1000)
         const first = merge && u ? u.before : before
         const after = cloneValue(value)
-        const cmd = {undo: () => apply(first, true, true), redo: () => apply(after, true, true)}
+        const cmd = {undo: () => this._atDispatch(c, () => apply(first, true, true)), redo: () => this._atDispatch(c, () => apply(after, true, true))}
         if (merge) um.replaceLast(cmd)
         else um.record(cmd)
         this._undo = {config: c, cmd, time: now, before: first}
+    }
+
+    /**
+     * Runs a change of a config at the event of its `dispatchMode` (`immediate` by default: at once), as `SetValue` of
+     * uiconfig.js applies a value (`runAtEvent`)
+     */
+    private _atDispatch(c: UiObjectConfig, run: () => void) {
+        const mode = getOrCall(c.dispatchMode, c) ?? UiConfigMethods.DefaultDispatchMode
+        if (mode === 'immediate') run()
+        else void this.methods.runAtEvent(c, run)
     }
 
     /** The end of a continuous edit: the final change (`last`), which some configs wait for (e.g. to rebuild a geometry) */
     private _end(c: UiObjectConfig, parents: UiObjectConfig[]) {
         if (this._unfinished !== c) return
         this._unfinished = undefined
-        const [obj, key] = UiConfigMethods.GetBinding(c)
-        const value = obj ? obj[key] : undefined
-        this._dispatch(c, parents, true, false, {value, lastValue: cloneValue(value)})
+        // after the changes of the edit, which can wait for the dispatchMode event
+        this._atDispatch(c, () => {
+            const [obj, key] = UiConfigMethods.GetBinding(c)
+            const value = obj ? obj[key] : undefined
+            this._dispatch(c, parents, true, false, {value, lastValue: cloneValue(value)})
+        })
     }
 
     /**
