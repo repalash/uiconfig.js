@@ -3,6 +3,7 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
+- Docs: `sendArgs` defaults to true (the arguments are sent unless it is `false`), and `dispatchMode` defaults to `UiConfigMethods.DefaultDispatchMode` (`'immediate'`), as the code has always done. The docs said false and `'postFrame'`.
 
 ## v0.5.0
 - A config can be drawn by more than one renderer at a time: `config.uiRefresh(deep, mode, delay)` refreshes it in each of them. Before, each renderer assigned `config.uiRefresh`, so a form and a Tweakpane panel on the same config replaced each other's refresh. Callers keep calling `config.uiRefresh?.(deep, mode, delay)`.

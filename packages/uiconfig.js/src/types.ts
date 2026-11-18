@@ -229,14 +229,15 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      */
     uiRefresh?: UiRefreshListener; // delay in ms
     /**
-     * This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
+     * This is used to specify when to change the values and/or call the function(like onClick) or change events.
+     * Default is `UiConfigMethods.DefaultDispatchMode` ('immediate' unless an app changes it).
      */
     dispatchMode?: TUiRefreshModes | 'immediate';
     /**
      * Specifies whether to send the click event etc to the onClick/value function.
      * Only for buttons, and only if the value is a function.
      * This can be a boolean or a function that returns a boolean.
-     * Default is false.
+     * Default is true: the arguments are sent unless this is (or returns) `false`.
      */
     sendArgs?: ValOrFunc<boolean>
 
