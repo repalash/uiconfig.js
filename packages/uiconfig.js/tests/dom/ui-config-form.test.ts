@@ -188,6 +188,21 @@ describe('UiConfigForm', () => {
         expect(seen).toEqual([field])
     })
 
+    test('a vector bound to a plain object is edited in place, and undo restores it', () => {
+        const offset = {x: 0, y: 0.5}
+        const target = {offset}
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([{type: 'vec2', label: 'Offset', property: [target, 'offset']}], {undoManager})
+        const inputs = row(form, 'Offset').inputs
+        expect(inputs.map(i => i.value)).toEqual(['0', '0.5'])
+        inputs[0].value = '2'
+        inputs[0].fire('change')
+        expect(target.offset).toBe(offset) // the same object
+        expect(offset).toEqual({x: 2, y: 0.5})
+        undoManager.undo()
+        expect(offset).toEqual({x: 0, y: 0.5})
+    })
+
     test('a folder\'s onChange can be a list of functions', () => {
         const target = {radius: 1}
         const parent = vi.fn()

@@ -156,6 +156,19 @@ describe('PerformAction', () => {
         expect(pending).toHaveBeenCalledTimes(1)
     })
 
+    test('onPending: an async action of a returned {action, undo}, once (also when the outer function is async)', async() => {
+        const {methods, config} = setup()
+        const pending = vi.fn()
+        let resolve!: () => void
+        const done = methods.performAction(undefined, () => ({action: () => new Promise<void>(r => resolve = r), undo: () => {}}), [], config, undefined, pending)
+        expect(pending).toHaveBeenCalledTimes(1) // before the action settles
+        resolve()
+        await done
+        const pending2 = vi.fn()
+        await methods.performAction(undefined, async() => ({action: async() => {}, undo: () => {}}), [], config, undefined, pending2)
+        expect(pending2).toHaveBeenCalledTimes(1)
+    })
+
     test('an action that returns no undo records no step; an error rejects the promise', async() => {
         const {undoManager, methods, config} = setup()
         await methods.performAction(undefined, () => 5, [], config)

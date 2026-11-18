@@ -371,16 +371,18 @@ export class UiConfigForm extends UiConfigRendererBase {
     private _set(c: UiObjectConfig, parents: UiObjectConfig[], value: any, last = true, structural = false) {
         const [obj, key] = UiConfigMethods.GetBinding(c)
         if (!obj) return
-        const before = clonePrimitive(obj[key])
-        if (equalsPrimitive(before, value)) {
+        const before = cloneValue(obj[key])
+        if (equalsValue(before, value)) {
             if (last) this._end(c, parents)
             return
         }
         const apply = (v: any, isLast: boolean, replay = false) => {
             const cur = obj[key]
-            const lastValue = clonePrimitive(cur)
+            const lastValue = cloneValue(cur)
             if (cur && typeof cur === 'object' && typeof cur.copy === 'function') copyPrimitive(cur, v)
-            else obj[key] = clonePrimitive(v)
+            // a plain object (a vector like {x, y}): changed in place, as an object with copy()
+            else if (isPlainObject(cur) && isPlainObject(v)) Object.assign(cur, v)
+            else obj[key] = cloneValue(v)
             // the events carry the new and the previous value, as the change events of the other renderers
             this._dispatch(c, parents, isLast, replay, {value: obj[key], lastValue})
             if (structural) this._structureChange()
@@ -397,7 +399,7 @@ export class UiConfigForm extends UiConfigRendererBase {
         // first value
         const merge = !!u && u.config === c && um.peek() === u.cmd && (continuing || now - u.time < 1000)
         const first = merge && u ? u.before : before
-        const after = clonePrimitive(value)
+        const after = cloneValue(value)
         const cmd = {undo: () => apply(first, true, true), redo: () => apply(after, true, true)}
         if (merge) um.replaceLast(cmd)
         else um.record(cmd)
@@ -410,7 +412,7 @@ export class UiConfigForm extends UiConfigRendererBase {
         this._unfinished = undefined
         const [obj, key] = UiConfigMethods.GetBinding(c)
         const value = obj ? obj[key] : undefined
-        this._dispatch(c, parents, true, false, {value, lastValue: clonePrimitive(value)})
+        this._dispatch(c, parents, true, false, {value, lastValue: cloneValue(value)})
     }
 
     /**
@@ -878,7 +880,8 @@ export class UiConfigForm extends UiConfigRendererBase {
             const inputs = axes.map(a => {
                 const input = this._number(n => {
                     const cur = value() as number[] | VectorLike
-                    const v: any = Array.isArray(cur) ? [...cur] : cur.clone()
+                    // a tuple, an object with clone() (a three.js vector), or a plain object ({x, y})
+                    const v: any = Array.isArray(cur) ? [...cur] : typeof cur.clone === 'function' ? cur.clone() : {...cur}
                     v[a] = Math.min(max, Math.max(min, n))
                     this._set(c, parents, v)
                 }, () => (value() as any)?.[a], getOrCall(c.stepSize))
@@ -1093,6 +1096,27 @@ function placePopover(pop: HTMLElement, anchor: HTMLElement, side: 'top' | 'left
 }
 
 /** `onChange` of a config, a function or a list of functions, without its `parentOnChange` */
+/** An object that is not an array and has no `copy` (a vector like `{x, y}`, a plain record) */
+function isPlainObject(v: any): v is Record<string, any> {
+    if (!v || typeof v !== 'object' || Array.isArray(v) || typeof v.copy === 'function') return false
+    const proto = Object.getPrototypeOf(v)
+    return proto === Object.prototype || proto === null
+}
+
+/** `clonePrimitive`, and a shallow copy of a plain object, which `clonePrimitive` returns as it is */
+function cloneValue(v: any) {
+    return isPlainObject(v) ? {...v} : clonePrimitive(v)
+}
+
+/** `equalsPrimitive`, and plain objects compared by their fields, which `equalsPrimitive` compares by reference */
+function equalsValue(a: any, b: any) {
+    if (isPlainObject(a) && isPlainObject(b)) {
+        const ka = Object.keys(a)
+        return ka.length === Object.keys(b).length && ka.every(k => equalsPrimitive(a[k], b[k]))
+    }
+    return equalsPrimitive(a, b)
+}
+
 function callOnChange(config: UiObjectConfig, ev: ChangeEvent) {
     const on = config.onChange
     // called on the config, as `UiConfigMethods.DispatchOnChangeSync` calls it (a method-style onChange that uses `this`)

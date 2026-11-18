@@ -254,17 +254,27 @@ export class UiConfigMethods {
      * @param onUndoRedo - optional callback function to be called on undo/redo of the command. Not called on first action execution, only on undo/redo.
      * @param um - the undo manager that records the step
      * @param undoEditingWaitTime - see {@link RecordUndo}
-     * @param onPending - called once, synchronously, when the action returns a promise (before it settles), for
-     * example to show that a button runs. Not called for a synchronous action, or for a redo.
+     * @param onPending - called once, synchronously, when the action (or the `action` of the object that it returns)
+     * returns a promise, before it settles: for example to show that a button runs. Not called for a synchronous action,
+     * or for a redo.
      */
     static async PerformAction<T extends AnyFunction>(targ: any|undefined, action: T, args: Parameters<T>, config: UiObjectConfig, onUndoRedo?: (c: ActionCommand)=>void, um?: JSUndoManager, undoEditingWaitTime?: number, onPending?: () => void) {
         const run = ()=> targ === undefined ? action(...args) : action.call(targ, ...args)
         let res = run()
+        let pending = false
         if (typeof res?.then === 'function') {
+            pending = true
             onPending?.()
             res = await res
         }
-        if (isActionObject(res) && typeof res.action === 'function') await res.action() // execute the action now
+        if (isActionObject(res) && typeof res.action === 'function') {
+            const ran = res.action() // execute the action now
+            // an async `action`: pending too (once)
+            if (typeof ran?.then === 'function') {
+                if (!pending) onPending?.()
+                await ran
+            }
+        }
         if (!hasUndo(res)) return
         // the result of the last run of the action, which the next undo undoes
         let last = res
