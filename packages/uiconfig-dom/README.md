@@ -56,7 +56,8 @@ unbundled modules, one per source file.
   ([`shortcutOf`](#options)) is at the end of its row in a stack, and in its tooltip in a bar.
 - **Values:** read and written through the bindings of the configs (`property`, `value`, `getValue` / `setValue`), as in
   the other renderers. A change calls `onChange` of the config and of each folder of the form that holds it, then
-  `parentOnChange` of the top config: the same handlers, once each, as an edit in a Tweakpane panel.
+  `parentOnChange` of the top config: the same handlers, once each, as an edit in a Tweakpane panel. The events carry the
+  new and the previous value (`value`, `lastValue`), also on undo and redo.
 - **Buttons:** the function of a button (its `property`, its `value`, or `onClick`) can return an undo function or
   `{action, undo, redo}`; it runs through `methods.performAction` of uiconfig.js, and with an `undoManager` it is one
   undo step. A function that returns a promise disables the button and shows a spinner until the promise settles; an

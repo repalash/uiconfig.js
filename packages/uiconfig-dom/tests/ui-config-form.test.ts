@@ -142,6 +142,25 @@ describe('UiConfigForm', () => {
         expect(input.value).toBe('10')
     })
 
+    test('change events carry the new and the previous value, also on undo and redo', () => {
+        const target = {radius: 1}
+        const events: [string, any, any][] = []
+        const field: UiObjectConfig = {type: 'number', label: 'Radius', property: [target, 'radius'], onChange: (e: any) => events.push(['field', e.value, e.lastValue])}
+        const folder: UiObjectConfig = {type: 'folder', label: 'Shape', children: [field], onChange: (e: any) => events.push(['folder', e.value, e.lastValue])}
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([folder], {undoManager})
+        const [input] = row(form, 'Radius').inputs
+        input.value = '4'
+        input.fire('change')
+        expect(events).toEqual([['field', 4, 1], ['folder', 4, 1]])
+        events.length = 0
+        undoManager.undo()
+        expect(events).toEqual([['field', 1, 4], ['folder', 1, 4]])
+        events.length = 0
+        undoManager.redo()
+        expect(events).toEqual([['field', 4, 1], ['folder', 4, 1]])
+    })
+
     test('a folder\'s onChange can be a list of functions', () => {
         const target = {radius: 1}
         const parent = vi.fn()
@@ -466,6 +485,18 @@ describe('UiConfigForm', () => {
         target.tris = 14
         form.refresh()
         expect(writes).toEqual(['textContent'])
+    })
+
+    test('a method-style onClick is called on the config, as clickButton of uiconfig.js does', async() => {
+        const seen: unknown[] = []
+        const config: UiObjectConfig = {type: 'button', label: 'Go', onClick(this: UiObjectConfig) {
+            seen.push(this)
+        }}
+        const form = new UiConfigForm([config])
+        const button = (form.element as any as FakeElement).all().find(e => e.tagName === 'button')!
+        button.fire('click')
+        await new Promise(r => setTimeout(r, 0))
+        expect(seen).toEqual([config])
     })
 
     test('the undo result of an onClick is one undo step', async() => {

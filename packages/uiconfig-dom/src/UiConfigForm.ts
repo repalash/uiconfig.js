@@ -378,9 +378,11 @@ export class UiConfigForm extends UiConfigRendererBase {
         }
         const apply = (v: any, isLast: boolean, replay = false) => {
             const cur = obj[key]
+            const lastValue = clonePrimitive(cur)
             if (cur && typeof cur === 'object' && typeof cur.copy === 'function') copyPrimitive(cur, v)
             else obj[key] = clonePrimitive(v)
-            this._dispatch(c, parents, isLast, replay)
+            // the events carry the new and the previous value, as the change events of the other renderers
+            this._dispatch(c, parents, isLast, replay, {value: obj[key], lastValue})
             if (structural) this._structureChange()
         }
         apply(value, last)
@@ -406,7 +408,9 @@ export class UiConfigForm extends UiConfigRendererBase {
     private _end(c: UiObjectConfig, parents: UiObjectConfig[]) {
         if (this._unfinished !== c) return
         this._unfinished = undefined
-        this._dispatch(c, parents, true)
+        const [obj, key] = UiConfigMethods.GetBinding(c)
+        const value = obj ? obj[key] : undefined
+        this._dispatch(c, parents, true, false, {value, lastValue: clonePrimitive(value)})
     }
 
     /**
@@ -414,11 +418,13 @@ export class UiConfigForm extends UiConfigRendererBase {
      * handlers, once each and with the same events, as an edit in a Tweakpane panel (which sets `parentOnChange` on the
      * children that it draws)
      * @param replay - an undo or redo: the fields show the values also when they have the focus
+     * @param values - the new value of a field and its value before the change (`value`, `lastValue` of the events)
      */
-    private _dispatch(c: UiObjectConfig, parents: UiObjectConfig[], last: boolean, replay = false) {
+    private _dispatch(c: UiObjectConfig, parents: UiObjectConfig[], last: boolean, replay = false, values: {value?: any, lastValue?: any} = {}) {
         const path = [...parents, c]
-        for (let i = path.length - 1; i > 0; i--) callOnChange(path[i], {type: 'change', last, config: c, configPath: path.slice(i), target: path[i]})
-        UiConfigMethods.DispatchOnChangeSync(path[0], {last, config: c, configPath: path.slice(1)})
+        const {value, lastValue} = values
+        for (let i = path.length - 1; i > 0; i--) callOnChange(path[i], {type: 'change', last, config: c, configPath: path.slice(i), target: path[i], value, lastValue})
+        UiConfigMethods.DispatchOnChangeSync(path[0], {last, config: c, configPath: path.slice(1), value, lastValue})
         this._options.onChange?.(c)
         // after a rebuild (onStructureChange), the replay of an older edit shows in the form made in place of this one
         this._live.refresh(replay)
@@ -611,7 +617,8 @@ export class UiConfigForm extends UiConfigRendererBase {
                 const fn = obj ? obj[key] ?? obj.value : undefined
                 // as in uiconfig.js: the result can be an undo function or {action, undo, redo}, one undo step
                 if (typeof fn === 'function') await this.methods.performAction(obj, fn as AnyFunction, [], c, replayed, pending)
-                if (typeof c.onClick === 'function') await this.methods.performAction(undefined, c.onClick as AnyFunction, [], c, replayed, pending)
+                // called on the config, as `clickButton` of uiconfig.js does (a method-style onClick that uses `this`)
+                if (typeof c.onClick === 'function') await this.methods.performAction(c, c.onClick as AnyFunction, [], c, replayed, pending)
             } catch (e) {
                 // a failed run changed nothing to report: no change events, no structure change
                 this._error(e, c)
