@@ -572,6 +572,24 @@ describe('UiConfigForm', () => {
         expect(got[1][1]).toMatchObject(event)
     })
 
+    test('a disabled folder disables the fields and buttons in it (also in a nested folder), and a refresh applies a change', () => {
+        const state = {off: true}
+        const target = {radius: 1}
+        const onClick = vi.fn()
+        const form = new UiConfigForm([{type: 'folder', label: 'Shape', disabled: () => state.off, children: [
+            {type: 'number', label: 'Radius', property: [target, 'radius']},
+            {type: 'folder', label: 'More', children: [{type: 'button', label: 'Go', onClick}]},
+        ]}])
+        const [input] = row(form, 'Radius').inputs
+        const button = (form.element as any as FakeElement).all().find(e => e.tagName === 'button')!
+        expect(input.disabled).toBe(true)
+        expect(button.disabled).toBe(true)
+        state.off = false
+        form.refresh()
+        expect(input.disabled).toBe(false)
+        expect(button.disabled).toBe(false)
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])

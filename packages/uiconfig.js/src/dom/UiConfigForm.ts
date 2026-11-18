@@ -424,10 +424,11 @@ export class UiConfigForm extends UiConfigRendererBase {
         this.addRefreshListener(c)
         const type = String(getOrCall(c.type))
         const label = labelOf(c)
-        // disabled and readOnly can change (a callback): refresh() applies them again
+        // disabled and readOnly can change (a callback): refresh() applies them again. A disabled folder (or a folder in
+        // one) disables everything in it, as in the other renderers
         const isDisabled = () => {
             const p = UiConfigMethods.GetBaseProps(c)
-            return !!(p.disabled || p.readOnly)
+            return !!(p.disabled || p.readOnly) || parents.some(f => !!UiConfigMethods.GetBaseProps(f).disabled)
         }
         if (type === 'folder' || type === 'panel') {
             const f = document.createElement('div')
