@@ -5,6 +5,8 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 ## [Unreleased]
 
 ## v0.5.0
+- README: with the UMD bundle of a renderer (it carries its own uiconfig.js), set the tooltip hook on the renderer's class or the renderer, not on `UiConfigRendererBase`.
+- Docs: `sendArgs` defaults to true (the arguments are sent unless it is `false`), and `dispatchMode` defaults to `UiConfigMethods.DefaultDispatchMode` (`'immediate'`), as the code has always done. The docs said false and `'postFrame'`.
 - A config can be drawn by more than one renderer at a time: `config.uiRefresh(deep, mode, delay)` refreshes it in each of them. Before, each renderer assigned `config.uiRefresh`, so a form and a Tweakpane panel on the same config replaced each other's refresh. Callers keep calling `config.uiRefresh?.(deep, mode, delay)`.
   - `UiConfigMethods.AddRefreshListener(config, listener)` adds a function that `config.uiRefresh` calls and returns a function that removes it; `UiConfigMethods.RemoveRefreshListener(config, listener)`. The type of the listener (and of `uiRefresh`) is the new exported type `UiRefreshListener`.
   - `UiConfigRendererBase.addRefreshListener(config)` (once per config; returns a remove function) and `removeRefreshListener(config)`: the listener of a renderer, made by the new protected `_createRefreshListener(config)`, which queues a refresh of the config in the renderer (`addToRefreshQueue`, `postFrame` when no mode is given).

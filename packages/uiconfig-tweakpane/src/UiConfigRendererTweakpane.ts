@@ -13,7 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
-import {folderHeaderButtons, isFolderMenuButton, layoutMountedActions, mountFolderActions, openButtonMenu, type MountedFolderActions} from './tpFolderMenu'
+import {HeaderButtons, isFolderMenuButton, layoutMountedActions, mountFolderActions, openButtonMenu, removeMountedActions, type MountedFolderActions} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -75,8 +75,17 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         layoutMountedActions(this) // they copy the theme of their folder
     }
 
+    /**
+     * The buttons that the folder headers and the mounted bars of this renderer show, and their folder
+     * @internal
+     */
+    readonly headerButtons = new HeaderButtons(this)
+
+    /** Disposes the panel and removes the bars mounted with {@link mountFolderActions} and their refresh listeners */
     unmount() {
+        removeMountedActions(this)
         this._root?.dispose()
+        this.headerButtons.clear()
         super.unmount()
     }
 
@@ -164,7 +173,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         parent = parent ?? this._root
         if (!uiConfig.type) return
         // console.log(`Render ui ${uiConfig.label} in ${parent?.title}`)
-        folderHeaderButtons.delete(uiConfig) // drawn as a control, not in a folder header
+        this.headerButtons.drop(uiConfig) // drawn as a control, not in a folder header
         this.methods.initUiConfig(uiConfig)
         if (uiConfig.uiRef && uiConfig.uiRefType !== uiConfig.type) {
             // console.log('Removing UI object because of type mismatch', uiConfig.uiRef)
@@ -189,21 +198,19 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     }
 
     /**
-     * The refresh of a config in this renderer: a button in a folder header refreshes its folder, while the folder is
-     * drawn (a removed folder is not drawn again; before, the button forwarded to `folder.uiRefresh`, which went with it)
+     * The refresh of a config in this renderer: a button in a folder header (or a mounted bar) refreshes what shows it
+     * in this renderer, the folder while this renderer draws it (a removed folder is not drawn again), or the bar
      */
     protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
         return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => {
-            const folder = folderHeaderButtons.get(config)
-            if (!folder) this.addToRefreshQueue(mode, config, deep, delay)
-            else if (folder.uiRef) this.addToRefreshQueue(mode, folder, false, delay)
+            if (this.headerButtons.folderOf(config)) this.headerButtons.refresh(config, mode, delay)
+            else this.addToRefreshQueue(mode, config, deep, delay)
         }
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
-        // a button in a folder header: its folder renders it (a deep refresh can list it before it moved from the body)
-        const folder = folderHeaderButtons.get(config)
-        if (folder) return folder.uiRef ? this.addToRefreshQueue('postFrame', folder, false, 0) : undefined
+        // a button in a folder header: what shows it renders it (a deep refresh can list it before it moved from the body)
+        if (this.headerButtons.folderOf(config)) return this.headerButtons.refresh(config, 'postFrame', 0)
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }
