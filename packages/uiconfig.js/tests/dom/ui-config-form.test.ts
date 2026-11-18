@@ -784,6 +784,24 @@ describe('UiConfigForm', () => {
         expect([a.v, b.v]).toEqual([1, 10])
     })
 
+    test('a dropdown with object values sets the option itself, and undo and the select follow it', () => {
+        const optA = {id: 'a'}, optB = {id: 'b'}
+        const target = {shape: optA as {id: string}}
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const form = new UiConfigForm([{type: 'dropdown', label: 'Shape', property: [target, 'shape'], children: [
+            {label: 'A', value: optA}, {label: 'B', value: optB},
+        ]}], {undoManager})
+        const [select] = row(form, 'Shape').inputs
+        select.value = '1'
+        select.fire('change')
+        expect(target.shape).toBe(optB)
+        form.refresh(true)
+        expect(select.value).toBe('1')
+        undoManager.undo()
+        expect(target.shape).toBe(optA)
+        expect(select.value).toBe('0')
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])
