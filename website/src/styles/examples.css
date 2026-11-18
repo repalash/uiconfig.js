@@ -403,6 +403,31 @@ main .ex-crumbs a:hover {
     display: none;
 }
 
+/* the forms of uiconfig-dom in the view (dom-form) */
+.ex-view-part:has(.dom-card) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.ex-view-part:has(.dom-card)[hidden] {
+    display: none;
+}
+
+.ex-view .dom-card {
+    align-self: stretch;
+    max-width: 320px;
+    padding: 4px 0;
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    border-radius: var(--radius);
+}
+
 .ex-view-part canvas {
     display: block;
     width: 100% !important;
