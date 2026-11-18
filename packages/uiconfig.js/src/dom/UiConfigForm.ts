@@ -8,7 +8,10 @@ import {
     UiConfigRendererBase,
     UiObjectConfig,
     UiRefreshListener,
+    UiTooltipHook,
+    UiTooltipInfo,
 } from '../index'
+export {titleTooltip} from '../index'
 import {AnyFunction, createStyles, getOrCall, IEvent, JSUndoManager} from 'ts-browser-helpers'
 import {uiConfigFormStyles} from './styles'
 import {iconMarkup} from './icons'
@@ -25,37 +28,17 @@ import {iconMarkup} from './icons'
  */
 export type UiConfigFormLayout = 'form' | 'bar' | 'stack'
 
-/** What a {@link UiConfigFormTooltip} gets besides the text */
-export interface UiConfigFormTooltipInfo {
-    /** The label of the config */
-    label: string
-    /** Its key, from {@link UiConfigFormOptions.shortcutOf} */
-    shortcut?: string
-    /**
-     * Whether the tooltip adds something now: the label is hidden (a button with an icon in a bar on a narrow screen),
-     * or the button has a key. A hook that shows its tooltip on hover can check it then (e.g. tippy.js `onShow`).
-     */
-    needed: () => boolean
-}
+/** What a {@link UiConfigFormTooltip} gets besides the text: {@link UiTooltipInfo} of uiconfig.js */
+export type UiConfigFormTooltipInfo = UiTooltipInfo
 
 /**
- * Adds a tooltip to an element of a `bar`: a button with an icon (its label, which a narrow screen hides) or with a key
- * (the label and the key). The form calls it again with the new text when the label or the key changes, after it
- * calls the function that the hook returned, which removes the tooltip. Default: {@link titleTooltip}.
- *
- * The accessible name of a button stays its `aria-label` (the label): the tooltip is only for sighted mouse users.
- * @param element - the button (or the chip of a dropdown or a monitor)
- * @param text - the label, and the key in parentheses: `Snapshot (⌘S)`
- * @param info - the label and the key apart (to draw the key in a `<kbd class="ucf-kbd">`), and whether it is needed
- * @returns a function that removes the tooltip, if it needs one
+ * The tooltip hook of the buttons of a `bar`: {@link UiTooltipHook} of uiconfig.js, shared by the renderers. A button
+ * with an icon (a narrow screen hides its label) gets its label, and a button with a key gets the label and the key
+ * (`Snapshot (⌘S)`); `info.needed()` says whether the tooltip adds something now. The form calls the hook again when
+ * the label or the key changes, after it calls the function that the hook returned. A stack shows the label and the key
+ * in the row: no tooltips. Default: the native `title` ({@link titleTooltip}).
  */
-export type UiConfigFormTooltip = (element: HTMLElement, text: string, info: UiConfigFormTooltipInfo) => void | (() => void)
-
-/** The default tooltip of {@link UiConfigForm}: the native `title` of the element */
-export const titleTooltip: UiConfigFormTooltip = (element, text) => {
-    element.title = text
-    return () => element.removeAttribute('title')
-}
+export type UiConfigFormTooltip = UiTooltipHook
 
 export interface UiConfigFormOptions {
     /** One undo step per edit; quick edits of the same field (scrub, typing, the slider) merge into one */
@@ -167,8 +150,6 @@ export class UiConfigForm extends UiConfigRendererBase {
     static InjectStyles = true
     /** The buttons of a `bar` have tooltips ({@link UiConfigFormOptions.tooltip}). Off: no tooltips in any form. */
     static Tooltips = true
-    /** The tooltip of the forms that set no {@link UiConfigFormOptions.tooltip}: the native `title` ({@link titleTooltip}) */
-    static Tooltip: UiConfigFormTooltip = titleTooltip
     private static _styles?: HTMLStyleElement
     /** The form whose `onStructureChange` runs: a form made in it is its {@link _next} */
     private static _replacing?: UiConfigForm
@@ -205,6 +186,8 @@ export class UiConfigForm extends UiConfigRendererBase {
         if (replaced && !replaced._next) replaced._next = this
         if (UiConfigForm.InjectStyles && !UiConfigForm._styles?.isConnected) UiConfigForm._styles = createStyles(uiConfigFormStyles)
         this._layout = _options.layout ?? 'form'
+        // the tooltip hook of this form (renderer.tooltip), else the static Tooltip
+        if (_options.tooltip !== undefined) this.tooltip = _options.tooltip
         this.element = document.createElement('div')
         this._build()
     }
@@ -555,9 +538,9 @@ export class UiConfigForm extends UiConfigRendererBase {
 
     /** The tooltip hook of this form, or none (tooltips off) */
     private _tooltipHook(): UiConfigFormTooltip | undefined {
-        if (!UiConfigForm.Tooltips) return undefined
-        const t = this._options.tooltip
-        return t === false ? undefined : t ?? UiConfigForm.Tooltip
+        // the option `tooltip`, else the static `Tooltip` of the forms (UiConfigForm.Tooltip), else of every renderer
+        // (UiConfigRendererBase.Tooltip): the native title by default
+        return UiConfigForm.Tooltips ? this.tooltipHook : undefined
     }
 
     /** An element of a bar or a stack that can have a tooltip ({@link _updateTooltip}) */

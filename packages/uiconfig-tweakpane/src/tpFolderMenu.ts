@@ -123,8 +123,11 @@ export function iconElement(config: UiObjectConfig): HTMLElement | undefined {
     return undefined
 }
 
-/** Sets the content of an item: the icon (with the label, or alone and the label as its name), else the label */
-function setItemContent(item: HTMLButtonElement, config: UiObjectConfig, iconOnly: boolean) {
+/**
+ * Sets the content of an item: the icon (with the label, or alone and the label as its name and its tooltip, through
+ * the tooltip hook of the renderer), else the label
+ */
+function setItemContent(renderer: UiConfigRendererTweakpane, item: HTMLButtonElement, config: UiObjectConfig, iconOnly: boolean) {
     const label = UiConfigMethods.GetLabel(config)
     const icon = getOrCall(config.icon) ?? ''
     if (item.dataset.label === label && item.dataset.icon === icon) return
@@ -133,11 +136,11 @@ function setItemContent(item: HTMLButtonElement, config: UiObjectConfig, iconOnl
     const el = iconElement(config)
     if (el && iconOnly) {
         item.replaceChildren(el)
-        item.title = label
         item.setAttribute('aria-label', label)
+        renderer.setTooltip(item, label)
     } else {
         item.replaceChildren(...el ? [el] : [], label)
-        item.removeAttribute('title')
+        renderer.setTooltip(item, undefined)
         item.removeAttribute('aria-label')
     }
     item.classList.toggle('tpfm-icon-only', !!el && iconOnly)
@@ -190,7 +193,7 @@ export function openButtonMenu(renderer: UiConfigRendererTweakpane, buttons: UiO
                 })
                 itemOf.set(b, item)
             }
-            setItemContent(item, b, false)
+            setItemContent(renderer, item, b, false)
             item.disabled = isOff(b)
             return item
         })
@@ -325,8 +328,8 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
     more.type = 'button'
     more.className = 'tpfm-button'
     more.textContent = '⋮'
-    more.title = 'More actions'
     more.setAttribute('aria-label', 'More actions')
+    renderer.setTooltip(more, 'More actions')
     more.setAttribute('aria-haspopup', 'menu')
     more.setAttribute('aria-expanded', 'false')
     bar.appendChild(more)
@@ -387,6 +390,7 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
         shown = buttons.filter(b => !isHidden(b))
         for (const [b, item] of itemOf) {
             if (shown.includes(b)) continue
+            renderer.setTooltip(item, undefined) // the tooltip goes with the button
             item.remove()
             itemOf.delete(b)
         }
@@ -402,7 +406,7 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
                 })
                 itemOf.set(b, item)
             }
-            setItemContent(item, b, true)
+            setItemContent(renderer, item, b, true)
             return item
         })
         if ([...items, more].some((item, i) => bar.children[i] !== item)) bar.replaceChildren(...items, more)
@@ -420,6 +424,9 @@ function createActionsBar(renderer: UiConfigRendererTweakpane, opts: {
         watched?.globalDisabled.emitter.off('change', onDisabled)
         watched = undefined
         if (open?.anchor === more) closeButtonMenu()
+        // the tooltips go with the bar
+        for (const item of itemOf.values()) renderer.setTooltip(item, undefined)
+        renderer.setTooltip(more, undefined)
         bar.remove()
     }
     return {bar, update, layout, dispose}

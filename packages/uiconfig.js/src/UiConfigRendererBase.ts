@@ -1,8 +1,33 @@
 import {getUrlQueryParam, JSUndoManager, now, SimpleEventDispatcher, timeout} from 'ts-browser-helpers'
 import {TUiRefreshModes, UiObjectConfig, UiRefreshListener} from './types'
 import {UiConfigMethods} from './UiConfigMethods'
+import {setElementTooltip, titleTooltip, UiTooltipHook, UiTooltipInfo} from './tooltips'
 
 export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFrame'|'preRender'|'postRender'|'postFrame'> {
+    /**
+     * The tooltip hook of the renderers that set no {@link tooltip}: set it here for every renderer, or on a renderer
+     * class for those of that class (`UiConfigRendererTweakpane.Tooltip = ...`). Default: the native `title`
+     * ({@link titleTooltip}). See {@link UiTooltipHook}.
+     */
+    static Tooltip: UiTooltipHook = titleTooltip
+
+    /** The tooltip hook of this renderer, or `false` for no tooltips; default: the static `Tooltip` of its class */
+    tooltip?: UiTooltipHook | false
+
+    /** The tooltip hook that this renderer uses ({@link tooltip}, else the static `Tooltip` of its class), or none */
+    get tooltipHook(): UiTooltipHook | undefined {
+        if (this.tooltip === false) return undefined
+        return this.tooltip ?? (this.constructor as typeof UiConfigRendererBase).Tooltip
+    }
+
+    /**
+     * Sets, changes or removes the tooltip of an element of this renderer with its {@link tooltipHook} (see
+     * {@link setElementTooltip}): call it again when the text changes, and with no text to remove it.
+     */
+    setTooltip(element: HTMLElement, text?: string, info?: Partial<UiTooltipInfo>) {
+        setElementTooltip(this.tooltipHook, element, text, info)
+    }
+
     public readonly methods: UiConfigMethods
     private _undoManager?: JSUndoManager
 

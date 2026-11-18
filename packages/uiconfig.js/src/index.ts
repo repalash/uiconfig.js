@@ -46,3 +46,4 @@ export type {TParams}
 
 export type {ActionCommand, SetValueCommand, SetValueCommandProps} from './undo_commands'
 export {undoCommandTypes} from './undo_commands'
+export {titleTooltip, setElementTooltip, type UiTooltipHook, type UiTooltipInfo} from './tooltips'

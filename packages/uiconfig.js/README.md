@@ -642,6 +642,27 @@ disposes the config (`disposeUiConfig`); the other listeners stay.
 The listeners are not enumerable properties of the config: JSON, a spread (`{...config}`) and `Object.assign` leave
 them out.
 
+## Tooltips
+
+Where a renderer shows a tooltip (an icon-only button: its label; the ⋮ button of a folder header; a button of a
+`uiconfig.js/dom` bar with a key), it calls a hook, so an app can draw every tooltip with its own library. The default,
+`titleTooltip`, sets the native `title`. The accessible name stays the `aria-label`.
+
+```javascript
+import tippy from 'tippy.js'
+import {UiConfigRendererBase} from 'uiconfig.js'
+
+// every renderer (uiconfig-tweakpane, uiconfig-blueprint, uiconfig.js/dom)
+UiConfigRendererBase.Tooltip = (element, text, {label, shortcut, needed}) => {
+    const t = tippy(element, {content: text, onShow: () => needed() ? undefined : false})
+    return () => t.destroy() // removes it: the renderer calls it before a new text, and when the element goes
+}
+```
+
+Set it on a renderer class for the renderers of that class only (`UiConfigRendererTweakpane.Tooltip = ...`), or on one
+renderer with `renderer.tooltip = hook` (`false`: no tooltips). Set it before the configs are drawn. A renderer of
+your own calls `this.setTooltip(element, text)` (and with no text to remove it); see `UiTooltipHook`.
+
 ## A form with plain DOM: `uiconfig.js/dom`
 
 `uiconfig.js/dom` draws configs with plain DOM, with no UI library: `UiConfigForm`, a small form (a row per field), a

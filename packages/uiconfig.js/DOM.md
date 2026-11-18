@@ -109,20 +109,21 @@ Members: `element` (the root element, put it in the page), `layout`, `refresh(fo
 
 Statics: `UiConfigForm.InjectStyles` (true: the first form adds the stylesheet to the page; false: the app adds
 `uiConfigFormStyles`, or its own styles for the `ucf-` classes), `UiConfigForm.Tooltips` (false: no tooltips in any
-form), `UiConfigForm.Tooltip` (the default tooltip hook, `titleTooltip`).
+form), `UiConfigForm.Tooltip` (the tooltip hook of the forms; it inherits `UiConfigRendererBase.Tooltip`, the native
+`title` by default).
 
 Exports: `UiConfigForm`, `titleTooltip`, `isIntegerName`, `lucideIcons`, `lucideIcon(name)`, `addIcons(icons)`,
 `iconMarkup(name)`, `uiConfigFormStyles`, and the types `UiConfigFormLayout`, `UiConfigFormOptions`,
-`UiConfigFormTooltip`, `UiConfigFormTooltipInfo`.
+`UiConfigFormTooltip`, `UiConfigFormTooltipInfo` (the `UiTooltipHook` and `UiTooltipInfo` of uiconfig.js).
 
 ## Tooltips
 
 The buttons of a bar can have a tooltip: a button with an icon (a narrow screen hides its label) shows its label, and a
 button with a key shows the label and the key. A stack shows both in the row, so it has none. The form has no tooltip
-library: it calls a hook,
+library: it calls the tooltip hook of uiconfig.js, which the other renderers use too ([Tooltips](README.md#tooltips)),
 
 ```ts
-type UiConfigFormTooltip = (element: HTMLElement, text: string, info: {label: string, shortcut?: string, needed: () => boolean}) => void | (() => void)
+type UiTooltipHook = (element: HTMLElement, text: string, info: {label: string, shortcut?: string, needed: () => boolean}) => void | (() => void)
 ```
 
 with the text (`Snapshot (⌘S)`), and calls the function that it returns to remove the tooltip (before it calls the hook
@@ -130,7 +131,8 @@ again with a new text, when the label or the key changes, and on `dispose`). The
 native `title`. `needed()` says whether the tooltip adds something now (the label is hidden, or there is a key), for a
 hook that can check when the tooltip would show. The accessible name of a button stays its `aria-label`, the label.
 
-With tippy.js, for example (as threepipe's editor does):
+The hook of a form: its option `tooltip`, else `UiConfigForm.Tooltip` (the forms only), else
+`UiConfigRendererBase.Tooltip` (every renderer). With tippy.js, for example (as threepipe's editor does):
 
 ```js
 import tippy from 'tippy.js'
