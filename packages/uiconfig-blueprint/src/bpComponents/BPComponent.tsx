@@ -100,24 +100,23 @@ export abstract class BPComponent<TValue, TState extends BPComponentState, TProp
     }
 
     /**
-     * Add reference to this to uiRef and set uiRefresh to the config to refresh this component
+     * Add reference to this to uiRef and the refresh listener of the renderer to the config (`config.uiRefresh()`
+     * refreshes this component, and the config in the other renderers that draw it)
      *
      * also refreshes the config once which re-renders (todo: check if this is required)
      */
     componentDidMount() {
         super.componentDidMount?.();
         this.props.config.uiRef = this
-        this.props.config.uiRefresh = (deep = false, mode = 'postFrame', delay = 0) => {
-            this.context.addToRefreshQueue(mode, this.props.config, deep, delay)
-        }
+        this.context.addRefreshListener(this.props.config)
         // console.log('mount', this.props.config.label, this.props.config.type, this.props.config)
-        this.props.config.uiRefresh()
+        this.context.addToRefreshQueue('postFrame', this.props.config, false, 0)
     }
 
     componentWillUnmount() {
         // console.log('unmount', this.props.config.label, this.props.config.type, this.props.config)
         this.props.config.uiRef = undefined
-        this.props.config.uiRefresh = undefined
+        this.context.removeRefreshListener(this.props.config)
         super.componentWillUnmount?.();
     }
 

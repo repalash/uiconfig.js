@@ -1,4 +1,4 @@
-import {ChangeArgs, ChangeEvent, TUiRefreshModes, UiObjectConfig} from './types'
+import {ChangeArgs, ChangeEvent, TUiRefreshModes, UiObjectConfig, UiRefreshListener} from './types'
 import {
     AnyFunction,
     clonePrimitive,
@@ -10,10 +10,11 @@ import {
     PrimitiveVal,
     recordUndoCommand,
     setValueUndoCommand,
-    uuidV4
+    uuidV4,
 } from 'ts-browser-helpers'
 import {UiConfigRendererBase} from './UiConfigRendererBase'
 import {ActionCommand, SetValueCommand, SetValueCommandProps, undoCommandTypes} from './undo_commands'
+import {addRefreshListener, removeRefreshListener} from './refresh_listeners'
 
 export class UiConfigMethods {
     constructor(
@@ -170,7 +171,7 @@ export class UiConfigMethods {
         return prop
     }
 
-    static GetRawValue<T extends any /*PrimitiveVal*/>(config: UiObjectConfig<T>): T | undefined {
+    static GetRawValue<T /* PrimitiveVal */>(config: UiObjectConfig<T>): T | undefined {
         const [tar, key] = this.GetBinding(config)
         if (!tar) return undefined
         const res = tar[key]
@@ -264,7 +265,7 @@ export class UiConfigMethods {
         return this.RunAtEvent(config, () => {
             const binding = this.GetBinding(config)
             const ev = setValueUndoCommand(um, binding, value, props, config, undoCommandTypes.setValue, trackUndo, undoEditingWaitTime, false, undefined)
-            if(!ev.undoable && !forceOnChange) return false
+            if (!ev.undoable && !forceOnChange) return false
             this.DispatchOnChangeSync(config, {...props, ...ev})
             return true
         }, dispatcher)
@@ -321,6 +322,29 @@ export class UiConfigMethods {
         return {min, max, step}
     }
 
+    /**
+     * Adds a function that `config.uiRefresh(deep, mode, delay)` calls. Each renderer that draws a config adds its own
+     * (`UiConfigRendererBase.addRefreshListener` does it for a renderer), so a config drawn by more than one renderer
+     * refreshes in all of them. Callers keep calling `config.uiRefresh?.(deep, mode, delay)`.
+     *
+     * A function assigned with `config.uiRefresh = fn` is called too; assigning `undefined` removes only that function.
+     * The listeners are not enumerable: JSON, a spread and `Object.assign` leave them out.
+     * @param config - the config
+     * @param listener - called with the arguments of `config.uiRefresh`; adding the same function again does nothing
+     * @returns a function that removes the listener
+     */
+    static AddRefreshListener(config: UiObjectConfig, listener: UiRefreshListener): () => void {
+        return addRefreshListener(config, listener)
+    }
+
+    /**
+     * Removes a function added with {@link AddRefreshListener}. The assigned `config.uiRefresh` function and the other
+     * listeners stay.
+     */
+    static RemoveRefreshListener(config: UiObjectConfig, listener: UiRefreshListener) {
+        removeRefreshListener(config, listener)
+    }
+
     static GetBaseProps(config: UiObjectConfig) {
         const hidden = getOrCall(config.hidden) ?? false
         const disabled = getOrCall(config.disabled) ?? false
@@ -344,7 +368,7 @@ export class UiConfigMethods {
      * @deprecated use {@link GetRawValue}
      * @param config
      */
-    getRawValue<T extends any /*PrimitiveVal*/>(config: UiObjectConfig<T>): T | undefined {
+    getRawValue<T /* PrimitiveVal */>(config: UiObjectConfig<T>): T | undefined {
         return UiConfigMethods.GetRawValue(config)
     }
 

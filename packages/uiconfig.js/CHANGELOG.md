@@ -4,6 +4,16 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 
 ## [Unreleased]
 
+## v0.5.0
+- A config can be drawn by more than one renderer at a time: `config.uiRefresh(deep, mode, delay)` refreshes it in each of them. Before, each renderer assigned `config.uiRefresh`, so a form and a Tweakpane panel on the same config replaced each other's refresh. Callers keep calling `config.uiRefresh?.(deep, mode, delay)`.
+  - `UiConfigMethods.AddRefreshListener(config, listener)` adds a function that `config.uiRefresh` calls and returns a function that removes it; `UiConfigMethods.RemoveRefreshListener(config, listener)`. The type of the listener (and of `uiRefresh`) is the new exported type `UiRefreshListener`.
+  - `UiConfigRendererBase.addRefreshListener(config)` (once per config; returns a remove function) and `removeRefreshListener(config)`: the listener of a renderer, made by the new protected `_createRefreshListener(config)`, which queues a refresh of the config in the renderer (`addToRefreshQueue`, `postFrame` when no mode is given).
+  - `disposeUiConfig` removes only the listener of the renderer that disposes; before, it set `config.uiRefresh` to `undefined`. A renderer that assigned `config.uiRefresh` should call `addRefreshListener` instead.
+  - Assigning a function still works (`config.uiRefresh = fn`, for example to forward the refreshes of a config to another): it is called with the listeners, and assigning `undefined` removes only that function. While the config has no listeners, `config.uiRefresh` reads back the assigned function.
+  - Once a renderer listens, `uiRefresh` is an accessor that is not enumerable, and the listeners are in a non-enumerable property: JSON, a spread (`{...config}`), `Object.assign` and `structuredClone` leave them out (before, a spread copied the `uiRefresh` function of the original config). Two copies of uiconfig.js on a page (the UMD bundle of a renderer includes one) share the listeners of a config.
+- `[Dev]` Unit tests (`npm test` runs them with vitest, after the type check and lint), and the lint errors in `src` fixed.
+
+
 ## v0.4.2
 - `UiObjectConfig.icon` (a string or a function): SVG markup, an image URL, or an icon name of the renderer. uiconfig-tweakpane and uiconfig-blueprint draw it on the folder header actions and their menus.
 

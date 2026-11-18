@@ -74,7 +74,7 @@ export function generateUiConfig(obj: any): Required<UiObjectConfig>['children']
                         const res = c1()
                         return !res ? res : Object.assign(res, {...params1, ...extraParams})
                     }
-                }else {
+                } else {
                     Object.assign(config, {...params1, ...extraParams})
                 }
             }

@@ -1,5 +1,10 @@
 # Changelog for uiconfig-blueprint
 
+## [Unreleased]
+
+## [0.1.0-dev.20] - 2026-11-18
+- Depends on uiconfig.js `^0.5.0`. A component adds the refresh of the renderer to its config with `addRefreshListener` when it mounts, and removes it when it unmounts, instead of assigning `config.uiRefresh` (and setting it to `undefined`): a config that another renderer also draws refreshes in both, and a function that the app assigned to `config.uiRefresh` stays.
+
 ## [0.1.0-dev.19] - 2026-11-09
 - Depends on uiconfig.js `^0.4.2` (the type of `UiObjectConfig.icon`).
 - Folder actions: the `button` children with the tag `context-menu` show in the folder header as small buttons after the label while they fit, and the rest in the ⋯ menu (before, all were in the menu). The header follows its size. The buttons are off in a disabled folder, and a long label ends before them. A button with an `icon` (SVG markup, an image URL or a Blueprint icon name) shows the icon only, with the label as its tooltip; the menu shows the icon and the label.

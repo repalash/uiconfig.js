@@ -1,6 +1,6 @@
 {
     "name": "uiconfig.js",
-    "version": "0.4.2",
+    "version": "0.5.0",
     "description": "A framework for building user interface layouts with JSON configuration.",
     "main": "dist/index.cjs",
     "module": "dist/index.mjs",
@@ -13,7 +13,7 @@
         "build": "rimraf dist ; tsc && vite build && vite build --mode umd",
         "dev": "NODE_ENV=development vite build --watch",
         "serve-docs": "ws -d docs -p 8080",
-        "test": "npm run check",
+        "test": "npm run check && vitest run",
 
         "serve": "ws",
         "prepack": "npm run build && npm run docs",
@@ -100,7 +100,8 @@
         "eslint": "^8.57.1",
         "eslint-plugin-deprecation": "^3.0.0",
         "eslint-plugin-html": "^8.1.2",
-        "eslint-plugin-import": "^2.31.0"
+        "eslint-plugin-import": "^2.31.0",
+        "vitest": "^4.1.2"
     },
     "dependencies": {
         "ts-browser-helpers": ">=0.19.4"

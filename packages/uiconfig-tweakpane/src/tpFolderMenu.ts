@@ -1,6 +1,6 @@
 import {FolderApi} from 'tweakpane'
 import type {ViewProps} from '@tweakpane/core'
-import {ChangeEvent, TUiRefreshModes, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
+import {ChangeEvent, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {createStyles, css, getOrCall} from 'ts-browser-helpers'
 import type {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
 
@@ -18,21 +18,23 @@ const hasTag = (config: UiObjectConfig, tag: string) => {
 }
 
 /**
- * The buttons that a folder shows in its header now (set by the folder generator at each render). The renderer refreshes
- * their folder for them, not a body control: a deep refresh can still list a button that just moved from the body.
+ * The buttons that a folder shows in its header now, and their folder (set by the folder generator at each render). The
+ * renderer refreshes their folder for them, not a body control: a deep refresh can still list a button that just moved
+ * from the body.
  */
-export const folderHeaderButtons = new WeakSet<UiObjectConfig>()
+export const folderHeaderButtons = new WeakMap<UiObjectConfig, UiObjectConfig>()
 
 /**
  * Sets up a header button of a folder as `renderUiObject` does for a body control, since it is not rendered: the binding
- * to its property, its change events to the folder (`onChange` of the folder gets the click) and its refresh (of the
- * folder). By the folder generator at each render, and by {@link mountFolderActions} for the buttons that it reads.
+ * to its property, its change events to the folder (`onChange` of the folder gets the click) and its refresh (the
+ * renderer refreshes the folder, see `UiConfigRendererTweakpane._createRefreshListener`). By the folder generator at
+ * each render, and by {@link mountFolderActions} for the buttons that it reads.
  */
-export function setupFolderMenuButton(folder: UiObjectConfig, button: UiObjectConfig) {
-    folderHeaderButtons.add(button)
+export function setupFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: UiObjectConfig, button: UiObjectConfig) {
+    folderHeaderButtons.set(button, folder)
     UiConfigMethods.InitUiConfig(button)
     button.parentOnChange = (ev: ChangeEvent, ...args: any[]) => UiConfigMethods.DispatchOnChangeSync(folder, {...ev}, ...args)
-    button.uiRefresh = (_deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => folder.uiRefresh?.(false, mode, delay)
+    renderer.addRefreshListener(button)
 }
 
 /** A button that a folder shows in its menu: a `button` with the `context-menu` tag, without the `inline` tag */
@@ -525,7 +527,7 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
     const refresh = () => {
         const buttons = renderer.folderMenuButtons(config)
         // set up as the folder render does (a function in children can make new configs; a button added since)
-        for (const b of buttons) setupFolderMenuButton(config, b)
+        for (const b of buttons) setupFolderMenuButton(renderer, config, b)
         actions.update(buttons)
     }
     // the size of the element, and the folder element: it stops or starts being rendered (a hide, also of a folder that

@@ -143,7 +143,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
 
     // the menu buttons are not rendered: set up as renderUiObject does for the body controls, after the loop above, which
     // clears these on a button that was in the body before
-    for (const b of menuButtons) setupFolderMenuButton(config, b)
+    for (const b of menuButtons) setupFolderMenuButton(plugin, config, b)
     updateFolderMenuButton(plugin, folder, menuButtons, config)
     return folder
 }
@@ -218,7 +218,8 @@ export const tpInputGenerator = (parent: FolderApi, config: UiObjectConfig, rend
     }
     // A read-only value is a monitor blade, an editable one an input blade, and Tweakpane cannot turn one into the
     // other: when readOnly (a value or a function) changes, the blade is made again at the same place in the parent.
-    // Its dispose handler (renderUiObject) clears config.uiRef and uiRefresh; renderUiObject sets them for the new one.
+    // Its dispose handler (renderUiObject) clears config.uiRef and removes the refresh listener of the renderer;
+    // renderUiObject sets them for the new one.
     const monitor = !inputParams.view && !!getOrCall(config.readOnly)
     let index: number | undefined
     if (input && config.__tpMonitor !== undefined && config.__tpMonitor !== monitor) {

@@ -1,5 +1,5 @@
 import {getUrlQueryParam, JSUndoManager, now, SimpleEventDispatcher, timeout} from 'ts-browser-helpers'
-import {TUiRefreshModes, UiObjectConfig} from './types'
+import {TUiRefreshModes, UiObjectConfig, UiRefreshListener} from './types'
 import {UiConfigMethods} from './UiConfigMethods'
 
 export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFrame'|'preRender'|'postRender'|'postFrame'> {
@@ -99,8 +99,45 @@ export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFra
         this._refreshQueue[mode] = l
     }
 
+    /** The refresh listener of this renderer on each config that it draws, see {@link addRefreshListener} */
+    private _refreshListeners = new WeakMap<UiObjectConfig, UiRefreshListener>()
+
+    /**
+     * Makes `config.uiRefresh()` refresh the UI of the config in this renderer, next to the other renderers that draw
+     * it (`UiConfigMethods.AddRefreshListener`). Call it when the config is rendered; once per config: a second call
+     * keeps the first listener. {@link disposeUiConfig} and {@link removeRefreshListener} remove it.
+     * @returns a function that removes the listener
+     */
+    addRefreshListener(config: UiObjectConfig): () => void {
+        let listener = this._refreshListeners.get(config)
+        if (!listener) {
+            listener = this._createRefreshListener(config)
+            this._refreshListeners.set(config, listener)
+        }
+        UiConfigMethods.AddRefreshListener(config, listener)
+        return () => this.removeRefreshListener(config)
+    }
+
+    /** Removes the refresh listener of this renderer from a config ({@link addRefreshListener}); other renderers keep theirs */
+    removeRefreshListener(config: UiObjectConfig) {
+        const listener = this._refreshListeners.get(config)
+        if (!listener) return
+        this._refreshListeners.delete(config)
+        UiConfigMethods.RemoveRefreshListener(config, listener)
+    }
+
+    /**
+     * The function that this renderer adds to `config.uiRefresh` ({@link addRefreshListener}). Default: queues a
+     * refresh of the config in this renderer ({@link addToRefreshQueue}, `postFrame` when no mode is given).
+     */
+    protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
+        return (deep = false, mode = 'postFrame', delay = 0) => this.addToRefreshQueue(mode, config, deep, delay)
+    }
+
     /**
      * Disposes the UI associated with a config, doesn't makes change to the object or its parent.
+     * Removes the refresh listener of this renderer from the config; the listeners of other renderers, and a function
+     * assigned to `config.uiRefresh`, stay.
      * @param config
      * @param performDispose
      */
@@ -111,7 +148,7 @@ export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFra
             config.uiRef = undefined
         }
         config.uiRefType = undefined
-        config.uiRefresh = undefined
+        this.removeRefreshListener(config)
     }
 
     addToRefreshQueue(mode: TUiRefreshModes | 'immediate', uiConfig: UiObjectConfig, deep: boolean, delay: number) {

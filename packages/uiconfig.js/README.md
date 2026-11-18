@@ -548,12 +548,13 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      */
     uiRefType?: UiObjectType
     /**
-     * After initial rendering, config.uiRefresh will be set to a function that can be used to re-render the UI.
+     * Refreshes the UI of this config in every renderer that draws it (each renderer adds a listener with
+     * UiConfigMethods.AddRefreshListener). An app can also assign a function; it is called with the listeners.
      * @param deep - If true, the UI will be re-rendered recursively, otherwise only the current object will be re-rendered.
      * @param mode - The mode to re-render in. See TUiRefreshModes for details. Use when syncing with custom render loop
      * @param delay - The delay in ms to wait before re-rendering. This is useful if multiple changes are made in quick succession. If another refresh event is in the queue for the same object, it will be postponed by this amount. This is not exact for small values.
      */
-    uiRefresh?: (deep?: boolean, mode?: TUiRefreshModes | 'immediate', delay?: number) => void; // delay in ms
+    uiRefresh?: UiRefreshListener; // (deep?: boolean, mode?: TUiRefreshModes | 'immediate', delay?: number) => void, delay in ms
     /**
      * This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
      */
@@ -616,6 +617,30 @@ const config = {
 renderer.appendUiConfig(config);
 // Here the value of the input box will be "John", and any changes to the input box will change the value of the variable name and log to the console.
 ```
+
+### Refreshing the UI after a change from code
+
+A renderer reads the values when it draws a config. After a change from code, call `uiRefresh` of the config:
+
+```javascript
+state.name = "Jane"
+config.uiRefresh?.(true) // deep: also the children; optional mode ('postFrame' by default) and delay in ms
+```
+
+A config can be drawn by more than one renderer at a time (for example a Tweakpane panel and a form): `uiRefresh`
+refreshes it in each of them. Each renderer adds its own listener when it draws the config, and removes it when it
+disposes the config (`disposeUiConfig`); the other listeners stay.
+
+- A renderer: `renderer.addRefreshListener(config)` (once per config; `UiConfigRendererBase` queues the refresh in
+  the renderer, and a subclass can change that in `_createRefreshListener`), and `renderer.removeRefreshListener(config)`.
+- Any other code: `const remove = UiConfigMethods.AddRefreshListener(config, (deep, mode, delay) => {...})`, and
+  `remove()` (or `UiConfigMethods.RemoveRefreshListener(config, fn)`).
+- Assigning a function still works, for example to forward the refreshes of a config to another:
+  `config.uiRefresh = (...args) => parent.uiRefresh?.(...args)`. It is called with the listeners, and assigning
+  `undefined` removes only that function.
+
+The listeners are not enumerable properties of the config: JSON, a spread (`{...config}`) and `Object.assign` leave
+them out.
 
 ## Integration with three.js
 
