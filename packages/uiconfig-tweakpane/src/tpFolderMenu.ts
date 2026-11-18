@@ -1,6 +1,6 @@
 import {FolderApi} from 'tweakpane'
 import type {ViewProps} from '@tweakpane/core'
-import {ChangeEvent, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
+import {ChangeEvent, TUiRefreshModes, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {createStyles, css, getOrCall} from 'ts-browser-helpers'
 import type {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
 
@@ -18,23 +18,103 @@ const hasTag = (config: UiObjectConfig, tag: string) => {
 }
 
 /**
- * The buttons that a folder shows in its header now, and their folder (set by the folder generator at each render). The
- * renderer refreshes their folder for them, not a body control: a deep refresh can still list a button that just moved
- * from the body.
- */
-export const folderHeaderButtons = new WeakMap<UiObjectConfig, UiObjectConfig>()
-
-/**
  * Sets up a header button of a folder as `renderUiObject` does for a body control, since it is not rendered: the binding
  * to its property, its change events to the folder (`onChange` of the folder gets the click) and its refresh (the
- * renderer refreshes the folder, see `UiConfigRendererTweakpane._createRefreshListener`). By the folder generator at
- * each render, and by {@link mountFolderActions} for the buttons that it reads.
+ * renderer refreshes the folder, see `UiConfigRendererTweakpane._createRefreshListener`).
  */
-export function setupFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: UiObjectConfig, button: UiObjectConfig) {
-    folderHeaderButtons.set(button, folder)
+function setupFolderMenuButton(renderer: UiConfigRendererTweakpane, folder: UiObjectConfig, button: UiObjectConfig) {
     UiConfigMethods.InitUiConfig(button)
     button.parentOnChange = (ev: ChangeEvent, ...args: any[]) => UiConfigMethods.DispatchOnChangeSync(folder, {...ev}, ...args)
     renderer.addRefreshListener(button)
+}
+
+/** What shows header buttons in a renderer: the header of a folder blade, or a mounted bar */
+interface HeaderOwner {
+    /** Draws its buttons again, for `uiRefresh` of one of them */
+    refresh: (mode: TUiRefreshModes | 'immediate', delay: number) => void
+}
+
+/**
+ * The buttons that the folder headers and the mounted bars ({@link mountFolderActions}) of one renderer show now, and
+ * their folder. `uiRefresh` of such a button refreshes what shows it in this renderer (the folder of a header, a mounted
+ * bar), not a body control: a deep refresh can still list a button that just moved from the body. A button that nothing
+ * shows any more loses the refresh listener of the renderer, unless the renderer draws it in a body since. Each renderer
+ * keeps its own, as whether a button is in a header depends on the renderer (`folderMenus`, mounted bars).
+ * @internal
+ */
+export class HeaderButtons {
+    private _folderOf = new WeakMap<UiObjectConfig, UiObjectConfig>()
+    private _owners = new WeakMap<UiObjectConfig, Set<HeaderOwner>>()
+    private _shown = new Map<HeaderOwner, {folder: UiObjectConfig, buttons: UiObjectConfig[]}>()
+    private _headers = new WeakMap<FolderApi, HeaderOwner>()
+
+    constructor(private _renderer: UiConfigRendererTweakpane) {}
+
+    /** The folder whose header (or mounted bar) shows the button in this renderer, if any */
+    folderOf(button: UiObjectConfig) {
+        return this._folderOf.get(button)
+    }
+
+    /** The button is drawn as a body control now, not in a header: its refresh listener refreshes it, not a folder */
+    drop(button: UiObjectConfig) {
+        this._folderOf.delete(button)
+    }
+
+    /** Refreshes what shows the button in this renderer: the folder of each header (while drawn), each mounted bar */
+    refresh(button: UiObjectConfig, mode: TUiRefreshModes | 'immediate', delay: number) {
+        this._owners.get(button)?.forEach(o => o.refresh(mode, delay))
+    }
+
+    /**
+     * The buttons that an owner shows now, set up as body controls are; the buttons that it showed before and nothing
+     * shows now lose the refresh listener
+     */
+    set(owner: HeaderOwner, folder: UiObjectConfig, buttons: UiObjectConfig[]) {
+        const before = this._shown.get(owner)?.buttons ?? []
+        for (const b of buttons) {
+            this._folderOf.set(b, folder)
+            let owners = this._owners.get(b)
+            if (!owners) this._owners.set(b, owners = new Set())
+            owners.add(owner)
+            setupFolderMenuButton(this._renderer, folder, b)
+        }
+        for (const b of before) {
+            if (buttons.includes(b)) continue
+            const owners = this._owners.get(b)
+            owners?.delete(owner)
+            if (owners?.size) continue
+            this._owners.delete(b)
+            // drawn in a body (or in the header of another folder) since: that keeps its listener
+            if (this._folderOf.get(b) !== folder) continue
+            this._folderOf.delete(b)
+            this._renderer.removeRefreshListener(b)
+        }
+        if (buttons.length) this._shown.set(owner, {folder, buttons})
+        else this._shown.delete(owner)
+    }
+
+    /** {@link set} for the header of a folder blade of this renderer: its buttons are let go when the blade is disposed */
+    setHeader(folderApi: FolderApi, folder: UiObjectConfig, buttons: UiObjectConfig[]) {
+        let owner = this._headers.get(folderApi)
+        if (!owner && !buttons.length) return
+        if (!owner) {
+            const viewProps = folderApi.controller_.viewProps
+            const header: HeaderOwner = {
+                // while this blade is the folder's (a removed folder is not drawn again)
+                refresh: (mode, delay) => {
+                    if (!viewProps.get('disposed') && folder.uiRef === folderApi) this._renderer.addToRefreshQueue(mode, folder, false, delay)
+                },
+            }
+            this._headers.set(folderApi, owner = header)
+            viewProps.handleDispose(() => this.set(header, folder, []))
+        }
+        this.set(owner, folder, buttons)
+    }
+
+    /** Lets go of the buttons of every owner (the renderer is unmounted) */
+    clear() {
+        for (const [owner, {folder}] of [...this._shown]) this.set(owner, folder, [])
+    }
 }
 
 /** A button that a folder shows in its menu: a `button` with the `context-menu` tag, without the `inline` tag */
@@ -271,9 +351,12 @@ interface ActionsBar {
 /** A bar mounted in another element ({@link mountFolderActions}) for a folder config */
 interface MountedBar {
     config: UiObjectConfig
+    /** Draws the buttons again from the folder config (`uiRefresh` of one of them) */
+    refresh: () => void
     /** `folder`: the folder of this render (its config's `uiRef` is set only after the folder generator returns) */
     update: (buttons: UiObjectConfig[], folder: FolderApi) => void
     layout: () => void
+    remove: () => void
 }
 /** The header actions of each folder (its element) */
 const folderActions = new WeakMap<HTMLElement, ActionsBar>()
@@ -283,6 +366,11 @@ const mountedActions = new WeakMap<UiConfigRendererTweakpane, Set<MountedBar>>()
 /** Lays out the bars mounted with a renderer again, for a change that is not a render or a resize (its theme) */
 export function layoutMountedActions(renderer: UiConfigRendererTweakpane) {
     mountedActions.get(renderer)?.forEach(m => m.layout())
+}
+
+/** Removes the bars mounted with a renderer ({@link mountFolderActions}), when it is unmounted */
+export function removeMountedActions(renderer: UiConfigRendererTweakpane) {
+    mountedActions.get(renderer)?.forEach(m => m.remove())
 }
 
 /**
@@ -534,7 +622,7 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
     const refresh = () => {
         const buttons = renderer.folderMenuButtons(config)
         // set up as the folder render does (a function in children can make new configs; a button added since)
-        for (const b of buttons) setupFolderMenuButton(renderer, config, b)
+        renderer.headerButtons.set(handle, config, buttons)
         actions.update(buttons)
     }
     // the size of the element, and the folder element: it stops or starts being rendered (a hide, also of a folder that
@@ -557,12 +645,15 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
     if (!set) mountedActions.set(renderer, set = new Set())
     const handle: MountedBar = {
         config,
+        refresh: () => refresh(),
         update: (buttons, f) => {
             rendered = f
             watch(f)
+            renderer.headerButtons.set(handle, config, buttons)
             actions.update(buttons)
         },
         layout: relayout,
+        remove: () => remove(),
     }
     set.add(handle)
     const remove = () => {
@@ -570,6 +661,7 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
         watch(undefined)
         actions.dispose()
         mountedActions.get(renderer)?.delete(handle)
+        renderer.headerButtons.set(handle, config, [])
     }
     watch(folder())
     refresh()

@@ -3,6 +3,7 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
+- README: with the UMD bundle of a renderer (it carries its own uiconfig.js), set the tooltip hook on the renderer's class or the renderer, not on `UiConfigRendererBase`.
 - Docs: `sendArgs` defaults to true (the arguments are sent unless it is `false`), and `dispatchMode` defaults to `UiConfigMethods.DefaultDispatchMode` (`'immediate'`), as the code has always done. The docs said false and `'postFrame'`.
 
 ## v0.5.0
