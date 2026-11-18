@@ -6,7 +6,7 @@
 - Tooltips through the tooltip hook of uiconfig.js 0.5 (`UiConfigRendererBase.Tooltip`, `UiConfigRendererTweakpane.Tooltip` or `renderer.tooltip`): the icon-only buttons of a folder header (and of `mountFolderActions`) and the ⋮ button. The default is the native `title`, as before; the tooltip is updated when the label changes, and removed for a button that shows its text, a button that goes, and a bar that is disposed.
 - Depends on uiconfig.js `^0.5.0`. The renderer adds its refresh to a config with `addRefreshListener` instead of assigning `config.uiRefresh`, so a config that another renderer also draws (a form, a second panel) refreshes in both, and a function that the app assigned to `config.uiRefresh` stays. When the renderer disposes a config (or its blade), it removes only its own listener.
 - Fix (from uiconfig.js 0.5.0): the undo and redo of a button whose function returns an undo function or `{undo, redo}` (see `PerformAction` in the uiconfig.js changelog).
-- The refresh of a button in a folder header refreshes the folder in this renderer (before, it called the `uiRefresh` of the folder, which other renderers could have replaced).
+- The refresh of a button in a folder header refreshes the folder in this renderer (before, it called the `uiRefresh` of the folder, which other renderers could have replaced). The folder is refreshed only while it is drawn: the header button of a removed folder does not draw it again.
 - The binding of a folder for its children with only a `path` comes from `UiConfigMethods.SetupPropertyForwarding` of uiconfig.js (was an internal helper of this package); no change in behaviour.
 
 ## [2.2.0] - 2026-11-12

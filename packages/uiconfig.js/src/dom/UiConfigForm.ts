@@ -709,7 +709,8 @@ export class UiConfigForm extends UiConfigRendererBase {
         b.type = 'button'
         b.className = 'ucf-button ucf-toggle'
         const updateIcon = this._content(b, c, label)
-        b.addEventListener('click', () => this._set(c, parents, !UiConfigMethods.GetRawValue(c)))
+        // the value is read when the edit runs (at the dispatchMode event), so two clicks before it toggle twice
+        b.addEventListener('click', () => this._atDispatch(c, () => this._setNow(c, parents, !UiConfigMethods.GetRawValue(c))))
         host.appendChild(b)
         this._tooltip(b, c)
         let pressed: string | undefined

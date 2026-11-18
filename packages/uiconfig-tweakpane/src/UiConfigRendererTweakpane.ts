@@ -188,19 +188,22 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         })
     }
 
-    /** The refresh of a config in this renderer: a button in a folder header refreshes its folder */
+    /**
+     * The refresh of a config in this renderer: a button in a folder header refreshes its folder, while the folder is
+     * drawn (a removed folder is not drawn again; before, the button forwarded to `folder.uiRefresh`, which went with it)
+     */
     protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
         return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => {
             const folder = folderHeaderButtons.get(config)
-            if (folder) this.addToRefreshQueue(mode, folder, false, delay)
-            else this.addToRefreshQueue(mode, config, deep, delay)
+            if (!folder) this.addToRefreshQueue(mode, config, deep, delay)
+            else if (folder.uiRef) this.addToRefreshQueue(mode, folder, false, delay)
         }
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
         // a button in a folder header: its folder renders it (a deep refresh can list it before it moved from the body)
         const folder = folderHeaderButtons.get(config)
-        if (folder) return this.addToRefreshQueue('postFrame', folder, false, 0)
+        if (folder) return folder.uiRef ? this.addToRefreshQueue('postFrame', folder, false, 0) : undefined
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }

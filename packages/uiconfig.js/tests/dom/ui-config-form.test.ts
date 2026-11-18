@@ -731,6 +731,19 @@ describe('UiConfigForm', () => {
         expect(target.radius).toBe(1)
     })
 
+    test('a toggle in a bar with a dispatchMode: two clicks before the event toggle twice', async() => {
+        const target = {on: false}
+        const form = new UiConfigForm([{type: 'checkbox', label: 'On', property: [target, 'on'], dispatchMode: 'postFrame'}], {layout: 'bar'})
+        const button = (form.element as any as FakeElement).all().find(e => e.tagName === 'button')!
+        button.fire('click')
+        button.fire('click')
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.on).toBe(false)
+        button.fire('click')
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.on).toBe(true)
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])
