@@ -16,6 +16,15 @@ import {UiConfigRendererBase} from './UiConfigRendererBase'
 import {ActionCommand, SetValueCommand, SetValueCommandProps, undoCommandTypes} from './undo_commands'
 import {addRefreshListener, removeRefreshListener} from './refresh_listeners'
 
+/** An object that an action returns: an undo, with an optional redo and an action to run now */
+function isActionObject(res: any): res is {undo?: AnyFunction, redo?: AnyFunction, action?: AnyFunction} {
+    return !!res && typeof res === 'object'
+}
+/** The result of an action can be undone: an undo function, or an object with `undo` */
+function hasUndo(res: any): res is AnyFunction | {undo: AnyFunction, redo?: AnyFunction, action?: AnyFunction} {
+    return typeof res === 'function' || isActionObject(res) && typeof res.undo === 'function'
+}
+
 export class UiConfigMethods {
     constructor(
         protected _renderer: UiConfigRendererBase
@@ -29,8 +38,11 @@ export class UiConfigMethods {
         recordUndoCommand(this._renderer.undoManager, com, undoCommandTypes.setValue, this.undoEditingWaitTime)
     }
 
-    async performAction<T extends AnyFunction>(targ: any|undefined, action: T, args: Parameters<T>, config: UiObjectConfig, onUndoRedo?: (c: ActionCommand)=>void) {
-        return UiConfigMethods.PerformAction(targ, action, args, config, onUndoRedo, this._renderer.undoManager, this.undoEditingWaitTime)
+    /**
+     * Performs an action with undo/redo support, with the undo manager of the renderer. See {@link PerformAction}.
+     */
+    async performAction<T extends AnyFunction>(targ: any|undefined, action: T, args: Parameters<T>, config: UiObjectConfig, onUndoRedo?: (c: ActionCommand)=>void, onPending?: () => void) {
+        return UiConfigMethods.PerformAction(targ, action, args, config, onUndoRedo, this._renderer.undoManager, this.undoEditingWaitTime, onPending)
     }
 
     getValue<T extends PrimitiveVal>(config: UiObjectConfig<T>, val: T | undefined, copyOnEqual = true): T | undefined {
@@ -225,32 +237,59 @@ export class UiConfigMethods {
 
     /**
      * Performs an action with undo/redo support.
+     *
+     * The action can return:
+     * 1. an undo function: undo calls it, and redo runs the action again; the undo function that this run returns
+     *    undoes it (the next undo calls that one).
+     * 2. an object with `undo` and optional `redo` and `action`: `action` (if any) runs now. Undo calls `undo` and redo
+     *    calls `redo` (else `action`, else it runs the action again, as in 1). They are read from the object when the
+     *    step is undone or redone, not when it is recorded, so an action can replace them (for example an undo that
+     *    sets the redo that brings back the same object).
+     *
+     * With an undo manager, the action is one undo step (when it returns an undo).
      * @param action - a function that returns - 1. an undo function, 2. an object with undo and redo functions (and optional action)
      * @param targ - the target object to call the action on
      * @param args - the arguments to pass to the action function
      * @param config - ui config
      * @param onUndoRedo - optional callback function to be called on undo/redo of the command. Not called on first action execution, only on undo/redo.
+     * @param um - the undo manager that records the step
+     * @param undoEditingWaitTime - see {@link RecordUndo}
+     * @param onPending - called once, synchronously, when the action returns a promise (before it settles), for
+     * example to show that a button runs. Not called for a synchronous action, or for a redo.
      */
-    static async PerformAction<T extends AnyFunction>(targ: any|undefined, action: T, args: Parameters<T>, config: UiObjectConfig, onUndoRedo?: (c: ActionCommand)=>void, um?: JSUndoManager, undoEditingWaitTime?: number) {
-        const ac = ()=> targ === undefined ? action(...args) : action.call(targ, ...args) // if a function is returned, it is treated as undo function
-        let res = await ac()
-        const undo = typeof res === 'function' ? res : res?.undo?.bind(res)
-        const resAction = typeof res !== 'function' ? res?.action?.bind(res) : null
-        const redo = typeof res === 'function' ? ac : res?.redo?.bind(res) ?? resAction
-        if (typeof resAction === 'function') {
-            res = await resAction() // execute the action now. adding await just in case
+    static async PerformAction<T extends AnyFunction>(targ: any|undefined, action: T, args: Parameters<T>, config: UiObjectConfig, onUndoRedo?: (c: ActionCommand)=>void, um?: JSUndoManager, undoEditingWaitTime?: number, onPending?: () => void) {
+        const run = ()=> targ === undefined ? action(...args) : action.call(targ, ...args)
+        let res = run()
+        if (typeof res?.then === 'function') {
+            onPending?.()
+            res = await res
         }
-        if (typeof undo === 'function') {
-            this.RecordUndo({
-                type: 'UiConfigMethods_action',
-                uid: config,
-                target: targ,
-                undo: undo,
-                redo: redo,
-                args,
-                onUndoRedo,
-            } as ActionCommand, um, undoEditingWaitTime)
+        if (isActionObject(res) && typeof res.action === 'function') await res.action() // execute the action now
+        if (!hasUndo(res)) return
+        // the result of the last run of the action, which the next undo undoes
+        let last = res
+        const undo = function(this: any, ...a: any[]) {
+            return typeof last === 'function' ? last.apply(this, a) : last.undo(...a)
         }
+        const redo = async(...a: any[]) => {
+            if (typeof last !== 'function') {
+                if (typeof last.redo === 'function') return last.redo(...a)
+                if (typeof last.action === 'function') return last.action(...a)
+            }
+            // the action again: what it returns undoes this run
+            const again = await run()
+            if (isActionObject(again) && typeof again.action === 'function') await again.action()
+            if (hasUndo(again)) last = again
+        }
+        this.RecordUndo({
+            type: 'UiConfigMethods_action',
+            uid: config,
+            target: targ,
+            undo,
+            redo,
+            args,
+            onUndoRedo,
+        } as ActionCommand, um, undoEditingWaitTime)
     }
 
     /**
