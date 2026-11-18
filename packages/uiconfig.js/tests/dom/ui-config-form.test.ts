@@ -541,6 +541,25 @@ describe('UiConfigForm', () => {
         expect(seen).toEqual([config])
     })
 
+    test('button callbacks get the click event, unless sendArgs is false', async() => {
+        const got: unknown[][] = []
+        const target = {go: (...a: unknown[]) => void got.push(['value', ...a])}
+        const form = new UiConfigForm([
+            {type: 'button', label: 'A', property: [target, 'go'], onClick: (...a: unknown[]) => void got.push(['onClick', ...a])},
+            {type: 'button', label: 'B', sendArgs: false, onClick: (...a: unknown[]) => void got.push(['noArgs', ...a])},
+        ])
+        const [a, b] = (form.element as any as FakeElement).all().filter(e => e.tagName === 'button')
+        const event = {shiftKey: true}
+        a.fire('click', event)
+        await new Promise(r => setTimeout(r, 0))
+        b.fire('click', event)
+        await new Promise(r => setTimeout(r, 0))
+        expect(got.map(g => g.length)).toEqual([2, 2, 1])
+        expect(got.map(g => g[0])).toEqual(['value', 'onClick', 'noArgs'])
+        expect(got[0][1]).toMatchObject(event)
+        expect(got[1][1]).toMatchObject(event)
+    })
+
     test('the undo result of an onClick is one undo step', async() => {
         const target = {count: 0}
         const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})

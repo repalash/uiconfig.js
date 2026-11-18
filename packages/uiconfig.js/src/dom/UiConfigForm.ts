@@ -616,15 +616,18 @@ export class UiConfigForm extends UiConfigRendererBase {
             this._dispatch(c, parents, true, true)
             this._structureChange()
         }
-        b.addEventListener('click', async() => {
+        b.addEventListener('click', async(event: MouseEvent) => {
             if (busy) return
             try {
                 const [obj, key] = UiConfigMethods.GetBinding(c, false)
                 const fn = obj ? obj[key] ?? obj.value : undefined
+                // the click event, as `clickButton` of uiconfig.js passes it (unless `sendArgs` is false); undo and redo
+                // run with the same arguments
+                const args = getOrCall(c.sendArgs, c) === false ? [] : [event]
                 // as in uiconfig.js: the result can be an undo function or {action, undo, redo}, one undo step
-                if (typeof fn === 'function') await this.methods.performAction(obj, fn as AnyFunction, [], c, replayed, pending)
+                if (typeof fn === 'function') await this.methods.performAction(obj, fn as AnyFunction, args, c, replayed, pending)
                 // called on the config, as `clickButton` of uiconfig.js does (a method-style onClick that uses `this`)
-                if (typeof c.onClick === 'function') await this.methods.performAction(c, c.onClick as AnyFunction, [], c, replayed, pending)
+                if (typeof c.onClick === 'function') await this.methods.performAction(c, c.onClick as AnyFunction, args, c, replayed, pending)
             } catch (e) {
                 // a failed run changed nothing to report: no change events, no structure change
                 this._error(e, c)
