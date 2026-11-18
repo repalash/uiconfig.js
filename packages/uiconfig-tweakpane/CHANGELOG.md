@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-18
+- Tooltips through the tooltip hook of uiconfig.js 0.5 (`UiConfigRendererBase.Tooltip`, `UiConfigRendererTweakpane.Tooltip` or `renderer.tooltip`): the icon-only buttons of a folder header (and of `mountFolderActions`) and the ⋮ button. The default is the native `title`, as before; the tooltip is updated when the label changes, and removed for a button that shows its text, a button that goes, and a bar that is disposed.
+- Depends on uiconfig.js `^0.5.0`. The renderer adds its refresh to a config with `addRefreshListener` instead of assigning `config.uiRefresh`, so a config that another renderer also draws (a form, a second panel) refreshes in both, and a function that the app assigned to `config.uiRefresh` stays. When the renderer disposes a config (or its blade), it removes only its own listener.
+- Fix (from uiconfig.js 0.5.0): the undo and redo of a button whose function returns an undo function or `{undo, redo}` (see `PerformAction` in the uiconfig.js changelog).
+- The refresh of a button in a folder header refreshes the folder in this renderer (before, it called the `uiRefresh` of the folder, which other renderers could have replaced). The folder is refreshed only while it is drawn: the header button of a removed folder does not draw it again.
+- The binding of a folder for its children with only a `path` comes from `UiConfigMethods.SetupPropertyForwarding` of uiconfig.js (was an internal helper of this package); no change in behaviour.
+
 ## [2.2.0] - 2026-11-12
 - `ui.mountFolderActions(config, element)` (`UiConfigRendererTweakpane.mountFolderActions`; also the exported `mountFolderActions(ui, config, element)`): draws the actions of a folder in another element, as in its header (buttons while they fit in the element's width, the rest in a ⋮ menu), for an app that hides the header of a folder and shows its own title row. The bar follows each render of the folder, the element's size, the folder's disabled state and its Tweakpane theme (also after `setTheme`); like the header, it is shown only while the folder is rendered (not while it or a folder that holds it is hidden or folded, and not after it leaves the UI). It returns `refresh()` and `remove()`.
 - `UiConfigRendererTweakpane.title` and the constructor option `title`: the title of the panel header ('Configuration' by default); an empty title hides the header, for an app that shows its own title row (`new UI(container, {title: ''})` or `ui.title = ''`), and opens the panel, since the header holds its fold button.

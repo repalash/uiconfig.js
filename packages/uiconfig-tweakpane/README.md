@@ -117,7 +117,9 @@ does the same in its folders. Example: https://repalash.com/uiconfig.js/examples
 ```
 
 - A button that also has the tag `inline` stays in the body.
-- A button with an `icon` shows the icon only in the header, with the label as its tooltip and name; the menu shows
+- A button with an `icon` shows the icon only in the header, with the label as its name and its tooltip (the tooltip
+  hook of uiconfig.js, the native `title` by default; the ⋮ button too: see
+  [Tooltips](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig.js#tooltips)); the menu shows
   the icon and the label. `icon` is SVG markup (it takes the text color; app markup only, it is inserted as HTML) or an
   image URL. An icon name (for uiconfig-blueprint) shows the label here, since Tweakpane has no icon set.
 - A hidden button is not shown; a disabled or read-only one is dimmed. The ⋮ button shows only when a button does not

@@ -305,6 +305,43 @@ export function configIcon(config: UiObjectConfig): IconName | MaybeElement {
  * The actions in a folder header: a button for each of `buttons` that fits after the folder label, and a ⋯ button with
  * a menu of the rest. It follows the size of the header (a resize of the panel) and each render of the folder.
  */
+/**
+ * The tooltip of an element through the tooltip hook of the renderer (`UiTooltipHook` of uiconfig.js: the native `title`
+ * by default): set when the element mounts or the text changes, removed when it unmounts.
+ * @returns the ref to put on the element
+ */
+function useTooltip<T extends HTMLElement>(context: UiConfigRendererContextType, text: string | undefined) {
+    const ref = React.useRef<T>(null)
+    React.useEffect(() => {
+        const el = ref.current
+        if (!el) return
+        context.setTooltip(el, text)
+        return () => context.setTooltip(el, undefined)
+    }, [context, text])
+    return ref
+}
+
+/** A button in a folder header: with an icon, the icon only, and the label as its name and its tooltip */
+const FolderAction: React.FC<{button: UiObjectConfig, context: UiConfigRendererContextType, disabled?: boolean}> = ({button: b, context, disabled}) => {
+    const label = context.methods.getLabel(b)
+    const icon = configIcon(b)
+    const ref = useTooltip<HTMLButtonElement>(context, icon ? label : undefined)
+    return (
+        <Button
+            ref={ref}
+            className="folder-action"
+            size="small"
+            {...icon ? {icon, 'aria-label': label} : {text: label}}
+            disabled={disabled || isOff(b)}
+            onClick={(e) => {
+                e.stopPropagation()
+                if (disabled || getOrCall(b.hidden) || isOff(b)) return
+                context.methods.clickButton(b, {args: [e]})
+            }}
+        />
+    )
+}
+
 export const FolderActions: React.FC<{
     buttons: UiObjectConfig[]
     context: UiConfigRendererContextType
@@ -314,6 +351,7 @@ export const FolderActions: React.FC<{
     onWidth?: (width: number) => void
 }> = ({buttons, context, disabled, onWidth}) => {
     const bar = React.useRef<HTMLDivElement>(null)
+    const moreRef = useTooltip<HTMLButtonElement>(context, 'More actions')
     const shown = buttons.filter(b => !getOrCall(b.hidden))
     const [fit, setFit] = React.useState(shown.length)
     // the buttons that fit after the label; the rest go to the menu. The display of each is set here, not by React
@@ -362,23 +400,11 @@ export const FolderActions: React.FC<{
     return (
         <div className="folder-actions" ref={bar}>
             {shown.map((b, i) => (
-                <Button
-                    key={b.uuid ?? 'a' + i}
-                    className="folder-action"
-                    size="small"
-                    // with an icon: the icon only, and the label as its tooltip and name
-                    {...configIcon(b) ? {icon: configIcon(b), title: context.methods.getLabel(b), 'aria-label': context.methods.getLabel(b)} : {text: context.methods.getLabel(b)}}
-                    disabled={disabled || isOff(b)}
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        if (disabled || getOrCall(b.hidden) || isOff(b)) return
-                        context.methods.clickButton(b, {args: [e]})
-                    }}
-                />
+                <FolderAction key={b.uuid ?? 'a' + i} button={b} context={context} disabled={disabled} />
             ))}
             <span className="folder-actions-more">
                 <Popover content={<ContextMenu buttons={shown.slice(fit)} context={context} />} placement="bottom-end" disabled={disabled}>
-                    <Button icon="more" variant="minimal" size="small" disabled={disabled} aria-label="More actions" title="More actions" />
+                    <Button ref={moreRef} icon="more" variant="minimal" size="small" disabled={disabled} aria-label="More actions" />
                 </Popover>
             </span>
         </div>

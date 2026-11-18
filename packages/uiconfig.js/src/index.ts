@@ -23,13 +23,14 @@ import {
     UiConfigContainer,
     UiObjectConfig,
     UiObjectType,
+    UiRefreshListener,
 } from './types'
 import {UiConfigRendererBase} from './UiConfigRendererBase'
 import {UiConfigRenderer} from './UiConfigRenderer'
 import {UiConfigMethods} from './UiConfigMethods'
 
 export {UiConfigRendererBase, UiConfigRenderer, UiConfigMethods, createValueUiConfig}
-export type {UiConfigContainer, IUiConfigContainer, UiObjectConfig, UiObjectType, TUiRefreshModes, ChangeArgs, ChangeEvent}
+export type {UiConfigContainer, IUiConfigContainer, UiObjectConfig, UiObjectType, TUiRefreshModes, UiRefreshListener, ChangeArgs, ChangeEvent}
 
 export {type PrimitiveVal, type PrimitiveValObject, clonePrimitive, equalsPrimitive, copyPrimitive} from 'ts-browser-helpers'
 
@@ -45,3 +46,4 @@ export type {TParams}
 
 export type {ActionCommand, SetValueCommand, SetValueCommandProps} from './undo_commands'
 export {undoCommandTypes} from './undo_commands'
+export {titleTooltip, setElementTooltip, type UiTooltipHook, type UiTooltipInfo} from './tooltips'

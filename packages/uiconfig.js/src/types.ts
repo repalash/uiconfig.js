@@ -1,6 +1,14 @@
 import type {Fof, StringKeyOf, ValOrArr, ValOrArrOp, ValOrFunc} from 'ts-browser-helpers'
 
 export type TUiRefreshModes = 'preRender' | 'postRender' | 'preFrame' | 'postFrame'
+/**
+ * A function that refreshes the UI of a config: the type of `UiObjectConfig.uiRefresh`, and of the listeners that
+ * renderers add with `UiConfigMethods.AddRefreshListener`.
+ * @param deep - If true, the UI will be re-rendered recursively, otherwise only the current object will be re-rendered.
+ * @param mode - The mode to re-render in. See TUiRefreshModes for details. Use when syncing with custom render loop
+ * @param delay - The delay in ms to wait before re-rendering.
+ */
+export type UiRefreshListener = (deep?: boolean, mode?: TUiRefreshModes | 'immediate', delay?: number) => void
 export type UiObjectType = string
 export interface ChangeEvent {
     target?: UiObjectConfig,
@@ -206,12 +214,20 @@ export interface UiObjectConfig<T = any, TType extends UiObjectType = UiObjectTy
      */
     uiRefType?: UiObjectType
     /**
-     * After initial rendering, config.uiRefresh will be set to a function that can be used to re-render the UI.
+     * Refreshes the UI of this config in every renderer that draws it. After the first render, it is a function that
+     * calls the refresh listener of each renderer (`UiConfigMethods.AddRefreshListener`), so a config drawn by more
+     * than one renderer (for example a Tweakpane panel and a form) refreshes in all of them. Call it after a change
+     * from code: `config.uiRefresh?.(true)`.
+     *
+     * An app can also assign a function (`config.uiRefresh = fn`, for example to forward the refreshes of a config to
+     * another): it is called with the listeners, and assigning `undefined` removes only that function. While the
+     * config has no listeners, it reads back the assigned function. It is not an enumerable property once a renderer
+     * listens (JSON and a spread leave it out).
      * @param deep - If true, the UI will be re-rendered recursively, otherwise only the current object will be re-rendered.
      * @param mode - The mode to re-render in. See TUiRefreshModes for details. Use when syncing with custom render loop
      * @param delay - The delay in ms to wait before re-rendering. This is useful if multiple changes are made in quick succession. If another refresh event is in the queue for the same object, it will be postponed by this amount. This is not exact for small values.
      */
-    uiRefresh?: (deep?: boolean, mode?: TUiRefreshModes | 'immediate', delay?: number) => void; // delay in ms
+    uiRefresh?: UiRefreshListener; // delay in ms
     /**
      * This is used to specify when to change the values and/or call the function(like onClick) or change events. Default is 'postFrame'
      */

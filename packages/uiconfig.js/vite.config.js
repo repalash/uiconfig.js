@@ -12,7 +12,8 @@ const isProd = process.env.NODE_ENV === 'production'
 const { name, version, author } = packageJson
 const {main, module, browser} = packageJson
 
-// `vite build`: the ESM bundle (dist/index.mjs) with the dependencies external, and the declarations.
+// `vite build`: the ESM bundles (dist/index.mjs, and dist/dom.mjs for `uiconfig.js/dom`) with the dependencies external,
+// and the declarations.
 // `vite build --mode umd`: the self-contained bundles, added to dist: UMD (dist/index.js) for script tags and CDN links,
 // CommonJS (dist/index.cjs) for require(). A .js file in this "type": "module" package loads as ESM in Node and
 // bundlers, where the UMD wrapper finds no `module` and returns nothing.
@@ -34,10 +35,14 @@ export default defineConfig(({mode}) => {
                 buildDelay: 1000,
             } : null,
             lib: {
-                entry: 'src/index.ts',
+                // the ES modules: the core (dist/index.mjs) and the plain-DOM form `uiconfig.js/dom` (dist/dom.mjs, which
+                // imports the core from ./index.mjs). The UMD and CommonJS bundles are the core only.
+                entry: umd ? 'src/index.ts' : {index: 'src/index.ts', dom: 'src/dom/index.ts'},
                 formats: umd ? ['umd', 'cjs'] : ['es'],
                 name: name,
-                fileName: (format) => ({umd: browser, cjs: main}[format] ?? module).replace('dist/', ''),
+                fileName: (format, entryName) => umd ?
+                    ({umd: browser, cjs: main}[format] ?? module).replace('dist/', '') :
+                    entryName === 'index' ? module.replace('dist/', '') : `${entryName}.mjs`,
             },
             outDir: 'dist',
             emptyOutDir: isProd && !umd,
@@ -47,6 +52,8 @@ export default defineConfig(({mode}) => {
             rollupOptions: {
                 output: {
                     // inlineDynamicImports: false,
+                    // the code that both ES entries use (index.mjs and dom.mjs import it): one file with a stable name
+                    chunkFileNames: 'core.mjs',
                 },
                 external: umd ? [] : externalDeps(packageJson),
             },

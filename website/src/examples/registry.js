@@ -20,7 +20,7 @@ export const topics = [
     {id: 'binding', title: 'Binding to data', icon: 'bind', intro: 'How a component reads and writes its value: a property of an object, the config itself, functions, or a path.'},
     {id: 'components', title: 'Components', icon: 'components', intro: 'The `type` of a config picks the component. Both renderers have the common set; Tweakpane adds a few.'},
     {id: 'dynamic', title: 'Dynamic panels', icon: 'playground', intro: 'Panels that change with the data: computed properties, children that come and go, change events, undo.'},
-    {id: 'renderers', title: 'Renderers', icon: 'install', intro: 'Options of one renderer: the themes of uiconfig-tweakpane and components of your own.'},
+    {id: 'renderers', title: 'Renderers', icon: 'install', intro: 'Options of one renderer: the themes of uiconfig-tweakpane and components of your own, and the plain DOM forms of uiconfig.js/dom.'},
     {id: 'three', title: 'three.js and threepipe', icon: 'three', intro: 'Colors and vectors of three.js objects, edited in place, and the panels of threepipe.'},
 ]
 
@@ -149,6 +149,11 @@ export const examples = [
         slug: 'tweakpane-themes', topic: 'renderers', title: 'Tweakpane themes', renderers: ['tweakpane'], theme: false,
         summary: 'uiconfig-tweakpane has an optional stylesheet with five color modes. Import `uiconfig-tweakpane/theme.css` once, then pick a mode for each renderer with `setTheme`.',
         preview: ['dropdown', 'slider', 'color', 'checkbox'],
+    },
+    {
+        slug: 'dom-form', topic: 'renderers', title: 'Plain DOM forms and toolbars', renderers: both, view: true, log: true,
+        summary: '`UiConfigForm` of uiconfig.js/dom draws the same config with plain DOM, no UI library: a small form, or a toolbar (`layout: \'bar\'`) where a slider or a color opens in a popover. One `uiRefresh` refreshes the config in the panel and in both forms; an edit in one shows in the others.',
+        preview: ['checkbox', 'slider', 'color', 'button'],
     },
     {
         slug: 'custom-component', topic: 'renderers', title: 'Custom components', renderers: ['tweakpane'],

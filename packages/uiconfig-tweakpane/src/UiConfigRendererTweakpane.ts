@@ -1,6 +1,6 @@
 import {AnyOptions, createDiv, createStyles, css, getOrCall, JSUndoManager} from 'ts-browser-helpers'
 import {BladeApi, FolderApi, Pane, TabPageApi} from 'tweakpane'
-import {TUiRefreshModes, UiConfigMethods, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
+import {TUiRefreshModes, UiConfigMethods, UiConfigRenderer, UiObjectConfig, UiRefreshListener} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
 import {
     tpButtonInputGenerator,
@@ -179,19 +179,31 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         uiConfig.uiRef = ui
         uiConfig.uiRefType = ui ? uiConfig.type : undefined
         uiConfig.__uiParent = parent
-        uiConfig.uiRefresh =
-            (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) =>
-                this.addToRefreshQueue(mode, uiConfig, deep, delay)
+        // config.uiRefresh() refreshes it here, and in the other renderers that draw it
+        this.addRefreshListener(uiConfig)
         ui?.controller_.viewProps.handleDispose(()=>{
             uiConfig.uiRef = undefined
             uiConfig.uiRefType = undefined
-            uiConfig.uiRefresh = undefined
+            this.removeRefreshListener(uiConfig)
         })
+    }
+
+    /**
+     * The refresh of a config in this renderer: a button in a folder header refreshes its folder, while the folder is
+     * drawn (a removed folder is not drawn again; before, the button forwarded to `folder.uiRefresh`, which went with it)
+     */
+    protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
+        return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => {
+            const folder = folderHeaderButtons.get(config)
+            if (!folder) this.addToRefreshQueue(mode, config, deep, delay)
+            else if (folder.uiRef) this.addToRefreshQueue(mode, folder, false, delay)
+        }
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
         // a button in a folder header: its folder renders it (a deep refresh can list it before it moved from the body)
-        if (folderHeaderButtons.has(config)) return config.uiRefresh?.()
+        const folder = folderHeaderButtons.get(config)
+        if (folder) return folder.uiRef ? this.addToRefreshQueue('postFrame', folder, false, 0) : undefined
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }

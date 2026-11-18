@@ -1,8 +1,7 @@
-import {UiObjectConfig} from 'uiconfig.js';
 import {createRoot} from "react-dom/client";
-import React from "react";
 import App from "@/App.tsx";
 
+// import {UiObjectConfig} from 'uiconfig.js';
 // const data = {
 //     name: 'John',
 //     age: 30,

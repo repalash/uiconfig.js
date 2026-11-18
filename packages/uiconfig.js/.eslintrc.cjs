@@ -121,6 +121,12 @@ module.exports = {
                         'modifiers': ['static'],
                         'format': ['PascalCase', 'UPPER_CASE'],
                     },
+                    {
+                        // names that need quotes, like the icon names of the dom form ('arrow-left')
+                        'selector': 'objectLiteralProperty',
+                        'modifiers': ['requiresQuotes'],
+                        'format': null,
+                    },
                 ],
                 'semi': 'off',
                 '@typescript-eslint/semi': ['error','never', { 'beforeStatementContinuationChars': 'always' }],

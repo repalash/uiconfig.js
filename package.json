@@ -1,7 +1,7 @@
 {
     "name": "uiconfig-monorepo",
     "private": true,
-    "description": "uiconfig.js and its renderers (Tweakpane, Blueprint, React, shadcn/ui) in one repository.",
+    "description": "uiconfig.js and its renderers (Tweakpane, Blueprint, plain DOM, React, shadcn/ui) in one repository.",
     "type": "module",
     "workspaces": [
         "packages/*",
