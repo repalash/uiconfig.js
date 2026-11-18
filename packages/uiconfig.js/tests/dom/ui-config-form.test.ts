@@ -706,6 +706,31 @@ describe('UiConfigForm', () => {
         expect(onError).toHaveBeenCalledWith(error, expect.anything())
     })
 
+    test('a field with a dispatchMode: the undo of an edit runs after the form was made again in onStructureChange', async() => {
+        const target = {radius: 1}
+        const undoManager = new JSUndoManager({limit: 100, debug: false, bindHotKeys: false})
+        const configs: UiObjectConfig[] = [
+            {type: 'number', label: 'Radius', property: [target, 'radius'], dispatchMode: 'postFrame'},
+            {type: 'button', label: 'Rebuild', onClick: () => {}},
+        ]
+        let form: UiConfigForm
+        const options = {undoManager, onStructureChange: () => {
+            form.dispose()
+            form = new UiConfigForm(configs, options)
+        }}
+        form = new UiConfigForm(configs, options)
+        const [input] = row(form, 'Radius').inputs
+        input.value = '4'
+        input.fire('change')
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.radius).toBe(4)
+        ;(form.element as any as FakeElement).all().find(e => e.tagName === 'button')!.fire('click') // the form is made again
+        await new Promise(r => setTimeout(r, 20))
+        undoManager.undo()
+        await new Promise(r => setTimeout(r, 20))
+        expect(target.radius).toBe(1)
+    })
+
     test('a button with a dispatchMode runs at that event, not during the click', async() => {
         const onClick = vi.fn()
         const form = new UiConfigForm([{type: 'button', label: 'Later', dispatchMode: 'postFrame', onClick}])

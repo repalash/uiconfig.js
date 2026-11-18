@@ -403,8 +403,12 @@ export class UiConfigForm extends UiConfigRendererBase {
     private _atDispatch(c: UiObjectConfig, run: () => void) {
         const mode = getOrCall(c.dispatchMode, c) ?? UiConfigMethods.DefaultDispatchMode
         if (mode === 'immediate') return run()
+        // a disposed form has no frames: the form made in its place (onStructureChange) schedules it (the undo of an older
+        // edit), else it runs now
+        const host = this._live
+        if (host._disposed) return run()
         // later, in a frame listener: an error goes to onError, not to an unhandled rejection
-        void this.methods.runAtEvent(c, () => {
+        void host.methods.runAtEvent(c, () => {
             try {
                 run()
             } catch (e) {
