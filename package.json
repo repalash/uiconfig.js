@@ -1,17 +1,17 @@
 {
     "name": "uiconfig-monorepo",
     "private": true,
-    "description": "uiconfig.js and its renderers (Tweakpane, Blueprint, React, shadcn/ui) in one repository.",
+    "description": "uiconfig.js and its renderers (Tweakpane, Blueprint, plain DOM, React, shadcn/ui) in one repository.",
     "type": "module",
     "workspaces": [
         "packages/*",
         "website"
     ],
     "scripts": {
-        "build": "npm run build -w uiconfig.js && npm run build -w uiconfig-react -w uiconfig-tweakpane -w uiconfig-blueprint -w uiconfig-shadcn",
+        "build": "npm run build -w uiconfig.js && npm run build -w uiconfig-react -w uiconfig-tweakpane -w uiconfig-blueprint -w uiconfig-shadcn -w uiconfig-dom",
         "test": "npm run test --workspaces --if-present",
         "lint": "npm run lint --workspaces --if-present",
-        "pages": "npm run build -w uiconfig.js && npm run build -w uiconfig-tweakpane -w uiconfig-blueprint && npm run build -w uiconfig-website && npm run docs -w uiconfig-website && npm run assemble -w uiconfig-website"
+        "pages": "npm run build -w uiconfig.js && npm run build -w uiconfig-tweakpane -w uiconfig-blueprint -w uiconfig-dom && npm run build -w uiconfig-website && npm run docs -w uiconfig-website && npm run assemble -w uiconfig-website"
     },
     "repository": {
         "type": "git",
