@@ -1,11 +1,11 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+
+## [2.3.0] - 2026-11-18
 - Fix: the buttons of a folder header and of `mountFolderActions` lose the renderer's refresh listener when nothing shows them any more: the folder is disposed or re-rendered without them, the bar is removed, or the renderer is unmounted. Before, they kept the listener (and the renderer) until the next setup.
 - Fix: which buttons are in a header is kept for each renderer. `uiRefresh` of a header button refreshes what shows it in that renderer: the folder while that renderer draws it, or the mounted bar (before, a mounted bar did not follow the refresh, and a renderer could draw the folder of another renderer into that renderer's pane).
 - `unmount()` also removes the bars mounted with `mountFolderActions`.
-
-## [2.3.0] - 2026-11-18
 - Tooltips through the tooltip hook of uiconfig.js 0.5 (`UiConfigRendererBase.Tooltip`, `UiConfigRendererTweakpane.Tooltip` or `renderer.tooltip`): the icon-only buttons of a folder header (and of `mountFolderActions`) and the ⋮ button. The default is the native `title`, as before; the tooltip is updated when the label changes, and removed for a button that shows its text, a button that goes, and a bar that is disposed.
 - Depends on uiconfig.js `^0.5.0`. The renderer adds its refresh to a config with `addRefreshListener` instead of assigning `config.uiRefresh`, so a config that another renderer also draws (a form, a second panel) refreshes in both, and a function that the app assigned to `config.uiRefresh` stays. When the renderer disposes a config (or its blade), it removes only its own listener.
 - Fix (from uiconfig.js 0.5.0): the undo and redo of a button whose function returns an undo function or `{undo, redo}` (see `PerformAction` in the uiconfig.js changelog).
