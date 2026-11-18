@@ -1,7 +1,6 @@
-# uiconfig-dom
+# uiconfig.js/dom
 
-A small plain-DOM renderer for [uiconfig.js](https://github.com/repalash/uiconfig.js/tree/master/packages/uiconfig.js)
-configs: `UiConfigForm`. No UI library (no Tweakpane, no React): it draws the configs with a few elements and one
+`uiconfig.js/dom` is the plain-DOM renderer of uiconfig.js: `UiConfigForm`. No UI library (no Tweakpane, no React): it draws the configs with a few elements and one
 small stylesheet, as
 
 - a **form**: a row for each field, with its name, for a popup or a card next to an object;
@@ -9,7 +8,7 @@ small stylesheet, as
 - a **stack**: the same buttons in a column, e.g. the controls of an example card.
 
 ```js
-import {UiConfigForm} from 'uiconfig-dom'
+import {UiConfigForm} from 'uiconfig.js/dom'
 
 const form = new UiConfigForm([
     {type: 'slider', label: 'Roughness', property: [material, 'roughness'], bounds: [0, 1], stepSize: 0.01},
@@ -31,17 +30,15 @@ A Tweakpane or Blueprint panel is the right UI for an editor, but too large for 
 loads its UI library. The form uses the same configs (a library describes its controls once, with uiconfig.js), and
 weighs about 12 KB gzip with its stylesheet and icons, after the app's bundler minifies it (14.6 KB gzip as built, see
 below). It started as `UiConfigForm` of threepipe's editor plugin (`@threepipe/plugin-tweakpane-editor`), and moved
-here so that a page can use it without loading the editor and Tweakpane.
+here so that a page can use it without loading the editor and Tweakpane. It is part of uiconfig.js, not a package of its
+own: it needs no UI library, and it changes with the core (its refresh listeners, `PerformAction`).
 
 ## Install
 
-```bash
-npm install uiconfig-dom uiconfig.js
-```
-
-The ES module (`dist/index.mjs`) imports `uiconfig.js` and `ts-browser-helpers` (dependencies of this package) instead
-of bundling them, so an app has one copy of uiconfig.js. There is no UMD or CommonJS bundle. `lib/esm` has the
-unbundled modules, one per source file.
+It comes with uiconfig.js (`npm install uiconfig.js`), as the entry point `uiconfig.js/dom`: an ES module
+(`dist/dom.mjs`) with its declarations (`dist/dom/`). It shares the code of the core with `uiconfig.js` (both import
+`dist/core.mjs`), so an app that uses both has one copy of it. It is not in the UMD and CommonJS bundles of uiconfig.js,
+and an app that does not import it does not load it.
 
 ## What it draws
 
@@ -76,7 +73,7 @@ unbundled modules, one per source file.
 
 A config can be drawn by the form and by another renderer at the same time (for example a Tweakpane panel on the same
 object): `config.uiRefresh(deep, mode, delay)` refreshes it in both. The form adds its refresh to each config that it
-draws with `addRefreshListener` (uiconfig.js 0.5), and `dispose()` removes it again; the listeners of the other
+draws with `addRefreshListener` (see [Refreshing the UI](README.md#refreshing-the-ui-after-a-change-from-code)), and `dispose()` removes it again; the listeners of the other
 renderers, and a function that the app assigned to `config.uiRefresh`, stay. The form does not use `config.uiRef`,
 which stays with the other renderer.
 
@@ -175,7 +172,7 @@ the system prefers it (and the body has no `tpTheme-` class). The classes are `u
 the text colour). An app adds more:
 
 ```js
-import {addIcons, lucideIcons} from 'uiconfig-dom'
+import {addIcons, lucideIcons} from 'uiconfig.js/dom'
 
 addIcons({logo: '<svg viewBox="0 0 24 24">...</svg>'}) // any SVG, by name: icon: 'logo'
 lucideIcons['bell'] = '<path d="..."/>'                // a Lucide icon, its inner markup from lucide-static
@@ -196,11 +193,11 @@ License (some derived from Feather, MIT); see [NOTICE](NOTICE).
   panel's), it calls `onStructureChange` after the undo and redo of a dropdown, and it refreshes at once after an undo or
   redo. Aligning `SetValue` of uiconfig.js (an undo/redo hook, the dispatch to the caller's folders, one merge rule) is a
   follow-up: [#20](https://github.com/repalash/uiconfig.js/issues/20).
-- **Tooltips are a hook**, with the native `title` by default, so the package depends only on uiconfig.js and
-  ts-browser-helpers. An app passes its tooltip library through the hook.
+- **Tooltips are a hook**, with the native `title` by default, so the form needs nothing beyond uiconfig.js and its
+  dependency ts-browser-helpers. An app passes its tooltip library through the hook.
 - **No threepipe imports.** The plan is that threepipe re-exports the form from its core bundle (and its editor passes its
   tippy.js tooltips through the hook).
 
 ## License
 
-[MIT](LICENSE). The Lucide icons: ISC (and MIT for those from Feather), see [NOTICE](NOTICE).
+[MIT](LICENSE), as uiconfig.js. The Lucide icons: ISC (and MIT for those from Feather), see [NOTICE](NOTICE).

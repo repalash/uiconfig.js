@@ -14,14 +14,12 @@
         "dev": "NODE_ENV=development vite build --watch",
         "serve-docs": "ws -d docs -p 8080",
         "test": "npm run check && vitest run",
-
         "serve": "ws",
         "prepack": "npm run build && npm run docs",
-        "docs": "typedoc ./src/index.ts",
+        "docs": "typedoc ./src/index.ts ./src/dom/index.ts",
         "lint": "eslint src --fix",
         "check": "tsc -p tsconfig.json --noEmit && eslint src",
         "prepublishOnly": "npm run test",
-
         "new:pack": "npm run prepack && clean-package && npm pack; clean-package restore"
     },
     "exports": {
@@ -29,6 +27,10 @@
             "types": "./dist/index.d.ts",
             "import": "./dist/index.mjs",
             "require": "./dist/index.cjs"
+        },
+        "./dom": {
+            "types": "./dist/dom/index.d.ts",
+            "import": "./dist/dom.mjs"
         },
         "./dist/": {
             "import": "./dist/",
@@ -51,7 +53,9 @@
         "dist",
         "src",
         "docs",
-        "tsconfig.json"
+        "tsconfig.json",
+        "NOTICE",
+        "DOM.md"
     ],
     "repository": {
         "type": "git",
@@ -101,7 +105,8 @@
         "eslint-plugin-deprecation": "^3.0.0",
         "eslint-plugin-html": "^8.1.2",
         "eslint-plugin-import": "^2.31.0",
-        "vitest": "^4.1.2"
+        "vitest": "^4.1.2",
+        "three": "^0.186.1"
     },
     "dependencies": {
         "ts-browser-helpers": ">=0.19.4"

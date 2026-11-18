@@ -642,6 +642,24 @@ disposes the config (`disposeUiConfig`); the other listeners stay.
 The listeners are not enumerable properties of the config: JSON, a spread (`{...config}`) and `Object.assign` leave
 them out.
 
+## A form with plain DOM: `uiconfig.js/dom`
+
+`uiconfig.js/dom` draws configs with plain DOM, with no UI library: `UiConfigForm`, a small form (a row per field), a
+toolbar (`layout: 'bar'`) or a stack of buttons (`layout: 'stack'`), for a popup, a card or a toolbar where a Tweakpane
+or Blueprint panel is too large. It works next to another renderer on the same configs: one `config.uiRefresh()`
+refreshes both.
+
+```javascript
+import {UiConfigForm} from 'uiconfig.js/dom'
+
+const form = new UiConfigForm([config], {layout: 'bar', undoManager})
+document.body.appendChild(form.element)
+```
+
+An ES module (`dist/dom.mjs`, about 12 KB gzip after an app's minifier, with its stylesheet and icons); it is not in the
+UMD and CommonJS bundles. Options, refresh, tooltips (a hook, the native `title` by default), theming and icons:
+[DOM.md](./DOM.md).
+
 ## Integration with three.js
 
 If supported in the renderer(like in tweakpane) the three.js objects will work out of the box for Color and Vector2,

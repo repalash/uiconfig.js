@@ -1,5 +1,5 @@
 // #region
-import {UiConfigForm} from 'uiconfig-dom'
+import {UiConfigForm} from 'uiconfig.js/dom'
 // #endregion
 
 export default function example(ui, {log, view}) {
@@ -47,7 +47,7 @@ export default function example(ui, {log, view}) {
     // the panel of the page
     ui.appendChild(config)
 
-    // the same config, drawn with plain DOM by uiconfig-dom: a form, and a toolbar
+    // the same config, drawn with plain DOM by uiconfig.js/dom: a form, and a toolbar
     const syncOthers = () => config.uiRefresh(true)
     const form = new UiConfigForm([config], {undoManager: ui.undoManager, onChange: syncOthers})
     const bar = new UiConfigForm([config], {layout: 'bar', undoManager: ui.undoManager, onChange: syncOthers})

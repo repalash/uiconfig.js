@@ -403,7 +403,7 @@ main .ex-crumbs a:hover {
     display: none;
 }
 
-/* the forms of uiconfig-dom in the view (dom-form) */
+/* the forms of uiconfig.js/dom in the view (dom-form) */
 .ex-view-part:has(.dom-card) {
     display: flex;
     flex-direction: column;

@@ -1,5 +1,5 @@
-uiconfig-dom includes icons from Lucide (https://lucide.dev), lucide-static 1.72.0, in src/icons.ts and in the
-bundles in dist/. Their license, as published in the lucide-static package:
+The plain-DOM form of uiconfig.js (`uiconfig.js/dom`) includes icons from Lucide (https://lucide.dev), lucide-static
+1.72.0, in src/dom/icons.ts and in dist/dom.mjs. Their license, as published in the lucide-static package:
 
 ISC License
 

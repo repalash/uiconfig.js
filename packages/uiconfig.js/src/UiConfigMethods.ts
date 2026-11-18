@@ -322,7 +322,7 @@ export class UiConfigMethods {
      * Binds a child config to the binding of its parent (a folder with `property` or `value`) when the child has no
      * binding of its own (no `property`, `value`, `getValue` or `setValue`) and is not a button: the child gets the
      * parent's `property` (or `[parent, 'value']`), and its `path` then selects a value inside it. Renderers call it for
-     * each child before drawing it (uiconfig-tweakpane, uiconfig-dom).
+     * each child before drawing it (uiconfig-tweakpane, `uiconfig.js/dom`).
      * @param child - the child config
      * @param parent - the folder (or other parent config) that holds it
      */

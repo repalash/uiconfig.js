@@ -82,10 +82,9 @@ npm install uiconfig.js uiconfig-tweakpane   # or uiconfig-blueprint
 
 | Package | What it is | |
 |---|---|---|
-| [uiconfig.js](packages/uiconfig.js) | Config types, decorators, renderer base classes | [![npm](https://img.shields.io/npm/v/uiconfig.js.svg)](https://www.npmjs.com/package/uiconfig.js) |
+| [uiconfig.js](packages/uiconfig.js) | Config types, decorators, renderer base classes, and a plain-DOM renderer with no UI library (`uiconfig.js/dom`: a small form, a toolbar or a stack of buttons) | [![npm](https://img.shields.io/npm/v/uiconfig.js.svg)](https://www.npmjs.com/package/uiconfig.js) |
 | [uiconfig-tweakpane](packages/uiconfig-tweakpane) | Renderer on [Tweakpane](https://tweakpane.github.io/docs/) 3: a compact floating panel | [![npm](https://img.shields.io/npm/v/uiconfig-tweakpane.svg)](https://www.npmjs.com/package/uiconfig-tweakpane) |
 | [uiconfig-blueprint](packages/uiconfig-blueprint) | Renderer on [Blueprint](https://blueprintjs.com/) 5 (React): panels and editor layouts | [![npm](https://img.shields.io/npm/v/uiconfig-blueprint.svg)](https://www.npmjs.com/package/uiconfig-blueprint) |
-| [uiconfig-dom](packages/uiconfig-dom) | Plain-DOM renderer, no UI library: a small form, a toolbar or a stack of buttons | not on npm yet |
 | [uiconfig-react](packages/uiconfig-react) | React base classes and un-styled components | in development |
 | [uiconfig-shadcn](packages/uiconfig-shadcn) | Components on [shadcn/ui](https://ui.shadcn.com/) for uiconfig-react | in development |
 

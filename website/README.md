@@ -3,13 +3,13 @@
 The landing page of uiconfig.js, published with the API docs and the example pages on GitHub Pages
 (https://repalash.com/uiconfig.js/). Vite and plain TypeScript; a private workspace package.
 
-The page imports `uiconfig.js`, `uiconfig-tweakpane` and `uiconfig-blueprint` (and the examples `uiconfig-dom`) from
+The page imports `uiconfig.js`, `uiconfig-tweakpane` and `uiconfig-blueprint` (and the examples `uiconfig.js/dom`) from
 this repository (their built `dist/`), so build them first. From the repository root:
 
 ```bash
 npm install
 npm run build -w uiconfig.js
-npm run build -w uiconfig-tweakpane -w uiconfig-blueprint -w uiconfig-dom
+npm run build -w uiconfig-tweakpane -w uiconfig-blueprint
 npm run dev -w uiconfig-website       # dev server
 npm run build -w uiconfig-website     # type check and static build in website/dist
 npm run preview -w uiconfig-website   # serves website/dist

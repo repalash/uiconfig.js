@@ -8,7 +8,7 @@ import {
     UiConfigRendererBase,
     UiObjectConfig,
     UiRefreshListener,
-} from 'uiconfig.js'
+} from '../index'
 import {AnyFunction, createStyles, getOrCall, IEvent, JSUndoManager} from 'ts-browser-helpers'
 import {uiConfigFormStyles} from './styles'
 import {iconMarkup} from './icons'

@@ -1,10 +1,10 @@
 // Ported from threepipe (tests/unit/ui-config-form.test.ts), where the form was UiConfigForm of
-// @threepipe/plugin-tweakpane-editor; the tests of the parts that are new in uiconfig-dom are at the end.
+// @threepipe/plugin-tweakpane-editor; the tests of the parts that are new in uiconfig.js/dom are at the end.
 import {afterAll, beforeAll, describe, expect, test, vi} from 'vitest'
 import {Color, Vector3} from 'three'
 import {JSUndoManager} from 'ts-browser-helpers'
-import {UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
-import {addIcons, isIntegerName, lucideIcon, lucideIcons, UiConfigForm, UiConfigFormTooltip} from '../src'
+import {UiConfigMethods, UiObjectConfig} from '../../src'
+import {addIcons, isIntegerName, lucideIcon, lucideIcons, UiConfigForm, UiConfigFormTooltip} from '../../src/dom'
 
 // Node has no DOM: a small element with what the form uses
 class FakeElement {
@@ -1135,8 +1135,8 @@ describe('UiConfigForm bar and stack layouts', () => {
     })
 })
 
-// the parts that are new in uiconfig-dom
-describe('UiConfigForm in uiconfig-dom', () => {
+// the parts that are new in uiconfig.js/dom
+describe('UiConfigForm in uiconfig.js/dom', () => {
     const frame = () => new Promise(r => setTimeout(r, 0)) // Node has no requestAnimationFrame: a timeout
 
     test('config.uiRefresh refreshes the form: at once with immediate, else in the next frame', async() => {
