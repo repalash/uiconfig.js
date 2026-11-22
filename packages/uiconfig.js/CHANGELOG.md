@@ -3,6 +3,7 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
+- Docs: `sendArgs` defaults to true and `dispatchMode` to `UiConfigMethods.DefaultDispatchMode` (`'immediate'`), as the code does; the docs said false and `'postFrame'`. README: with the UMD bundle of a renderer, which carries its own uiconfig.js, set the tooltip hook on the renderer's class.
 
 ## v0.5.1
 - Fix: a refresh queued in a mode while the queue of that mode runs (for example from a refresh, or a change handler it calls) is kept, and runs at the next run of that mode. Before, it was dropped. A delayed refresh queued again while it waits is still not doubled.

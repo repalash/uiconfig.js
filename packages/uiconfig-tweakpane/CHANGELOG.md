@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-11-22
+- Fix: the buttons of a folder header and of `mountFolderActions` lose the renderer's refresh listener when nothing shows them any more (the folder is disposed or re-rendered without them, the bar is removed, the renderer is unmounted). In 2.3.0 they kept it, and the renderer with it.
+- Fix: the header buttons are kept for each renderer. Their `uiRefresh` is queued with its mode and delay, then refreshes what shows them in that renderer: the folder or the mounted bar. Before, a mounted bar missed the refresh, and a renderer could draw another renderer's folder into its own pane.
+- Fix: a refresh queued before a control left the UI does not draw it again (a disposed body control, a header button that left its header, the folder of a header button).
+- Fix: the tabs generator disposes the controls it clears from a page, as the folder generator does.
+- `unmount()` also removes the bars of `mountFolderActions`, and `refresh()` of a removed bar does nothing.
+
 ## [2.3.0] - 2026-11-18
 - Tooltips through the tooltip hook of uiconfig.js 0.5 (`UiConfigRendererBase.Tooltip`, `UiConfigRendererTweakpane.Tooltip` or `renderer.tooltip`): the icon-only buttons of a folder header (and of `mountFolderActions`) and the ⋮ button. The default is the native `title`, as before; the tooltip is updated when the label changes, and removed for a button that shows its text, a button that goes, and a bar that is disposed.
 - Depends on uiconfig.js `^0.5.0`. The renderer adds its refresh to a config with `addRefreshListener` instead of assigning `config.uiRefresh`, so a config that another renderer also draws (a form, a second panel) refreshes in both, and a function that the app assigned to `config.uiRefresh` stays. When the renderer disposes a config (or its blade), it removes only its own listener.
