@@ -4,7 +4,7 @@
 
 ## [2.3.1] - 2026-11-22
 - Fix: the buttons of a folder header and of `mountFolderActions` lose the renderer's refresh listener when nothing shows them any more: the folder is disposed or re-rendered without them, the bar is removed, or the renderer is unmounted. Before, they kept the listener (and the renderer) until the next setup.
-- Fix: which buttons are in a header is kept for each renderer. `uiRefresh` of a header button refreshes what shows it in that renderer: the folder while that renderer draws it, or the mounted bar (before, a mounted bar did not follow the refresh, and a renderer could draw the folder of another renderer into that renderer's pane).
+- Fix: which buttons are in a header is kept for each renderer. `uiRefresh` of a header button is queued with its mode and delay, as for a body control, and then refreshes what shows it in that renderer: the folder while that renderer draws it, or the mounted bar (before, a mounted bar did not follow the refresh, and a renderer could draw the folder of another renderer into that renderer's pane).
 - `unmount()` also removes the bars mounted with `mountFolderActions`.
 
 ## [2.3.0] - 2026-11-18

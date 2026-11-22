@@ -141,8 +141,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         folder.controller_.foldable.cleanUpTransition()
     }
 
-    // the menu buttons are not rendered: set up as renderUiObject does for the body controls, after the loop above, which
-    // drops a button that moved to the body (it keeps its listener); a button that left the header loses it
+    // the menu buttons are not rendered: set up as renderUiObject does for the body controls, after the loop above
     plugin.headerButtons.setHeader(folder, config, menuButtons)
     updateFolderMenuButton(plugin, folder, menuButtons, config)
     return folder

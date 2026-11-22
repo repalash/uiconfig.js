@@ -1,6 +1,6 @@
 import {AnyOptions, createDiv, createStyles, css, getOrCall, JSUndoManager} from 'ts-browser-helpers'
 import {BladeApi, FolderApi, Pane, TabPageApi} from 'tweakpane'
-import {TUiRefreshModes, UiConfigMethods, UiConfigRenderer, UiObjectConfig, UiRefreshListener} from 'uiconfig.js'
+import {UiConfigMethods, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
 import {
     tpButtonInputGenerator,
@@ -75,10 +75,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         layoutMountedActions(this) // they copy the theme of their folder
     }
 
-    /**
-     * The buttons that the folder headers and the mounted bars of this renderer show, and their folder
-     * @internal
-     */
+    /** @internal */
     readonly headerButtons = new HeaderButtons(this)
 
     /** Disposes the panel and removes the bars mounted with {@link mountFolderActions} and their refresh listeners */
@@ -197,20 +194,9 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         })
     }
 
-    /**
-     * The refresh of a config in this renderer: a button in a folder header (or a mounted bar) refreshes what shows it
-     * in this renderer, the folder while this renderer draws it (a removed folder is not drawn again), or the bar
-     */
-    protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
-        return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => {
-            if (this.headerButtons.folderOf(config)) this.headerButtons.refresh(config, mode, delay)
-            else this.addToRefreshQueue(mode, config, deep, delay)
-        }
-    }
-
     protected _refreshUiConfigObject(config: UiObjectConfig) {
-        // a button in a folder header: what shows it renders it (a deep refresh can list it before it moved from the body)
-        if (this.headerButtons.folderOf(config)) return this.headerButtons.refresh(config, 'postFrame', 0)
+        // a button in a folder header or a mounted bar: what shows it draws it
+        if (this.headerButtons.folderOf(config)) return this.headerButtons.refresh(config)
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }
