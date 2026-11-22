@@ -3,10 +3,10 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
-- Docs: `sendArgs` defaults to true and `dispatchMode` to `UiConfigMethods.DefaultDispatchMode` (`'immediate'`), as the code does; the docs said false and `'postFrame'`. README: with the UMD bundle of a renderer, which carries its own uiconfig.js, set the tooltip hook on the renderer's class.
 
 ## v0.5.1
-- Fix: a refresh queued in a mode while the queue of that mode runs (for example from a refresh, or a change handler it calls) is kept, and runs at the next run of that mode. Before, it was dropped. A delayed refresh queued again while it waits is still not doubled.
+- Fix: a refresh queued in a mode while that mode's queue runs (from a refresh, or a change handler it calls) runs at the next run instead of being dropped.
+- Docs: `sendArgs` defaults to true and `dispatchMode` to `UiConfigMethods.DefaultDispatchMode` (`'immediate'`), as the code does; the docs said false and `'postFrame'`. README: with the UMD bundle of a renderer, which carries its own uiconfig.js, set the tooltip hook on the renderer's class.
 
 ## v0.5.0
 - A config can be drawn by more than one renderer at a time: `config.uiRefresh(deep, mode, delay)` refreshes it in each of them. Before, each renderer assigned `config.uiRefresh`, so a form and a Tweakpane panel on the same config replaced each other's refresh. Callers keep calling `config.uiRefresh?.(deep, mode, delay)`.
