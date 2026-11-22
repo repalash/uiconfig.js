@@ -408,6 +408,7 @@ export const tpTabGenerator = (parent: FolderApi, config: UiObjectConfig, plugin
         while (tabPage.children.length > 0) {
             const child = tabPage.children[0]
             tabPage.remove(child)
+            child.dispose() // its dispose handlers run, as for the children that a folder removes
         }
 
         // Render each child of the folder into the tab page

@@ -44,6 +44,8 @@ export class HeaderButtons {
     private _owners = new WeakMap<UiObjectConfig, Set<HeaderOwner>>()
     private _shown = new Map<HeaderOwner, {folder: UiObjectConfig, buttons: UiObjectConfig[]}>()
     private _headers = new WeakMap<FolderApi, HeaderOwner>()
+    /** Buttons that left every header and are not drawn since: a refresh queued before that does nothing */
+    private _released = new WeakSet<UiObjectConfig>()
 
     constructor(private _renderer: UiConfigRendererTweakpane) {}
 
@@ -51,9 +53,14 @@ export class HeaderButtons {
         return this._folderOf.get(button)
     }
 
+    released(button: UiObjectConfig) {
+        return this._released.has(button)
+    }
+
     /** The button is drawn as a body control now */
     drop(button: UiObjectConfig) {
         this._folderOf.delete(button)
+        this._released.delete(button)
     }
 
     refresh(button: UiObjectConfig) {
@@ -65,6 +72,7 @@ export class HeaderButtons {
         const before = this._shown.get(owner)?.buttons ?? []
         for (const b of buttons) {
             this._folderOf.set(b, folder)
+            this._released.delete(b)
             let owners = this._owners.get(b)
             if (!owners) this._owners.set(b, owners = new Set())
             owners.add(owner)
@@ -79,6 +87,7 @@ export class HeaderButtons {
             // now drawn in a body or another header, which keeps the listener
             if (this._folderOf.get(b) !== folder) continue
             this._folderOf.delete(b)
+            this._released.add(b)
             this._renderer.removeRefreshListener(b)
         }
         if (buttons.length) this._shown.set(owner, {folder, buttons})
@@ -92,9 +101,9 @@ export class HeaderButtons {
         if (!owner) {
             const viewProps = folderApi.controller_.viewProps
             const header: HeaderOwner = {
-                // a removed folder is not drawn again
+                // now, as the queue is at this button: a removed folder is not drawn again
                 refresh: () => {
-                    if (!viewProps.get('disposed') && folder.uiRef === folderApi) this._renderer.addToRefreshQueue('immediate', folder, false, 0)
+                    if (!viewProps.get('disposed') && folder.uiRef === folderApi) this._renderer.renderUiObject(folder, folder.__uiParent)
                 },
             }
             this._headers.set(folderApi, owner = header)
@@ -609,7 +618,9 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
             return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
         },
     })
+    let removed = false
     const refresh = () => {
+        if (removed) return
         const buttons = renderer.folderMenuButtons(config)
         // set up as the folder render does (a function in children can make new configs; a button added since)
         renderer.headerButtons.set(handle, config, buttons)
@@ -637,6 +648,7 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
         config,
         refresh: () => refresh(),
         update: (buttons, f) => {
+            if (removed) return
             rendered = f
             watch(f)
             renderer.headerButtons.set(handle, config, buttons)
@@ -647,6 +659,7 @@ export function mountFolderActions(renderer: UiConfigRendererTweakpane, config: 
     }
     set.add(handle)
     const remove = () => {
+        removed = true
         observer.disconnect()
         watch(undefined)
         actions.dispose()

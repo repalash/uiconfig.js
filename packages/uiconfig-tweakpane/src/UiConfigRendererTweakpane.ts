@@ -78,6 +78,9 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     /** @internal */
     readonly headerButtons = new HeaderButtons(this)
 
+    /** Configs whose blade was disposed and that are not drawn since: a refresh queued before does not draw them again */
+    private _disposedBlades = new WeakSet<UiObjectConfig>()
+
     /** Disposes the panel and removes the bars mounted with {@link mountFolderActions} and their refresh listeners */
     unmount() {
         removeMountedActions(this)
@@ -185,11 +188,13 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         uiConfig.uiRef = ui
         uiConfig.uiRefType = ui ? uiConfig.type : undefined
         uiConfig.__uiParent = parent
+        this._disposedBlades.delete(uiConfig)
         // config.uiRefresh() refreshes it here, and in the other renderers that draw it
         this.addRefreshListener(uiConfig)
         ui?.controller_.viewProps.handleDispose(()=>{
             uiConfig.uiRef = undefined
             uiConfig.uiRefType = undefined
+            this._disposedBlades.add(uiConfig)
             this.removeRefreshListener(uiConfig)
         })
     }
@@ -203,6 +208,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     protected _refreshUiConfigObject(config: UiObjectConfig) {
         // a button in a folder header or a mounted bar: what shows it draws it
         if (this.headerButtons.folderOf(config)) return this.headerButtons.refresh(config)
+        if (this.headerButtons.released(config) || this._disposedBlades.has(config)) return
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }
