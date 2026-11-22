@@ -81,6 +81,9 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
     /** Configs whose blade was disposed and that are not drawn since: a refresh queued before does not draw them again */
     private _disposedBlades = new WeakSet<UiObjectConfig>()
 
+    /** Blades that {@link renderUiObject} has added its dispose handler to */
+    private _bladesWithDisposeHandler = new WeakSet<BladeApi<BladeController<View>>>()
+
     /** Disposes the panel and removes the bars mounted with {@link mountFolderActions} and their refresh listeners */
     unmount() {
         removeMountedActions(this)
@@ -191,12 +194,18 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         this._disposedBlades.delete(uiConfig)
         // config.uiRefresh() refreshes it here, and in the other renderers that draw it
         this.addRefreshListener(uiConfig)
-        ui?.controller_.viewProps.handleDispose(()=>{
-            uiConfig.uiRef = undefined
-            uiConfig.uiRefType = undefined
-            this._disposedBlades.add(uiConfig)
-            this.removeRefreshListener(uiConfig)
-        })
+        // once per blade: each call of handleDispose adds a listener, and a refresh renders the blade again
+        if (ui && !this._bladesWithDisposeHandler.has(ui)) {
+            this._bladesWithDisposeHandler.add(ui)
+            ui.controller_.viewProps.handleDispose(()=>{
+                // a blade that the config no longer shows (it has a newer one) leaves the config as it is
+                if (uiConfig.uiRef && uiConfig.uiRef !== ui) return
+                uiConfig.uiRef = undefined
+                uiConfig.uiRefType = undefined
+                this._disposedBlades.add(uiConfig)
+                this.removeRefreshListener(uiConfig)
+            })
+        }
     }
 
     protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
