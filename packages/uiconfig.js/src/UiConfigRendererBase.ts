@@ -94,18 +94,15 @@ export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFra
 
     refreshQueue(mode: TUiRefreshModes) {
         const l = this._refreshQueue[mode]
-        const l2: any[] = []
+        // a refresh queued while this runs goes to the new list, and runs at the next run
+        this._refreshQueue[mode] = []
         const t = now()
         const delta = t - this._lastModeTime[mode]
-        l.forEach(value => {
-            if (value[1] > 0.001) {
-                value[1] -= delta
-                l2.push(value)
-            } else
-                this._refreshUiConfigObject(value[0])
-        }) // todo: add option to disable ui refresh like for when animating
-        this._refreshQueue[mode] = l2
         this._lastModeTime[mode] = t
+        for (const value of l) { // todo: add option to disable ui refresh like for when animating
+            if (value[1] > 0.001) this._addToRefreshQueue(mode, value[0], value[1] - delta)
+            else this._refreshUiConfigObject(value[0])
+        }
     }
 
     private _addToRefreshQueue(mode: TUiRefreshModes, config: UiObjectConfig, delay: number) {
