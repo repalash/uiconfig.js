@@ -13,7 +13,7 @@ import {
 } from './tpGenerators'
 import {THREE, tpColorInputGenerator} from './tpGeneratorsThree'
 import * as TextareaPlugin from '@pangenerator/tweakpane-textarea-plugin'
-import {folderHeaderButtons, isFolderMenuButton, layoutMountedActions, mountFolderActions, openButtonMenu, type MountedFolderActions} from './tpFolderMenu'
+import {HeaderButtons, isFolderMenuButton, layoutMountedActions, mountFolderActions, openButtonMenu, removeMountedActions, type MountedFolderActions} from './tpFolderMenu'
 
 /** Color modes of the theme in `uiconfig-tweakpane/theme.css`. */
 export const tweakpaneThemeModes = ['light', 'dark', 'blue', 'white', 'black'] as const
@@ -75,8 +75,17 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         layoutMountedActions(this) // they copy the theme of their folder
     }
 
+    /** @internal */
+    readonly headerButtons = new HeaderButtons(this)
+
+    /** Configs whose blade was disposed and that are not drawn since: a refresh queued before does not draw them again */
+    private _disposedBlades = new WeakSet<UiObjectConfig>()
+
+    /** Disposes the panel and removes the bars mounted with {@link mountFolderActions} and their refresh listeners */
     unmount() {
+        removeMountedActions(this)
         this._root?.dispose()
+        this.headerButtons.clear()
         super.unmount()
     }
 
@@ -164,7 +173,7 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         parent = parent ?? this._root
         if (!uiConfig.type) return
         // console.log(`Render ui ${uiConfig.label} in ${parent?.title}`)
-        folderHeaderButtons.delete(uiConfig) // drawn as a control, not in a folder header
+        this.headerButtons.drop(uiConfig) // drawn as a control, not in a folder header
         this.methods.initUiConfig(uiConfig)
         if (uiConfig.uiRef && uiConfig.uiRefType !== uiConfig.type) {
             // console.log('Removing UI object because of type mismatch', uiConfig.uiRef)
@@ -179,31 +188,27 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
         uiConfig.uiRef = ui
         uiConfig.uiRefType = ui ? uiConfig.type : undefined
         uiConfig.__uiParent = parent
+        this._disposedBlades.delete(uiConfig)
         // config.uiRefresh() refreshes it here, and in the other renderers that draw it
         this.addRefreshListener(uiConfig)
         ui?.controller_.viewProps.handleDispose(()=>{
             uiConfig.uiRef = undefined
             uiConfig.uiRefType = undefined
+            this._disposedBlades.add(uiConfig)
             this.removeRefreshListener(uiConfig)
         })
     }
 
-    /**
-     * The refresh of a config in this renderer: a button in a folder header refreshes its folder, while the folder is
-     * drawn (a removed folder is not drawn again; before, the button forwarded to `folder.uiRefresh`, which went with it)
-     */
     protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
-        return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) => {
-            const folder = folderHeaderButtons.get(config)
-            if (!folder) this.addToRefreshQueue(mode, config, deep, delay)
-            else if (folder.uiRef) this.addToRefreshQueue(mode, folder, false, delay)
-        }
+        // a deep refresh skips configs without a blade, which a header button is; it has no children anyway
+        return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) =>
+            this.addToRefreshQueue(mode, config, deep && !this.headerButtons.folderOf(config), delay)
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
-        // a button in a folder header: its folder renders it (a deep refresh can list it before it moved from the body)
-        const folder = folderHeaderButtons.get(config)
-        if (folder) return folder.uiRef ? this.addToRefreshQueue('postFrame', folder, false, 0) : undefined
+        // a button in a folder header or a mounted bar: what shows it draws it
+        if (this.headerButtons.folderOf(config)) return this.headerButtons.refresh(config)
+        if (this.headerButtons.released(config) || this._disposedBlades.has(config)) return
         if (!config.__uiParent) {
             console.error('No parent for ui object', config)
         }

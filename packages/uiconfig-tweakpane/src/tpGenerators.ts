@@ -4,7 +4,7 @@ import {tweakpaneChildIndex, tweakPaneMoveToParentIndex} from './tpUtils'
 import {ChangeEvent, UiConfigMethods, UiObjectConfig} from 'uiconfig.js'
 import {getOrCall, objectHasOwn, safeSetProperty} from 'ts-browser-helpers'
 import {UiConfigRendererTweakpane} from './UiConfigRendererTweakpane'
-import {folderHeaderButtons, isFolderMenuButton, setupFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
+import {isFolderMenuButton, updateFolderMenuButton} from './tpFolderMenu'
 
 export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plugin: UiConfigRendererTweakpane, _?: any) => {
     let folder = config.uiRef as FolderApi | undefined
@@ -45,7 +45,7 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
     for (const child of childObjects) { // todo check comparison with uiConfig.uuid
         child.parentOnChange = onChildChange
         UiConfigMethods.SetupPropertyForwarding(child, config)
-        folderHeaderButtons.delete(child)
+        plugin.headerButtons.drop(child)
 
         let ui = child.uiRef as BladeApi<BladeController<View>> | undefined
         if (ui) {
@@ -141,9 +141,8 @@ export const tpFolderGenerator = (parent: FolderApi, config: UiObjectConfig, plu
         folder.controller_.foldable.cleanUpTransition()
     }
 
-    // the menu buttons are not rendered: set up as renderUiObject does for the body controls, after the loop above, which
-    // clears these on a button that was in the body before
-    for (const b of menuButtons) setupFolderMenuButton(plugin, config, b)
+    // the menu buttons are not rendered: set up as renderUiObject does for the body controls, after the loop above
+    plugin.headerButtons.setHeader(folder, config, menuButtons)
     updateFolderMenuButton(plugin, folder, menuButtons, config)
     return folder
 }
@@ -409,6 +408,7 @@ export const tpTabGenerator = (parent: FolderApi, config: UiObjectConfig, plugin
         while (tabPage.children.length > 0) {
             const child = tabPage.children[0]
             tabPage.remove(child)
+            child.dispose() // its dispose handlers run, as for the children that a folder removes
         }
 
         // Render each child of the folder into the tab page

@@ -663,6 +663,10 @@ Set it on a renderer class for the renderers of that class only (`UiConfigRender
 renderer with `renderer.tooltip = hook` (`false`: no tooltips). Set it before the configs are drawn. A renderer of
 your own calls `this.setTooltip(element, text)` (and with no text to remove it); see `UiTooltipHook`.
 
+`UiConfigRendererBase.Tooltip` is a static of one copy of uiconfig.js. The UMD bundle of a renderer carries its own
+copy, so with a UMD bundle set the hook on the renderer's class (`UiConfigRendererTweakpane.Tooltip = ...`) or on the
+renderer.
+
 ## A form with plain DOM: `uiconfig.js/dom`
 
 `uiconfig.js/dom` draws configs with plain DOM, with no UI library: `UiConfigForm`, a small form (a row per field), a
