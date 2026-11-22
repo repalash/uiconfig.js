@@ -4,6 +4,9 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 
 ## [Unreleased]
 
+## v0.5.1
+- Fix: a refresh queued in a mode while the queue of that mode runs (for example from a refresh, or a change handler it calls) is kept, and runs at the next run of that mode. Before, it was dropped. A delayed refresh queued again while it waits is still not doubled.
+
 ## v0.5.0
 - A config can be drawn by more than one renderer at a time: `config.uiRefresh(deep, mode, delay)` refreshes it in each of them. Before, each renderer assigned `config.uiRefresh`, so a form and a Tweakpane panel on the same config replaced each other's refresh. Callers keep calling `config.uiRefresh?.(deep, mode, delay)`.
   - `UiConfigMethods.AddRefreshListener(config, listener)` adds a function that `config.uiRefresh` calls and returns a function that removes it; `UiConfigMethods.RemoveRefreshListener(config, listener)`. The type of the listener (and of `uiRefresh`) is the new exported type `UiRefreshListener`.
