@@ -3,12 +3,11 @@
 ## [Unreleased]
 
 ## [2.3.1] - 2026-11-22
-- Fix: the buttons of a folder header and of `mountFolderActions` lose the renderer's refresh listener when nothing shows them any more: the folder is disposed or re-rendered without them, the bar is removed, or the renderer is unmounted. Before, they kept the listener (and the renderer) until the next setup.
-- Fix: which buttons are in a header is kept for each renderer. `uiRefresh` of a header button is queued with its mode and delay, as for a body control, and then refreshes what shows it in that renderer: the folder while that renderer draws it, or the mounted bar (before, a mounted bar did not follow the refresh, and a renderer could draw the folder of another renderer into that renderer's pane).
-- `unmount()` also removes the bars mounted with `mountFolderActions`.
-- `refresh()` of a mounted bar does nothing after `remove()` or `unmount()` (before, it set the buttons up again).
-- Fix: a refresh that was queued before a control left the UI does not draw it again: a body control whose blade was disposed, a header button that left every header (before, it was drawn at the root of the panel), and the folder of a header button, which is now drawn when the queue gets to the button.
-- Fix: the tabs generator disposes the controls it clears from a page before drawing them again, as the folder generator does, so their dispose handlers run (before, the header buttons of folders in tabs were never let go).
+- Fix: the buttons of a folder header and of `mountFolderActions` lose the renderer's refresh listener when nothing shows them any more (the folder is disposed or re-rendered without them, the bar is removed, the renderer is unmounted). In 2.3.0 they kept it, and the renderer with it.
+- Fix: the header buttons are kept for each renderer. Their `uiRefresh` is queued with its mode and delay, then refreshes what shows them in that renderer: the folder or the mounted bar. Before, a mounted bar missed the refresh, and a renderer could draw another renderer's folder into its own pane.
+- Fix: a refresh queued before a control left the UI does not draw it again (a disposed body control, a header button that left its header, the folder of a header button).
+- Fix: the tabs generator disposes the controls it clears from a page, as the folder generator does.
+- `unmount()` also removes the bars of `mountFolderActions`, and `refresh()` of a removed bar does nothing.
 
 ## [2.3.0] - 2026-11-18
 - Tooltips through the tooltip hook of uiconfig.js 0.5 (`UiConfigRendererBase.Tooltip`, `UiConfigRendererTweakpane.Tooltip` or `renderer.tooltip`): the icon-only buttons of a folder header (and of `mountFolderActions`) and the ⋮ button. The default is the native `title`, as before; the tooltip is updated when the label changes, and removed for a button that shows its text, a button that goes, and a bar that is disposed.
