@@ -1,6 +1,6 @@
 import {AnyOptions, createDiv, createStyles, css, getOrCall, JSUndoManager} from 'ts-browser-helpers'
 import {BladeApi, FolderApi, Pane, TabPageApi} from 'tweakpane'
-import {UiConfigMethods, UiConfigRenderer, UiObjectConfig} from 'uiconfig.js'
+import {TUiRefreshModes, UiConfigMethods, UiConfigRenderer, UiObjectConfig, UiRefreshListener} from 'uiconfig.js'
 import {BladeController, View} from '@tweakpane/core'
 import {
     tpButtonInputGenerator,
@@ -192,6 +192,12 @@ export class UiConfigRendererTweakpane extends UiConfigRenderer {
             uiConfig.uiRefType = undefined
             this.removeRefreshListener(uiConfig)
         })
+    }
+
+    protected _createRefreshListener(config: UiObjectConfig): UiRefreshListener {
+        // a deep refresh skips configs without a blade, which a header button is; it has no children anyway
+        return (deep = false, mode: TUiRefreshModes | 'immediate' = 'postFrame', delay = 0) =>
+            this.addToRefreshQueue(mode, config, deep && !this.headerButtons.folderOf(config), delay)
     }
 
     protected _refreshUiConfigObject(config: UiObjectConfig) {
