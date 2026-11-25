@@ -3,6 +3,7 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
+- Fix: a config whose refresh throws (a `getValue` that throws, for example) is logged with `console.error`, and the other refreshes of that run still happen. Before, the configs after it in the queue were skipped for that run.
 
 ## v0.5.1
 - Fix: a refresh queued in a mode while that mode's queue runs (from a refresh, or a change handler it calls) runs at the next run instead of being dropped.

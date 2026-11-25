@@ -100,8 +100,16 @@ export abstract class UiConfigRendererBase extends SimpleEventDispatcher<'preFra
         const delta = t - this._lastModeTime[mode]
         this._lastModeTime[mode] = t
         for (const value of l) { // todo: add option to disable ui refresh like for when animating
-            if (value[1] > 0.001) this._addToRefreshQueue(mode, value[0], value[1] - delta)
-            else this._refreshUiConfigObject(value[0])
+            if (value[1] > 0.001) {
+                this._addToRefreshQueue(mode, value[0], value[1] - delta)
+                continue
+            }
+            // one config that fails to refresh (a getValue that throws) does not stop the others
+            try {
+                this._refreshUiConfigObject(value[0])
+            } catch (e) {
+                console.error('uiconfig: the refresh of a config failed', value[0], e)
+            }
         }
     }
 
