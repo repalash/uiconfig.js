@@ -72,6 +72,19 @@ class FakeElement {
         const tags = selector.split(',').map(t => t.trim())
         return this.all().filter(e => tags.includes(e.tagName))
     }
+    getBoundingClientRect() {
+        return {left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0}
+    }
+    querySelector(selector: string) {
+        return this.querySelectorAll(selector)[0] ?? null
+    }
+    focus() {}
+    contains(e: unknown) {
+        return e === this || this.all().includes(e as FakeElement)
+    }
+    get isConnected() {
+        return !!this.parent
+    }
     /** All elements below this one, depth first */
     all(): FakeElement[] {
         return this.children.flatMap(c => [c, ...c.all()])
@@ -334,12 +347,13 @@ describe('UiConfigForm', () => {
         expect(target.name).toBe('Ring')
     })
 
-    test('a hidden config is not drawn; a config in the list twice is drawn once', () => {
+    test('a hidden config is drawn but not shown; a config in the list twice is drawn once', () => {
         const target = {a: 1, b: 2}
         const a: UiObjectConfig = {type: 'number', label: 'A', property: [target, 'a']}
         const form = new UiConfigForm([a, a, {type: 'number', label: 'B', property: [target, 'b'], hidden: () => true}])
         const rows = (form.element as any as FakeElement).all().filter(e => e.className === 'ucf-row')
-        expect(rows.map(r => r.children[0].textContent)).toEqual(['A'])
+        expect(rows.map(r => r.children[0].textContent)).toEqual(['A', 'B'])
+        expect(rows.map(r => r.style.display)).toEqual(['', 'none'])
     })
 
     test('a button calls its function, then onChange and onStructureChange', async() => {
@@ -1294,7 +1308,62 @@ describe('UiConfigForm bar and stack layouts', () => {
         const g = find(form, 'ucf-group')
         expect(g.getAttribute('role')).toBe('group')
         expect(g.getAttribute('aria-label')).toBe('Views')
-        expect(g.children.map(c => c.textContent)).toEqual(['Top', 'Left'])
+        expect(g.children.map(c => c.textContent)).toEqual(['Views', 'Top', 'Left'])
+        // the name as a heading (shown in a stack by the CSS), hidden from screen readers: the group's name has it
+        expect(g.children[0].className).toBe('ucf-group-head')
+        expect(g.children[0].getAttribute('aria-hidden')).toBe('true')
+    })
+
+    test('a hidden config is drawn, and shown or hidden on refresh as hidden changes (stack)', () => {
+        const state = {mode: 'normal', uv: 0}
+        const form = new UiConfigForm([
+            {type: 'button', label: 'Always', value: () => {}},
+            {type: 'number', label: 'UV Set', property: [state, 'uv'], hidden: () => state.mode !== 'uv'},
+            {type: 'folder', label: 'Extra', hidden: () => state.mode !== 'uv', children: [{type: 'button', label: 'In extra', value: () => {}}]},
+        ], {layout: 'stack'})
+        const uv = find(form, 'ucf-more', 'UV Set')
+        const extra = find(form, 'ucf-group')
+        expect(uv.style.display).toBe('none')
+        expect(extra.style.display).toBe('none')
+        expect(find(form, 'ucf-button', 'Always').style.display).toBe('')
+        state.mode = 'uv'
+        form.refresh()
+        expect(uv.style.display).toBe('')
+        expect(extra.style.display).toBe('')
+        state.mode = 'normal'
+        form.refresh()
+        expect(uv.style.display).toBe('none')
+    })
+
+    test('the form layout shows or hides a config on refresh too', () => {
+        const state = {on: false, v: 1}
+        const form = new UiConfigForm([{type: 'number', label: 'Value', property: [state, 'v'], hidden: () => !state.on}])
+        const row = (form.element as any as FakeElement).children[0]
+        expect(row.style.display).toBe('none')
+        state.on = true
+        form.refresh()
+        expect(row.style.display).toBe('')
+    })
+
+    test('a field that hides closes its open popover', () => {
+        const state = {on: true, v: 1}
+        const form = new UiConfigForm([{type: 'number', label: 'Value', property: [state, 'v'], hidden: () => !state.on}], {layout: 'bar'})
+        const b = find(form, 'ucf-more', 'Value')
+        const hadWindow = typeof globalThis.window !== 'undefined'
+        if (!hadWindow) (globalThis as any).window = {innerWidth: 800, innerHeight: 600}
+        try {
+            b.fire('click')
+        } finally {
+            if (!hadWindow) delete (globalThis as any).window
+        }
+        const body = doc.body as FakeElement
+        const pop = body.children[body.children.length - 1]
+        expect(pop.getAttribute('role')).toBe('dialog')
+        expect(pop.isConnected).toBe(true)
+        state.on = false
+        form.refresh()
+        expect(pop.isConnected).toBe(false)
+        expect(b.getAttribute('aria-expanded')).toBe('false')
     })
 
     test('a dropdown in a bar is a select with the label as its name; a change sets the binding', () => {

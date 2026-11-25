@@ -115,8 +115,8 @@ const FRAME_EVENTS: FrameEvent[] = ['preFrame', 'preRender', 'postRender', 'post
  * - The values are read and written through the bindings of the configs. A change calls `onChange` of the config and
  *   of each parent folder, as the Tweakpane renderer does.
  * - With an `undoManager`, each edit is one undo step. Quick edits of the same field merge into one step.
- * - A config that is `hidden` when the form is made is not drawn. Make the form again when the fields change
- *   ({@link UiConfigFormOptions.onStructureChange}).
+ * - A config whose `hidden` changes (a function) is shown or hidden on refresh, as in the other renderers. Make the
+ *   form again when the configs themselves change ({@link UiConfigFormOptions.onStructureChange}).
  *
  * - A button whose function returns a promise is disabled, and shows a spinner, until the promise settles. An error is
  *   given to {@link UiConfigFormOptions.onError}.
@@ -170,6 +170,8 @@ export class UiConfigForm extends UiConfigRendererBase {
     private _tooltips = new Map<HTMLElement, FormTooltip>()
     /** Closes the open popover of a field (`bar` and `stack`) */
     private _closePopover?: () => void
+    /** The button of the open popover */
+    private _popoverAnchor?: HTMLElement
     /** The configs whose `uiRefresh` asked for a refresh in the next frame */
     private _pending = new Set<UiObjectConfig>()
     private _frameRequested = false
@@ -454,7 +456,24 @@ export class UiConfigForm extends UiConfigRendererBase {
     }
 
     private _render(c: UiObjectConfig, host: HTMLElement, parents: UiObjectConfig[]) {
-        if (!c || this._drawn.has(c) || UiConfigMethods.GetBaseProps(c).hidden) return
+        if (!c || this._drawn.has(c)) return
+        const before = host.lastChild
+        this._renderConfig(c, host, parents)
+        const el = host.lastChild as HTMLElement | null
+        if (!el || el === before) return
+        // `hidden` can change (a function): a refresh shows or hides the config, as in the other renderers. A field that
+        // hides (or is in a group that hides) closes its open popover, which is outside the toolbar
+        let hidden: boolean | undefined
+        this._addRow(c, parents, () => {
+            const h = !!UiConfigMethods.GetBaseProps(c).hidden
+            if (h === hidden) return
+            hidden = h
+            el.style.display = h ? 'none' : ''
+            if (h && this._popoverAnchor && el.contains(this._popoverAnchor)) this._closePopover?.()
+        }, true)
+    }
+
+    private _renderConfig(c: UiObjectConfig, host: HTMLElement, parents: UiObjectConfig[]) {
         this._drawn.add(c)
         // a config with getValue / setValue gets its property binding here, as in the other renderers
         UiConfigMethods.InitUiConfig(c)
@@ -478,10 +497,17 @@ export class UiConfigForm extends UiConfigRendererBase {
                 h.textContent = label
                 f.appendChild(h)
             } else {
-                // a group of buttons in a bar, with a line between groups
+                // a group of buttons in a bar, with a line between groups; a stack also shows its name
                 f.className = 'ucf-group'
                 f.setAttribute('role', 'group')
                 f.setAttribute('aria-label', label)
+                if (label) {
+                    const h = document.createElement('div')
+                    h.className = 'ucf-group-head'
+                    h.setAttribute('aria-hidden', 'true')
+                    h.textContent = label
+                    f.appendChild(h)
+                }
             }
             host.appendChild(f)
             for (const ch of this._children(c)) {
@@ -803,7 +829,10 @@ export class UiConfigForm extends UiConfigRendererBase {
             b.setAttribute('aria-expanded', 'false')
             document.removeEventListener('pointerdown', onDown, true)
             document.removeEventListener('keydown', onKey, true)
-            if (this._closePopover === close) this._closePopover = undefined
+            if (this._closePopover === close) {
+                this._closePopover = undefined
+                this._popoverAnchor = undefined
+            }
         }
         const onDown = (e: Event) => {
             const t = e.target as Node
@@ -819,6 +848,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             if (pop.isConnected) return close()
             this._closePopover?.()
             this._closePopover = close
+            this._popoverAnchor = b
             popoverParent().appendChild(pop)
             b.setAttribute('aria-expanded', 'true')
             placePopover(pop, b, this._layout === 'stack' ? 'left' : 'top')
@@ -829,6 +859,8 @@ export class UiConfigForm extends UiConfigRendererBase {
         const isColor = this._kind(c, type) === 'color'
         let shown: string | undefined
         this._addRow(c, parents, () => {
+            // the button is no longer shown (hidden from elsewhere, the card around it collapsed): the popover closes
+            if (pop.isConnected && b.offsetParent === null) close()
             const raw = UiConfigMethods.GetRawValue(c)
             // a colour: its hex code, with a swatch in front
             const color = isColor || isColorLike(raw) ? colorHex(raw) : undefined
