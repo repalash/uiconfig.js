@@ -3,8 +3,6 @@
 uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators/zod schema etc
 
 ## [Unreleased]
-
-## v0.5.3
 - Fix, `uiconfig.js/dom`: a refresh does not read the fields of a hidden config (or of a hidden folder), whose value can be missing then (a field hidden while there is no object to edit); they update when they show. Before, a field shown and then hidden again sent an error to `onError` on each refresh.
 
 ## v0.5.2
