@@ -71,11 +71,15 @@ export interface UiConfigFormOptions {
     tooltip?: UiConfigFormTooltip | false
 }
 
+const isHidden = (c: UiObjectConfig) => !!getOrCall(c.hidden)
+
 /** A part of the form that a refresh updates: the fields of a config, and the folders of the form that hold it */
 interface FormRow {
     config: UiObjectConfig
     parents: UiObjectConfig[]
     update: (force?: boolean) => void
+    /** Shows or hides its config: runs also while the config is hidden */
+    visibility?: boolean
 }
 
 /** A tooltip of an element, see {@link UiConfigForm._updateTooltip} */
@@ -481,7 +485,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             const el = this._renderShown(c, document.createElement('div'), parents)
             if (el) host.insertBefore(el, slot)
             slot.remove()
-        })
+        }, false, true)
     }
 
     /** Draws a config, and shows or hides it on refresh as its `hidden` changes. Returns its element */
@@ -499,7 +503,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             hidden = h
             el.style.display = h ? 'none' : ''
             if (h && this._popoverAnchor && el.contains(this._popoverAnchor)) this._closePopover?.()
-        }, true)
+        }, true, true)
         return el
     }
 
@@ -573,15 +577,19 @@ export class UiConfigForm extends UiConfigRendererBase {
     }
 
     /** Adds a part of the form that a refresh updates, and updates it the first time when `now` */
-    private _addRow(config: UiObjectConfig, parents: UiObjectConfig[], update: (force?: boolean) => void, now = false) {
-        const r = {config, parents, update}
+    private _addRow(config: UiObjectConfig, parents: UiObjectConfig[], update: (force?: boolean) => void, now = false, visibility = false) {
+        const r = {config, parents, update, visibility}
         this._rows.push(r)
         if (now) this._update(r)
     }
 
-    /** Updates a row; an error goes to onError, and the other rows still update */
+    /**
+     * Updates a row; an error goes to onError, and the other rows still update. The fields of a hidden config (or of a
+     * hidden folder) are not read, as their value can be missing then; only the rows that show and hide run.
+     */
     private _update(r: FormRow, force?: boolean) {
         try {
+            if (!r.visibility && (isHidden(r.config) || r.parents.some(isHidden))) return
             r.update(force)
         } catch (e) {
             this._error(e, r.config)

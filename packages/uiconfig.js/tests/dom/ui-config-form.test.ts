@@ -1385,6 +1385,44 @@ describe('UiConfigForm bar and stack layouts', () => {
         expect(root.all().length).toBe(count)
     })
 
+    test.each(['form', 'stack'] as const)('%s: a field (or a folder) hidden again is not read on refresh; it updates when it shows', (layout) => {
+        const state: {obj: {x: number} | null} = {obj: {x: 1}}
+        const onError = vi.fn()
+        const field = (label: string) => ({type: 'number', label, hidden: () => !state.obj, getValue: () => state.obj!.x, setValue: () => {}})
+        const form = new UiConfigForm([
+            field('X'),
+            {type: 'folder', label: 'More', hidden: () => !state.obj, children: [{...field('Y'), hidden: undefined}]},
+        ], {layout, onError})
+        const root = form.element as any as FakeElement
+        state.obj = null
+        form.refresh()
+        form.refresh(true)
+        expect(onError).not.toHaveBeenCalled()
+        state.obj = {x: 4}
+        form.refresh()
+        expect(onError).not.toHaveBeenCalled()
+        const shown = root.all().filter(e => e.tagName === 'input' && e.value === '4').length + root.all().filter(e => e.className.includes('ucf-value') && e.textContent === '4').length
+        expect(shown).toBe(2)
+    })
+
+    test('a hidden callback that throws on refresh goes to onError; the other fields still update', () => {
+        const state = {fail: false, b: 2}
+        const onError = vi.fn()
+        const form = new UiConfigForm([
+            {type: 'number', label: 'A', property: [state, 'b'], hidden: () => {
+                if (state.fail) throw new Error('no hidden')
+                return false
+            }},
+            {type: 'number', label: 'B', property: [state, 'b']},
+        ], {onError})
+        state.fail = true
+        state.b = 5
+        form.refresh()
+        expect(onError).toHaveBeenCalled()
+        expect(onError.mock.calls[0][0].message).toBe('no hidden')
+        expect(row(form, 'B').inputs.map(i => i.value)).toContain('5')
+    })
+
     test('a field whose value throws on refresh goes to onError; the other fields still update', () => {
         const state = {fail: false, a: 1, b: 2}
         const onError = vi.fn()
