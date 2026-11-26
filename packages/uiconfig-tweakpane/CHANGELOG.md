@@ -1,6 +1,8 @@
 # Changelog for uiconfig-tweakpane
 
 ## [Unreleased]
+- Fix: a control adds its dispose handler to its blade once. Before, each refresh added another, so a control refreshed every frame (a monitor, a live value) gained a listener per frame for as long as its blade lived.
+- Fix: the dispose of a blade that a config no longer shows (it was drawn again as a new blade) leaves the config as it is. Before, it cleared `uiRef` and removed the renderer's refresh listener, so the new blade stopped refreshing.
 
 ## [2.3.1] - 2026-11-22
 - Fix: the buttons of a folder header and of `mountFolderActions` lose the renderer's refresh listener when nothing shows them any more (the folder is disposed or re-rendered without them, the bar is removed, the renderer is unmounted). In 2.3.0 they kept it, and the renderer with it.
