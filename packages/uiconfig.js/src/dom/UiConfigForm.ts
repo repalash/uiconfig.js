@@ -477,7 +477,8 @@ export class UiConfigForm extends UiConfigRendererBase {
         this._addRow(c, parents, () => {
             if (drawn || UiConfigMethods.GetBaseProps(c).hidden) return
             drawn = true
-            const el = this._renderShown(c, host, parents)
+            // drawn off the page, then put in its place: a draw that throws (goes to onError) leaves nothing half drawn
+            const el = this._renderShown(c, document.createElement('div'), parents)
             if (el) host.insertBefore(el, slot)
             slot.remove()
         })

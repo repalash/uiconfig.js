@@ -1370,6 +1370,21 @@ describe('UiConfigForm bar and stack layouts', () => {
         expect(labels()[1]).toMatch(/X/)
     })
 
+    test('a hidden field whose value throws when it shows goes to onError and leaves nothing half drawn', () => {
+        const state = {on: false}
+        const onError = vi.fn()
+        const form = new UiConfigForm([
+            {type: 'input', label: 'X', hidden: () => !state.on, getValue: () => { throw new Error('no value') }, setValue: () => {}},
+            {type: 'button', label: 'Last', value: () => {}},
+        ], {onError})
+        const root = form.element as any as FakeElement
+        const count = root.all().length
+        state.on = true
+        form.refresh()
+        expect(onError).toHaveBeenCalledTimes(1)
+        expect(root.all().length).toBe(count)
+    })
+
     test('a field whose value throws on refresh goes to onError; the other fields still update', () => {
         const state = {fail: false, a: 1, b: 2}
         const onError = vi.fn()
