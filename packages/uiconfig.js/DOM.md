@@ -49,7 +49,7 @@ and an app that does not import it does not load it.
   number field, else a text field.
 - **In a bar or a stack:** a button; a checkbox is a toggle button (`aria-pressed`); a dropdown is a select with its
   label; a monitor shows its value; any other field is a button with its value that opens the field in a popover. A
-  folder is a group (`role="group"`), with a line between groups. The key of a button
+  folder is a group (`role="group"`), with a line between groups; a stack shows its name above it. The key of a button
   ([`shortcutOf`](#options)) is at the end of its row in a stack, and in its tooltip in a bar.
 - **Values:** read and written through the bindings of the configs (`property`, `value`, `getValue` / `setValue`), as in
   the other renderers. A change calls `onChange` of the config and of each folder of the form that holds it, then
@@ -66,8 +66,12 @@ and an app that does not import it does not load it.
   only. A label or an icon can be a function (Play / Pause): a refresh draws it again.
 - **Disabled and read only:** `disabled` and `readOnly` (values or functions) disable a field, also its scrub. A refresh
   applies them again.
-- **Hidden:** a config that is `hidden` when the form is made is not drawn. Make the form again when the fields change
-  ([`onStructureChange`](#options)).
+- **Hidden:** `hidden` (a value or a function) hides a field or a group; a refresh shows or hides it again, as in the
+  other renderers, and closes the open popover of a field that hides. A config hidden when the form is made is drawn
+  the first time it shows, so its value is not read before (a field hidden while there is no object to edit). Make the
+  form again when the configs themselves change ([`onStructureChange`](#options)).
+- **Errors:** an error in the refresh of a field (a `getValue` that throws) goes to `onError`, and the other fields
+  still update.
 
 ## Refresh
 

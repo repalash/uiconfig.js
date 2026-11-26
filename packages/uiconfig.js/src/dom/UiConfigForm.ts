@@ -115,8 +115,10 @@ const FRAME_EVENTS: FrameEvent[] = ['preFrame', 'preRender', 'postRender', 'post
  * - The values are read and written through the bindings of the configs. A change calls `onChange` of the config and
  *   of each parent folder, as the Tweakpane renderer does.
  * - With an `undoManager`, each edit is one undo step. Quick edits of the same field merge into one step.
- * - A config that is `hidden` when the form is made is not drawn. Make the form again when the fields change
+ * - A config whose `hidden` changes (a function) is shown or hidden on refresh, as in the other renderers. One hidden
+ *   when the form is made is drawn the first time it shows. Make the form again when the configs themselves change
  *   ({@link UiConfigFormOptions.onStructureChange}).
+ * - An error in the refresh of a field goes to {@link UiConfigFormOptions.onError}; the other fields still update.
  *
  * - A button whose function returns a promise is disabled, and shows a spinner, until the promise settles. An error is
  *   given to {@link UiConfigFormOptions.onError}.
@@ -170,6 +172,8 @@ export class UiConfigForm extends UiConfigRendererBase {
     private _tooltips = new Map<HTMLElement, FormTooltip>()
     /** Closes the open popover of a field (`bar` and `stack`) */
     private _closePopover?: () => void
+    /** The button of the open popover */
+    private _popoverAnchor?: HTMLElement
     /** The configs whose `uiRefresh` asked for a refresh in the next frame */
     private _pending = new Set<UiObjectConfig>()
     private _frameRequested = false
@@ -240,7 +244,7 @@ export class UiConfigForm extends UiConfigRendererBase {
      * @param force - also the field that has the focus (an undo or redo replaces what it shows)
      */
     refresh(force = false) {
-        for (const r of this._rows) r.update(force)
+        for (const r of this._rows) this._update(r, force)
     }
 
     /**
@@ -303,7 +307,7 @@ export class UiConfigForm extends UiConfigRendererBase {
 
     /** The fields of a config, and of the configs in it (a folder), read their values again */
     protected _refreshUiConfigObject(config: UiObjectConfig) {
-        for (const r of this._rows) if (r.config === config || r.parents.includes(config)) r.update(false)
+        for (const r of this._rows) if (r.config === config || r.parents.includes(config)) this._update(r, false)
     }
 
     /**
@@ -454,7 +458,52 @@ export class UiConfigForm extends UiConfigRendererBase {
     }
 
     private _render(c: UiObjectConfig, host: HTMLElement, parents: UiObjectConfig[]) {
-        if (!c || this._drawn.has(c) || UiConfigMethods.GetBaseProps(c).hidden) return
+        if (!c || this._drawn.has(c)) return
+        if (UiConfigMethods.GetBaseProps(c).hidden) this._renderWhenShown(c, host, parents)
+        else this._renderShown(c, host, parents)
+    }
+
+    /**
+     * A config that is hidden when the form is made is drawn the first time it shows, in its place: until then its
+     * value can be missing (a field hidden while there is no object to edit)
+     */
+    private _renderWhenShown(c: UiObjectConfig, host: HTMLElement, parents: UiObjectConfig[]) {
+        this._drawn.add(c)
+        this.addRefreshListener(c)
+        const slot = document.createElement('div')
+        slot.style.display = 'none'
+        host.appendChild(slot)
+        let drawn = false
+        this._addRow(c, parents, () => {
+            if (drawn || UiConfigMethods.GetBaseProps(c).hidden) return
+            drawn = true
+            // drawn off the page, then put in its place: a draw that throws (goes to onError) leaves nothing half drawn
+            const el = this._renderShown(c, document.createElement('div'), parents)
+            if (el) host.insertBefore(el, slot)
+            slot.remove()
+        })
+    }
+
+    /** Draws a config, and shows or hides it on refresh as its `hidden` changes. Returns its element */
+    private _renderShown(c: UiObjectConfig, host: HTMLElement, parents: UiObjectConfig[]) {
+        const before = host.lastChild
+        this._renderConfig(c, host, parents)
+        const el = host.lastChild as HTMLElement | null
+        if (!el || el === before) return
+        // `hidden` can change (a function): a refresh shows or hides the config, as in the other renderers. A field that
+        // hides (or is in a group that hides) closes its open popover, which is outside the toolbar
+        let hidden: boolean | undefined
+        this._addRow(c, parents, () => {
+            const h = !!UiConfigMethods.GetBaseProps(c).hidden
+            if (h === hidden) return
+            hidden = h
+            el.style.display = h ? 'none' : ''
+            if (h && this._popoverAnchor && el.contains(this._popoverAnchor)) this._closePopover?.()
+        }, true)
+        return el
+    }
+
+    private _renderConfig(c: UiObjectConfig, host: HTMLElement, parents: UiObjectConfig[]) {
         this._drawn.add(c)
         // a config with getValue / setValue gets its property binding here, as in the other renderers
         UiConfigMethods.InitUiConfig(c)
@@ -478,10 +527,17 @@ export class UiConfigForm extends UiConfigRendererBase {
                 h.textContent = label
                 f.appendChild(h)
             } else {
-                // a group of buttons in a bar, with a line between groups
+                // a group of buttons in a bar, with a line between groups; a stack also shows its name
                 f.className = 'ucf-group'
                 f.setAttribute('role', 'group')
                 f.setAttribute('aria-label', label)
+                if (label) {
+                    const h = document.createElement('div')
+                    h.className = 'ucf-group-head'
+                    h.setAttribute('aria-hidden', 'true')
+                    h.textContent = label
+                    f.appendChild(h)
+                }
             }
             host.appendChild(f)
             for (const ch of this._children(c)) {
@@ -518,8 +574,18 @@ export class UiConfigForm extends UiConfigRendererBase {
 
     /** Adds a part of the form that a refresh updates, and updates it the first time when `now` */
     private _addRow(config: UiObjectConfig, parents: UiObjectConfig[], update: (force?: boolean) => void, now = false) {
-        this._rows.push({config, parents, update})
-        if (now) update()
+        const r = {config, parents, update}
+        this._rows.push(r)
+        if (now) this._update(r)
+    }
+
+    /** Updates a row; an error goes to onError, and the other rows still update */
+    private _update(r: FormRow, force?: boolean) {
+        try {
+            r.update(force)
+        } catch (e) {
+            this._error(e, r.config)
+        }
     }
 
     /**
@@ -803,7 +869,10 @@ export class UiConfigForm extends UiConfigRendererBase {
             b.setAttribute('aria-expanded', 'false')
             document.removeEventListener('pointerdown', onDown, true)
             document.removeEventListener('keydown', onKey, true)
-            if (this._closePopover === close) this._closePopover = undefined
+            if (this._closePopover === close) {
+                this._closePopover = undefined
+                this._popoverAnchor = undefined
+            }
         }
         const onDown = (e: Event) => {
             const t = e.target as Node
@@ -819,6 +888,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             if (pop.isConnected) return close()
             this._closePopover?.()
             this._closePopover = close
+            this._popoverAnchor = b
             popoverParent().appendChild(pop)
             b.setAttribute('aria-expanded', 'true')
             placePopover(pop, b, this._layout === 'stack' ? 'left' : 'top')
@@ -829,6 +899,8 @@ export class UiConfigForm extends UiConfigRendererBase {
         const isColor = this._kind(c, type) === 'color'
         let shown: string | undefined
         this._addRow(c, parents, () => {
+            // the button is no longer shown (hidden from elsewhere, the card around it collapsed): the popover closes
+            if (pop.isConnected && b.offsetParent === null) close()
             const raw = UiConfigMethods.GetRawValue(c)
             // a colour: its hex code, with a swatch in front
             const color = isColor || isColorLike(raw) ? colorHex(raw) : undefined
@@ -1003,7 +1075,7 @@ export class UiConfigForm extends UiConfigRendererBase {
             controls.forEach(el => el.disabled = d)
         })
         // the first values of the fields of this config (a slider has two)
-        for (let i = firstRow; i < this._rows.length; i++) this._rows[i].update()
+        for (let i = firstRow; i < this._rows.length; i++) this._update(this._rows[i])
     }
 
     /**
