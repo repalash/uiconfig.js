@@ -40,6 +40,7 @@ class FakeElement {
         return this.attributes[name] ?? null
     }
     insertBefore(c: FakeElement, ref: FakeElement) {
+        c.remove()
         c.parent = this
         this.children.splice(this.children.indexOf(ref), 0, c)
         return c
@@ -347,13 +348,12 @@ describe('UiConfigForm', () => {
         expect(target.name).toBe('Ring')
     })
 
-    test('a hidden config is drawn but not shown; a config in the list twice is drawn once', () => {
+    test('a hidden config is not drawn until it shows; a config in the list twice is drawn once', () => {
         const target = {a: 1, b: 2}
         const a: UiObjectConfig = {type: 'number', label: 'A', property: [target, 'a']}
         const form = new UiConfigForm([a, a, {type: 'number', label: 'B', property: [target, 'b'], hidden: () => true}])
         const rows = (form.element as any as FakeElement).all().filter(e => e.className === 'ucf-row')
-        expect(rows.map(r => r.children[0].textContent)).toEqual(['A', 'B'])
-        expect(rows.map(r => r.style.display)).toEqual(['', 'none'])
+        expect(rows.map(r => r.children[0].textContent)).toEqual(['A'])
     })
 
     test('a button calls its function, then onChange and onStructureChange', async() => {
@@ -1321,28 +1321,71 @@ describe('UiConfigForm bar and stack layouts', () => {
             {type: 'number', label: 'UV Set', property: [state, 'uv'], hidden: () => state.mode !== 'uv'},
             {type: 'folder', label: 'Extra', hidden: () => state.mode !== 'uv', children: [{type: 'button', label: 'In extra', value: () => {}}]},
         ], {layout: 'stack'})
-        const uv = find(form, 'ucf-more', 'UV Set')
-        const extra = find(form, 'ucf-group')
-        expect(uv.style.display).toBe('none')
-        expect(extra.style.display).toBe('none')
+        expect(() => find(form, 'ucf-more', 'UV Set')).toThrow()
+        expect(() => find(form, 'ucf-group')).toThrow()
         expect(find(form, 'ucf-button', 'Always').style.display).toBe('')
         state.mode = 'uv'
         form.refresh()
+        const uv = find(form, 'ucf-more', 'UV Set')
+        const extra = find(form, 'ucf-group')
         expect(uv.style.display).toBe('')
         expect(extra.style.display).toBe('')
+        expect(extra.all().some(e => e.textContent === 'In extra')).toBe(true)
         state.mode = 'normal'
         form.refresh()
         expect(uv.style.display).toBe('none')
+        expect(extra.style.display).toBe('none')
+        state.mode = 'uv'
+        form.refresh()
+        expect(uv.style.display).toBe('')
     })
 
     test('the form layout shows or hides a config on refresh too', () => {
         const state = {on: false, v: 1}
         const form = new UiConfigForm([{type: 'number', label: 'Value', property: [state, 'v'], hidden: () => !state.on}])
-        const row = (form.element as any as FakeElement).children[0]
-        expect(row.style.display).toBe('none')
         state.on = true
         form.refresh()
-        expect(row.style.display).toBe('')
+        const r = row(form, 'Value').row
+        expect(r.style.display).toBe('')
+        state.on = false
+        form.refresh()
+        expect(r.style.display).toBe('none')
+    })
+
+    test.each(['form', 'bar', 'stack'] as const)('%s: a field hidden while its object is missing is drawn when it shows, in its place', (layout) => {
+        const state: {obj: {x: number} | null} = {obj: null}
+        const form = new UiConfigForm([
+            {type: 'button', label: 'First', value: () => {}},
+            {type: 'number', label: 'X', hidden: () => !state.obj, getValue: () => state.obj!.x, setValue: (v: number) => state.obj!.x = v},
+            {type: 'button', label: 'Last', value: () => {}},
+        ], {layout})
+        const root = form.element as any as FakeElement
+        const labels = () => root.children.filter(e => e.style.display !== 'none').map(e => e.textContent || e.children.map(c => c.textContent).join(''))
+        expect(labels().length).toBe(2)
+        state.obj = {x: 7}
+        form.refresh()
+        expect(labels().length).toBe(3)
+        expect(root.children.length).toBe(3)
+        expect(root.all().some(e => e.tagName === 'input' && e.value === '7') || root.all().some(e => e.textContent === '7')).toBe(true)
+        expect(labels()[1]).toMatch(/X/)
+    })
+
+    test('a field whose value throws on refresh goes to onError; the other fields still update', () => {
+        const state = {fail: false, a: 1, b: 2}
+        const onError = vi.fn()
+        const form = new UiConfigForm([
+            {type: 'number', label: 'A', getValue: () => {
+                if (state.fail) throw new Error('no value')
+                return state.a
+            }, setValue: () => {}},
+            {type: 'number', label: 'B', property: [state, 'b']},
+        ], {onError})
+        state.fail = true
+        state.b = 5
+        form.refresh()
+        expect(onError).toHaveBeenCalledTimes(1)
+        expect(onError.mock.calls[0][0].message).toBe('no value')
+        expect(row(form, 'B').inputs.map(i => i.value)).toContain('5')
     })
 
     test('a field that hides closes its open popover', () => {
