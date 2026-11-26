@@ -588,8 +588,8 @@ export class UiConfigForm extends UiConfigRendererBase {
      * hidden folder) are not read, as their value can be missing then; only the rows that show and hide run.
      */
     private _update(r: FormRow, force?: boolean) {
-        if (!r.visibility && (isHidden(r.config) || r.parents.some(isHidden))) return
         try {
+            if (!r.visibility && (isHidden(r.config) || r.parents.some(isHidden))) return
             r.update(force)
         } catch (e) {
             this._error(e, r.config)

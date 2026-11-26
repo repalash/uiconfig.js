@@ -1405,6 +1405,24 @@ describe('UiConfigForm bar and stack layouts', () => {
         expect(shown).toBe(2)
     })
 
+    test('a hidden callback that throws on refresh goes to onError; the other fields still update', () => {
+        const state = {fail: false, b: 2}
+        const onError = vi.fn()
+        const form = new UiConfigForm([
+            {type: 'number', label: 'A', property: [state, 'b'], hidden: () => {
+                if (state.fail) throw new Error('no hidden')
+                return false
+            }},
+            {type: 'number', label: 'B', property: [state, 'b']},
+        ], {onError})
+        state.fail = true
+        state.b = 5
+        form.refresh()
+        expect(onError).toHaveBeenCalled()
+        expect(onError.mock.calls[0][0].message).toBe('no hidden')
+        expect(row(form, 'B').inputs.map(i => i.value)).toContain('5')
+    })
+
     test('a field whose value throws on refresh goes to onError; the other fields still update', () => {
         const state = {fail: false, a: 1, b: 2}
         const onError = vi.fn()
