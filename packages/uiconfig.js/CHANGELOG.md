@@ -4,6 +4,9 @@ uiconfig.js is a UI renderer framework to generate UIs from a JSON/ts decorators
 
 ## [Unreleased]
 
+## v0.5.3
+- Fix, `uiconfig.js/dom`: a refresh does not read the fields of a hidden config (or of a hidden folder), whose value can be missing then (a field hidden while there is no object to edit); they update when they show. Before, a field shown and then hidden again sent an error to `onError` on each refresh.
+
 ## v0.5.2
 - `uiconfig.js/dom`: a config whose `hidden` changes (a function) is shown or hidden on `refresh()`, in every layout, as in the other renderers (before, a config hidden when the form was made was never drawn). A config hidden when the form is made is drawn the first time it shows, so its value is not read before (a field hidden while there is no object to edit). A field that hides closes its open popover, and so does a field whose button is no longer shown (the card around it collapsed).
 - `uiconfig.js/dom`: in a `stack`, a group (a folder) shows its name above it, as the `form` layout does; a `bar` shows no name.

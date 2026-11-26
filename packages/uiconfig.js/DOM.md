@@ -68,8 +68,9 @@ and an app that does not import it does not load it.
   applies them again.
 - **Hidden:** `hidden` (a value or a function) hides a field or a group; a refresh shows or hides it again, as in the
   other renderers, and closes the open popover of a field that hides. A config hidden when the form is made is drawn
-  the first time it shows, so its value is not read before (a field hidden while there is no object to edit). Make the
-  form again when the configs themselves change ([`onStructureChange`](#options)).
+  the first time it shows, and a refresh does not read the fields of a hidden config: their value can be missing then
+  (a field hidden while there is no object to edit). Make the form again when the configs themselves change
+  ([`onStructureChange`](#options)).
 - **Errors:** an error in the refresh of a field (a `getValue` that throws) goes to `onError`, and the other fields
   still update.
 
