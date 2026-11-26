@@ -52,3 +52,29 @@ describe('refresh queue', () => {
         expect(r.refreshed).toEqual([a])
     })
 })
+
+describe('refresh queue errors', () => {
+    test('a refresh that throws is logged, and the others of that run still refresh', () => {
+        const r = new TestRenderer()
+        const a = config('a'), bad = config('bad'), c = config('c')
+        r.onRefresh.set(bad, () => {
+            throw new Error('getValue failed')
+        })
+        const errors: unknown[] = []
+        const error = console.error
+        console.error = (...args: unknown[]) => errors.push(args)
+        try {
+            for (const x of [a, bad, c]) r.addToRefreshQueue('postFrame', x, false, 0)
+            r.refreshQueue('postFrame')
+        } finally {
+            console.error = error
+        }
+        expect(r.refreshed).toEqual([a, bad, c])
+        expect(errors.length).toBe(1)
+        expect(String((errors[0] as unknown[]).find(e => e instanceof Error))).toContain('getValue failed')
+        // the queue goes on working in the next runs
+        r.addToRefreshQueue('postFrame', a, false, 0)
+        r.refreshQueue('postFrame')
+        expect(r.refreshed).toEqual([a, bad, c, a])
+    })
+})
